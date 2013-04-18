@@ -185,6 +185,9 @@ uint8_t calculateAverage(const uint8_t* data)
 
 uint8_t getLineType(const uint8_t* data)
 {
+	static uint8_t previous_val = NO_LINE;
+	static uint8_t count = 0;
+	
 	uint8_t num_detection = 0;
 	
 	uint8_t i;
@@ -198,14 +201,29 @@ uint8_t getLineType(const uint8_t* data)
 	
 	if (num_detection == 0)
 	{
+		previous_val = NO_LINE;
 		return NO_LINE;
 	}
 	else if (num_detection < sensor_parameters.horizontal_line_threshold)
 	{
+		if (previous_val == HORIZONTAL_LINE && count < 30)
+		{
+			++count;
+			return HORIZONTAL_LINE;
+		}
+		else if (previous_val == NO_LINE)
+		{
+			count = 0;
+			return NO_LINE;
+		}
+		
+		previous_val = VERTICAL_LINE;
+		count = 0;
 		return VERTICAL_LINE;
 	}
 	else
 	{
+		previous_val = HORIZONTAL_LINE;
 		return HORIZONTAL_LINE;
 	}
 }
@@ -246,13 +264,15 @@ void convertLineData(RawLineData* data)
 			{
 				// Första tejpen detekteras
 				current_line = LINE_1;
+				line_detections = 0;
 			}
-			else if (goal_mode && current_line == LINE_1 )
+			else if (goal_mode && current_line == LINE_FOLLOWING)
 			{
 				// Andra tejpen detekteras efter vertikal/mål-tejp
 				sensor_data.line_type = LINE_GOAL_STOP;
 				current_line = 0;
 				goal_mode = 0;
+				line_detections = 0;
 			}
 			else if (current_line == SPACE_1)
 			{
@@ -265,8 +285,9 @@ void convertLineData(RawLineData* data)
 				sensor_data.line_type = LINE_STOP;
 				current_line = 0;
 				line_detections = 0;
-				no_line_detections = 0;
 			}
+
+			no_line_detections = 0;
 
 			if (current_line == LINE_1 || current_line == LINE_2)
 			{
@@ -281,7 +302,7 @@ void convertLineData(RawLineData* data)
 			if (current_line == LINE_1)
 			{
 				goal_mode = 1;
-				line_detections = 0;
+				current_line = LINE_FOLLOWING;
 				sensor_data.line_type = LINE_GOAL;
 				sensor_data.line_deviation = calculateCenter(data->value);
 			}

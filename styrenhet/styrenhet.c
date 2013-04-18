@@ -9,6 +9,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "spi.h"
@@ -258,8 +259,8 @@ void commandToControlSignal(uint8_t cmd)
 
 int main()
 {
-	memset(&control_signals, 0, sizeof(control_signals));
-	memset(&control_parameters, 0, sizeof(control_parameters));
+	memset((void*)&control_signals, 0, sizeof(control_signals));
+	memset((void*)&control_parameters, 0, sizeof(control_parameters));
     spi_status = SPI_READY;
     buffer = NULL;
     buffer_size = 0;

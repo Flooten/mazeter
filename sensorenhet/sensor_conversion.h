@@ -30,6 +30,7 @@
 #define SPACE_1 0x02
 #define LINE_2 0x03
 #define SPACE_2 0x04
+#define LINE_FOLLOWING 0x05
 
 #define CONVERSION_ERROR 1;
 

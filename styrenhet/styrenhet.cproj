@@ -85,6 +85,9 @@
     <Compile Include="styrenhet.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="styrenhet.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

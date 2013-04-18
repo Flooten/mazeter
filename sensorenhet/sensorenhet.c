@@ -12,6 +12,11 @@
 #include "sensorenhet.h"
 #include "line_calibration.h"
 
+#ifndef F_CPU
+#define F_CPU 8000000UL
+#endif
+#include <util/delay.h>
+
 /* för test */
 volatile uint8_t tmp = 1;
 
@@ -176,80 +181,87 @@ ISR(ADC_vect)
 		
 		case LINE_SENSOR_0:
 		line_sensor.value[0] = ADCH;
-		current_sensor = LINE_SENSOR_3;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_3);
-		break;
-		
-		case LINE_SENSOR_1:
-		line_sensor.value[1] = ADCH;
-		current_sensor = LINE_SENSOR_4;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_4);
-		break;
-		
-		case LINE_SENSOR_2:
-		line_sensor.value[2] = ADCH;
 		current_sensor = LINE_SENSOR_5;
 		ADMUX = 0x27; // Ingång ADC7
 		readLine(LINE_SENSOR_5);
 		break;
 		
-		case LINE_SENSOR_3:
-		line_sensor.value[3] = ADCH;
+		case LINE_SENSOR_1:
+		line_sensor.value[1] = ADCH;
 		current_sensor = LINE_SENSOR_6;
 		ADMUX = 0x27; // Ingång ADC7
 		readLine(LINE_SENSOR_6);
 		break;
 		
-		case LINE_SENSOR_4:
-		line_sensor.value[4] = ADCH;
+		case LINE_SENSOR_2:
+		line_sensor.value[2] = ADCH;
 		current_sensor = LINE_SENSOR_7;
 		ADMUX = 0x27; // Ingång ADC7
 		readLine(LINE_SENSOR_7);
 		break;
 		
-		case LINE_SENSOR_5:
-		line_sensor.value[5] = ADCH;
+		case LINE_SENSOR_3:
+		line_sensor.value[3] = ADCH;
 		current_sensor = LINE_SENSOR_8;
 		ADMUX = 0x27; // Ingång ADC7
 		readLine(LINE_SENSOR_8);
-		break;		
+		break;
 		
-		case LINE_SENSOR_6:
-		line_sensor.value[6] = ADCH;
+		case LINE_SENSOR_4:
+		line_sensor.value[4] = ADCH;
 		current_sensor = LINE_SENSOR_9;
 		ADMUX = 0x27; // Ingång ADC7
 		readLine(LINE_SENSOR_9);
 		break;
 		
+		case LINE_SENSOR_5:
+		line_sensor.value[5] = ADCH;
+		current_sensor = LINE_SENSOR_1;
+		ADMUX = 0x27; // Ingång ADC7
+		readLine(LINE_SENSOR_1);
+		break;		
+		
+		case LINE_SENSOR_6:
+		line_sensor.value[6] = ADCH;
+		current_sensor = LINE_SENSOR_2;
+		ADMUX = 0x27; // Ingång ADC7
+		readLine(LINE_SENSOR_2);
+		break;
+		
 		case LINE_SENSOR_7:
 		line_sensor.value[7] = ADCH;
-		current_sensor = LINE_SENSOR_10;
+		current_sensor = LINE_SENSOR_3;
 		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_10);
+		readLine(LINE_SENSOR_3);
 		break;
 		
 		case LINE_SENSOR_8:
 		line_sensor.value[8] = ADCH;
-		line_sensor.is_converted = 0;
-		current_sensor = DISTANCE_1; 
-		ADMUX = 0x20; // Ingång ADC0
-		readLine(0xFF); // Avaktiverar muxarna
+		//line_sensor.is_converted = 0;
+		//current_sensor = DISTANCE_1;
+		//ADMUX = 0x20; // Ingång ADC0
+		//readLine(0xFF); // Avaktiverar muxarna
+		current_sensor = LINE_SENSOR_4;
+		ADMUX = 0x27;
+		readLine(LINE_SENSOR_4);
 		break;
 		
 		case LINE_SENSOR_9:
 		line_sensor.value[9] = ADCH;
-		current_sensor = LINE_SENSOR_1;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_1);
+		line_sensor.is_converted = 0;
+		current_sensor = DISTANCE_1;
+		ADMUX = 0x20; // Ingång ADC0
+		readLine(0xFF); // Avaktiverar muxarna
+		//current_sensor = LINE_SENSOR_1;
+		//ADMUX = 0x27; // Ingång ADC7
+		//readLine(LINE_SENSOR_1);
 		break;
 		
 		case LINE_SENSOR_10:
 		line_sensor.value[10] = ADCH;
-		current_sensor = LINE_SENSOR_2;
+		current_sensor = LINE_SENSOR_0;
 		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_2);
+		readLine(LINE_SENSOR_0);
 		break;		
 		
 		// --------------- Gyro ---------------
@@ -270,9 +282,9 @@ ISR(ADC_vect)
 		gyro_temp.is_converted = 0;
 		gyro_temp.sensor_type = GYRO_TEMP;
 		
-		current_sensor = LINE_SENSOR_0;
+		current_sensor = LINE_SENSOR_10;
 		ADMUX = 0x27;
-		readLine(LINE_SENSOR_0);
+		readLine(LINE_SENSOR_10);
 		break;
 		
 	} 
@@ -370,7 +382,7 @@ int main()
 	
 	sensor_parameters.tape_threshold = 100;
 	sensor_parameters.horizontal_line_threshold = 4;
-	sensor_parameters.no_line_detection_threshold = 15;
+	sensor_parameters.no_line_detection_threshold = 100;
 	sensor_parameters.line_diff_threshold = 5;
 
 	ioInit();
@@ -384,6 +396,7 @@ int main()
 	
 	while (1)
 	{
+
 		if (calibrate_line_sensor)
 		{
 			uint8_t tape_value = calibrateLineSensorTape((const RawLineData*)&line_sensor);
@@ -396,7 +409,5 @@ int main()
 		
 		//convertAllData();
 		convertLineData((RawLineData*)&line_sensor);
-
-		PORTB = gyro_sample1.value;
 	}
 }
