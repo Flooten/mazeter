@@ -206,7 +206,7 @@ uint8_t getLineType(const uint8_t* data)
 	}
 	else if (num_detection < sensor_parameters.horizontal_line_threshold)
 	{
-		if (previous_val == HORIZONTAL_LINE && count < 30)
+		if (previous_val == HORIZONTAL_LINE && count < sensor_parameters.horizontal_to_vertical_threshold)
 		{
 			++count;
 			return HORIZONTAL_LINE;
