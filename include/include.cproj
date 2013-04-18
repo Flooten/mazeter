@@ -64,6 +64,9 @@
     <Compile Include="controlsignals.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="control_parameters.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="sensor_data.h">
       <SubType>compile</SubType>
     </Compile>

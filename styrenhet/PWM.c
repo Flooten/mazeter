@@ -39,7 +39,7 @@ void pwmInit()
 	OCR2B = MIN_PWM_CLAW + 5;
 }
 
-void pwmWheels(ControlSignals ctrlsig)
+void pwmWheels(const ControlSignals ctrlsig)
 {
 	OCR1A = MIN_PWM_WHEELS + ctrlsig.left_value * INCREASE_PWM_WHEELS;
 	OCR1B = MIN_PWM_WHEELS + ctrlsig.right_value * INCREASE_PWM_WHEELS;
@@ -47,7 +47,19 @@ void pwmWheels(ControlSignals ctrlsig)
 	PORTA = (ctrlsig.right_direction << PORTA0) | (ctrlsig.left_direction << PORTA1);
 }
 
-void pwmClaw(ControlSignals ctrlsig)
+void pwmClaw(const ControlSignals ctrlsig)
 {
 	OCR2B = MIN_PWM_CLAW + ctrlsig.claw_value;
 }
+
+//void pwmWheels(uint8_t* ctrlsig)
+//{
+	//OCR1A = MIN_PWM_WHEELS + ctrlsig[LEFT_VALUE] * INCREASE_PWM_WHEELS;
+	//OCR1B = MIN_PWM_WHEELS + ctrlsig[RIGHT_VALUE] * INCREASE_PWM_WHEELS;
+	//PORTA = (ctrlsig[RIGHT_DIRECTION] << PORTA0) | (ctrlsig[LEFT_DIRECTION] << PORTA1);
+//}
+//
+//void pwmClaw(uint8_t* ctrlsig)
+//{
+	//OCR2B = MIN_PWM_CLAW + ctrlsig[CLAW_VALUE];
+//}

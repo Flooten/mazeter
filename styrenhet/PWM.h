@@ -21,7 +21,9 @@
 #define MIN_PWM_CLAW 7
 
 void pwmInit();
-void pwmWheels(ControlSignals ctrlsig);
-void pwmClaw(ControlSignals ctrlsig);
-
+void pwmWheels(const ControlSignals ctrlsig);
+void pwmClaw(const ControlSignals ctrlsig);
+//void pwmWheels(uint8_t* ctrlsig);
+//void pwmClaw(uint8_t* ctrlsig);
+//
 #endif /* PWM_H_ */

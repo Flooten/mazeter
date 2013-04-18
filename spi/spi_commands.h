@@ -59,6 +59,7 @@
 #define LINE_STOP 0x56
 #define LINE_NONE 0x57
 
+#define CONTROL_PARAMETERS_ALL 0x60
 #define PARA_KP_RIGHT 0x61
 #define PARA_KD_RIGHT 0x62
 #define PARA_KP_LEFT 0x63
