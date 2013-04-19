@@ -23,6 +23,27 @@ uint8_t first_line_val = 0;
 uint8_t second_line_val = 0;
 uint8_t goal_mode = 0;
 
+/* filter parameters multiplied with 1000 */
+void initGYRO()
+{
+	filter_coeff[0]=50;
+	filter_coeff[1]=32;
+	filter_coeff[2]=-580;
+	filter_coeff[3]=583;
+	filter_coeff[4]=4915;
+	filter_coeff[5]=4915;
+	filter_coeff[6]=583;
+	filter_coeff[7]=-580;
+	filter_coeff[8]=32;
+	filter_coeff[9]=50;
+	
+	uint8_t i;
+	for (i = 0; i < NR_OF_GYRO_SAMPLES; i++)
+	{
+		gyro_samples[i]=0;
+	}
+}
+
 void convertAllData()
 {
 
@@ -109,35 +130,63 @@ void convertDistanceShort(RawData data)
 
 void convertRawDataGyro(RawDataGyro data)
 {	
+		//* --- FIR filter, uint16_t angle ---------- */
 	if (! data.is_converted)
 	{
-		uint16_t time = ((uint16_t)data.time + 4) / 8; /* tid i mikrosekunder */
-		uint16_t ref_level = 126;
+		uint8_t i;
+		long int time_in_micros = ((long)data.time + 4) / 8; /* tid i mikrosekunder */
 	
-		if (data.value >=ref_level)
+		for (i = 0; i < NR_OF_GYRO_SAMPLES-1; i++)
+		{
+			gyro_samples[i] = gyro_samples[i+1];
+		}
+	
+		if (data.value >= GYRO_REF_LEVEL)
 		{
 			/* positiv ändring */
-			sensor_data.angle += (time * ((uint16_t)data.value - ref_level) * 3 + 517) / 1034 ; /* ger antal hundradelsgrader matematiskt avrundat */
-			
-			/* korrigera för överslag */
-			if (sensor_data.angle >= 36000)
-			{
-				sensor_data.angle -= 36000;
-			}
+			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data.value - GYRO_REF_LEVEL) * 3 + 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 		else
 		{
 			/* negativ ändring */
-			sensor_data.angle -= (time * (ref_level - (uint16_t)data.value) * 3 + 517) / 1034 ; /* ger antal hundradelsgrader matematiskt avrundat */			
+			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data.value - GYRO_REF_LEVEL) * 3 - 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+		}
+	
+		for (i=0; i < NR_OF_GYRO_SAMPLES ; i++)
+		{
+			long int tmp;
+			tmp = 3 * (long int)filter_coeff[i] * (long int)gyro_samples[NR_OF_GYRO_SAMPLES - 1 - i];
 			
-			/* korrigera för överslag */
+			if ( tmp >= 0)
+			{
+				tmp += 25000;
+			}
+			else
+			{
+				tmp -= 25000;
+			}
+							
+			gyro_filtered += tmp * 1 / 50000; /* original tmp / 10000, infogat normeringsfaktor 3/5 */
+		}
+		
+		sensor_data.angle += gyro_filtered;
+		
+		if (gyro_filtered >= 0)
+		{
 			if (sensor_data.angle >= 36000)
 			{
-				sensor_data.angle -= 29537;
+				sensor_data.angle -= 36000;
 			}
-		}	
-		
+		} 
+		else
+		{
+			if (sensor_data.angle >= 36000)
+			{
+				sensor_data.angle -= 29536;
+			}
+		}		
 		data.is_converted = 1;
+		gyro_filtered = 0;		
 	}
 	
 }

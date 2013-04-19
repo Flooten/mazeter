@@ -32,6 +32,9 @@
 #define SPACE_2 0x04
 #define LINE_FOLLOWING 0x05
 
+#define NR_OF_GYRO_SAMPLES 10
+#define GYRO_REF_LEVEL 127
+
 #define CONVERSION_ERROR 1;
 
 /* ------- Variabler -------- */
@@ -43,12 +46,16 @@ extern uint8_t first_line_val;
 extern uint8_t second_line_val;
 extern uint8_t goal_mode;
 
+volatile long int gyro_filtered;
+volatile long int gyro_total_time;
+volatile long int gyro_samples[10];
+volatile int filter_coeff[10];
 
 /* conversion_status */
 
 /* ------ Variabler slut ------- */
 
-
+void initGYRO();
 void convertAllData();
 void convertRawData(RawData data);
 

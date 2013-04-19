@@ -388,6 +388,7 @@ int main()
 
 	ioInit();
 	initADC();
+	initGYRO();
 	
 	//spiSlaveSetup();
 	sei();
