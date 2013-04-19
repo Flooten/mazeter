@@ -14,6 +14,7 @@
 #include <string.h>
 
 volatile Queue rx_queue;
+volatile uint8_t bt_connected = 0;
 volatile uint8_t bt_status = BT_READY;
 volatile uint8_t current_command = 0;
 volatile uint8_t data_count = 0;
@@ -81,6 +82,11 @@ void btSendByte(const uint8_t data)
 {
 	// Se till så att överföringsbuffern är tömd
 	while (!(UCSR0A & (1 << UDRE0)));
+	
+	if (!bt_connected)
+	{
+		return;
+	}		
 	
 	UDR0 = data;
 }

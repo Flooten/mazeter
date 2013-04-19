@@ -24,6 +24,7 @@
 
 // Meddelandekön och dess hjälpvariabler
 extern volatile Queue rx_queue;
+extern volatile uint8_t bt_connected;
 extern volatile uint8_t bt_status;
 extern volatile uint8_t current_command;
 extern volatile uint8_t data_count;
