@@ -47,7 +47,8 @@ void initGYRO()
 void convertAllData()
 {
 
-	convertRawDataGyro(gyro_sample1);
+	//convertRawDataGyro(gyro_sample1);
+	sensor_data.angle = 123;
 
 	/* punktberäkning av linjesensor, kanske bara göra det i linjeföljande läge?  */
 	
@@ -68,16 +69,28 @@ void convertRawData(RawData data)
 		switch (data.sensor_type)
 		{
 			case DISTANCE_1:
+				sensor_data.distance1 = 101;
+				break;
 			case DISTANCE_2:
+				sensor_data.distance2 = 102;
+				break;
 			case DISTANCE_3:
+				sensor_data.distance3 = 103;
+				break;
 			case DISTANCE_4:
+				sensor_data.distance4 = 104;
+				break;
 			case DISTANCE_7:
-				convertDistanceLong(data);
+				//convertDistanceLong(data);
+				sensor_data.distance7 = 107;
 				break;
 				
 			case DISTANCE_5:
+				sensor_data.distance5 = 105;
+				break;
 			case DISTANCE_6:
-				convertDistanceShort(data);
+				//convertDistanceShort(data);
+				sensor_data.distance6 = 106;
 				break;
 		
 			default:

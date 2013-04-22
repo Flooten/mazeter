@@ -19,6 +19,7 @@
 
 /* för test */
 volatile uint8_t tmp = 1;
+volatile uint8_t my_const = 121;
 
 void ioInit()
 {
@@ -363,6 +364,13 @@ void parseCommand(uint8_t cmd)
 			SPDR = CALIBRATE_LINE_SENSOR;
 			calibrate_line_sensor = 1;
 			break;
+			
+		case 0x95:
+			SPDR = 0x95;
+			buffer = &my_const;
+			buffer_size = 1;
+			current_byte = 0;
+			break;
 		
 		default:
 			SPDR = ERROR_UNKNOWN_SPI_COMMAND;
@@ -390,7 +398,7 @@ int main()
 	initADC();
 	initGYRO();
 	
-	//spiSlaveInit();
+	spiSlaveInit();
 	sei();
 	
 	startADC();
@@ -408,7 +416,7 @@ int main()
 			calibrate_line_sensor = 0;
 		}
 		
-		//convertAllData();
-		convertLineData((RawLineData*)&line_sensor);
+		convertAllData();
+	//	convertLineData((RawLineData*)&line_sensor);
 	}
 }

@@ -11,8 +11,14 @@
 #include "sensor_names.h"
 #include <avr/pgmspace.h> 
 
-const uint8_t distance1_table[256] PROGMEM =
-{0};
+const uint8_t distance1_table[] PROGMEM =
+{
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 110
+};
 const uint8_t distance2_table[256] PROGMEM =
 {0};
 const uint8_t distance3_table[256] PROGMEM =
@@ -24,8 +30,8 @@ const uint8_t distance5_table[256] PROGMEM =
 const uint8_t distance6_table[256] PROGMEM =
 {0};
 const uint8_t distance7_table[256] PROGMEM =
-{0};	
-	
+{0};
+
 uint8_t lookUpDistance(uint8_t raw_value, uint8_t sensor)
 {
 	switch(sensor)

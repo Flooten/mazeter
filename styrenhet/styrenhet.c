@@ -12,11 +12,15 @@
 #include <string.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "styrenhet.h"
 #include "spi.h"
 #include "PWM.h"
 #include "controlsignals.h"
 #include "sensor_data.h"
 #include "control_parameters.h"
+#include "pd_control.h"
+
+#define SPI_RECEIVING_SENSOR_DATA 0x03
 
 // SPI-variabler
 volatile uint8_t* buffer;
@@ -27,13 +31,14 @@ volatile uint8_t spi_status;
 volatile uint8_t control_mode_flag;
 volatile uint8_t current_command;
 volatile uint8_t throttle;
+volatile uint8_t new_sensor_data = 0;
 
 volatile ControlSignals control_signals;
-volatile SensorData sensor_data;
+volatile SensorData current_sensor_data;
+volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
 void parseCommand(uint8_t cmd);
-
 
 ISR(SPI_STC_vect)
 {
@@ -68,6 +73,11 @@ ISR(SPI_STC_vect)
             }
             
             SPDR = buffer[current_byte++];
+			
+			if (current_byte == buffer_size && spi_status == SPI_RECEIVING_SENSOR_DATA)
+			{
+				new_sensor_data = 1;
+			}				
         }
         else
         {
@@ -82,10 +92,12 @@ void parseCommand(uint8_t cmd)
     {
         case SENSOR_DATA_ALL:
             SPDR = SENSOR_DATA_ALL;
-            buffer = &sensor_data.distance1;
-            buffer_size = sizeof(sensor_data);
+            buffer = &current_sensor_data.distance1;
+            buffer_size = sizeof(current_sensor_data);
             current_byte = 0;
-            spi_status = SPI_RECEIVING_DATA;
+            spi_status = SPI_RECEIVING_SENSOR_DATA;
+			new_sensor_data = 0;
+			previous_sensor_data = current_sensor_data;
             break;
 
 		case CONTROL_SIGNALS:
@@ -261,6 +273,9 @@ int main()
 {
 	memset((void*)&control_signals, 0, sizeof(control_signals));
 	memset((void*)&control_parameters, 0, sizeof(control_parameters));
+	memset((void*)&current_sensor_data, 0, sizeof(current_sensor_data));
+	memset((void*)&previous_sensor_data, 0, sizeof(previous_sensor_data));
+	
     spi_status = SPI_READY;
     buffer = NULL;
     buffer_size = 0;
@@ -291,6 +306,15 @@ int main()
 		{
 			commandToControlSignal(current_command);
 		}
+		else if (control_mode_flag == FLAG_AUTO)
+		{
+			if (new_sensor_data == 1)
+			{
+				sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+				new_sensor_data = 0;
+			}
+		}
+		
 		pwmWheels(control_signals);
 		pwmClaw(control_signals);
     }
