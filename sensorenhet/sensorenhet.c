@@ -113,156 +113,156 @@ ISR(ADC_vect)
 		// --------------- Avståndssensorer ---------------
 		
 		case DISTANCE_1:
-		distance1.value = ADCH;
-		distance1.is_converted = 0;
-		distance1.sensor_type = DISTANCE_1;
+			distance1.value = ADCH;
+			distance1.is_converted = 0;
+			distance1.sensor_type = DISTANCE_1;
 		
-		current_sensor = DISTANCE_2;
-		ADMUX = 0x21; // Ingång ADC1 
-		break;
+			current_sensor = DISTANCE_2;
+			ADMUX = 0x21; // Ingång ADC1 
+			break;
 		
 		case DISTANCE_2:
-		distance2.value = ADCH;
-		distance2.is_converted = 0;
-		distance2.sensor_type = DISTANCE_2;
+			distance2.value = ADCH;
+			distance2.is_converted = 0;
+			distance2.sensor_type = DISTANCE_2;
 		
-		current_sensor = DISTANCE_3;
-		ADMUX = 0x22; // Ingång ADC2
-		break;
+			current_sensor = DISTANCE_3;
+			ADMUX = 0x22; // Ingång ADC2
+			break;
 		
 		case DISTANCE_3:
-		distance3.value = ADCH;
-		distance3.is_converted = 0;
-		distance3.sensor_type = DISTANCE_3;
+			distance3.value = ADCH;
+			distance3.is_converted = 0;
+			distance3.sensor_type = DISTANCE_3;
 		
-		current_sensor = DISTANCE_4;
-		ADMUX = 0x23; // Ingång ADC3
-		break;
+			current_sensor = DISTANCE_4;
+			ADMUX = 0x23; // Ingång ADC3
+			break;
 		
 		case DISTANCE_4:
-		distance4.value = ADCH;
-		distance4.is_converted = 0;
-		distance4.sensor_type = DISTANCE_4;
+			distance4.value = ADCH;
+			distance4.is_converted = 0;
+			distance4.sensor_type = DISTANCE_4;
 
-		current_sensor = DISTANCE_5;
-		ADMUX = 0x24; // Ingång ADC5
-		readLine(0xFF); // Avaktiverar muxarna
-		break;
+			current_sensor = DISTANCE_5;
+			ADMUX = 0x24; // Ingång ADC5
+			readLine(0xFF); // Avaktiverar muxarna
+			break;
 		
 		case DISTANCE_5:
-		distance5.value = ADCH;
-		distance5.is_converted = 0;
-		distance5.sensor_type = DISTANCE_5;
+			distance5.value = ADCH;
+			distance5.is_converted = 0;
+			distance5.sensor_type = DISTANCE_5;
 				
-		current_sensor = DISTANCE_6;
-		ADMUX = 0x25; // Ingång ADC5
-		break;
+			current_sensor = DISTANCE_6;
+			ADMUX = 0x25; // Ingång ADC5
+			break;
 				
 		case DISTANCE_6:
-		distance6.value = ADCH;
-		distance6.is_converted = 0;
-		distance6.sensor_type = DISTANCE_6;
+			distance6.value = ADCH;
+			distance6.is_converted = 0;
+			distance6.sensor_type = DISTANCE_6;
 				
-		current_sensor = DISTANCE_7;
-		ADMUX = 0x26; // Ingång ADC6
-		break;
+			current_sensor = DISTANCE_7;
+			ADMUX = 0x26; // Ingång ADC6
+			break;
 				
 		case DISTANCE_7:
-		distance7.value = ADCH;
-		distance7.is_converted = 0;
-		distance7.sensor_type = DISTANCE_7;
+			distance7.value = ADCH;
+			distance7.is_converted = 0;
+			distance7.sensor_type = DISTANCE_7;
 				
-		current_sensor = GYRO_SAMPLE_1;
-		ADMUX = 0x27; // Ingång ADC7
-		readGyroData();
-		break;
+			current_sensor = GYRO_SAMPLE_1;
+			ADMUX = 0x27; // Ingång ADC7
+			readGyroData();
+			break;
 		
 		// --------------- Linjesensor ---------------
 		
 		case LINE_SENSOR_0:
-		line_sensor.value[0] = ADCH;
-		current_sensor = LINE_SENSOR_5;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_5);
-		break;
+			line_sensor.value[0] = ADCH;
+			current_sensor = LINE_SENSOR_5;
+			ADMUX = 0x27; // Ingång ADC7
+			readLine(LINE_SENSOR_5);
+			break;
 		
 		case LINE_SENSOR_1:
-		line_sensor.value[1] = ADCH;
-		current_sensor = LINE_SENSOR_6;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_6);
-		break;
+			line_sensor.value[1] = ADCH;
+			current_sensor = LINE_SENSOR_6;
+			ADMUX = 0x27; // Ingång ADC7
+			readLine(LINE_SENSOR_6);
+			break;
 		
 		case LINE_SENSOR_2:
-		line_sensor.value[2] = ADCH;
-		current_sensor = LINE_SENSOR_7;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_7);
-		break;
+			line_sensor.value[2] = ADCH;
+			current_sensor = LINE_SENSOR_7;
+			ADMUX = 0x27; // Ingång ADC7
+			readLine(LINE_SENSOR_7);
+			break;
 		
 		case LINE_SENSOR_3:
-		line_sensor.value[3] = ADCH;
-		current_sensor = LINE_SENSOR_8;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_8);
-		break;
+			line_sensor.value[3] = ADCH;
+			current_sensor = LINE_SENSOR_8;
+			ADMUX = 0x27; // Ingång ADC7
+			readLine(LINE_SENSOR_8);
+			break;
 		
 		case LINE_SENSOR_4:
-		line_sensor.value[4] = ADCH;
-		current_sensor = LINE_SENSOR_9;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_9);
-		break;
+			line_sensor.value[4] = ADCH;
+			current_sensor = LINE_SENSOR_9;
+			ADMUX = 0x27; // Ingång ADC7
+			readLine(LINE_SENSOR_9);
+			break;
 		
 		case LINE_SENSOR_5:
-		line_sensor.value[5] = ADCH;
-		current_sensor = LINE_SENSOR_1;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_1);
-		break;		
+			line_sensor.value[5] = ADCH;
+			current_sensor = LINE_SENSOR_1;
+			ADMUX = 0x27; // Ingång ADC7
+			readLine(LINE_SENSOR_1);
+			break;		
 		
 		case LINE_SENSOR_6:
-		line_sensor.value[6] = ADCH;
-		current_sensor = LINE_SENSOR_2;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_2);
-		break;
+			line_sensor.value[6] = ADCH;
+			current_sensor = LINE_SENSOR_2;
+			ADMUX = 0x27; // Ingång ADC7
+			readLine(LINE_SENSOR_2);
+			break;
 		
 		case LINE_SENSOR_7:
-		line_sensor.value[7] = ADCH;
-		current_sensor = LINE_SENSOR_3;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_3);
-		break;
+			line_sensor.value[7] = ADCH;
+			current_sensor = LINE_SENSOR_3;
+			ADMUX = 0x27; // Ingång ADC7
+			readLine(LINE_SENSOR_3);
+			break;
 		
 		case LINE_SENSOR_8:
-		line_sensor.value[8] = ADCH;
-		//line_sensor.is_converted = 0;
-		//current_sensor = DISTANCE_1;
-		//ADMUX = 0x20; // Ingång ADC0
-		//readLine(0xFF); // Avaktiverar muxarna
-		current_sensor = LINE_SENSOR_4;
-		ADMUX = 0x27;
-		readLine(LINE_SENSOR_4);
-		break;
+			line_sensor.value[8] = ADCH;
+			//line_sensor.is_converted = 0;
+			//current_sensor = DISTANCE_1;
+			//ADMUX = 0x20; // Ingång ADC0
+			//readLine(0xFF); // Avaktiverar muxarna
+			current_sensor = LINE_SENSOR_4;
+			ADMUX = 0x27;
+			readLine(LINE_SENSOR_4);
+			break;
 		
 		case LINE_SENSOR_9:
-		line_sensor.value[9] = ADCH;
-		line_sensor.is_converted = 0;
-		current_sensor = DISTANCE_1;
-		ADMUX = 0x20; // Ingång ADC0
-		readLine(0xFF); // Avaktiverar muxarna
-		//current_sensor = LINE_SENSOR_1;
-		//ADMUX = 0x27; // Ingång ADC7
-		//readLine(LINE_SENSOR_1);
-		break;
+			line_sensor.value[9] = ADCH;
+			line_sensor.is_converted = 0;
+			current_sensor = DISTANCE_1;
+			ADMUX = 0x20; // Ingång ADC0
+			readLine(0xFF); // Avaktiverar muxarna
+			//current_sensor = LINE_SENSOR_1;
+			//ADMUX = 0x27; // Ingång ADC7
+			//readLine(LINE_SENSOR_1);
+			break;
 		
 		case LINE_SENSOR_10:
-		line_sensor.value[10] = ADCH;
-		current_sensor = LINE_SENSOR_0;
-		ADMUX = 0x27; // Ingång ADC7
-		readLine(LINE_SENSOR_0);
-		break;		
+			line_sensor.value[10] = ADCH;
+			current_sensor = LINE_SENSOR_0;
+			ADMUX = 0x27; // Ingång ADC7
+			readLine(LINE_SENSOR_0);
+			break;		
 		
 		// --------------- Gyro ---------------
 		
