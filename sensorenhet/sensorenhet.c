@@ -390,10 +390,9 @@ int main()
 	initADC();
 	initGYRO();
 	
-	//spiSlaveSetup();
+	//spiSlaveInit();
 	sei();
 	
-	PORTB = 0xFF;
 	startADC();
 	
 	while (1)
