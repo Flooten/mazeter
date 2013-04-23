@@ -11,14 +11,53 @@
 #include "sensor_names.h"
 #include <avr/pgmspace.h> 
 
-const uint8_t distance1_table[] PROGMEM =
+//test
+#include <avr/pgmspace.h>
+
+const uint8_t distance1_table[3][2] =
 {
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 110
+{136,15},
+{134,16},
+{132,17}
 };
+
+uint8_t lookUpDistance(uint8_t raw_value)
+{
+	int i= 0;
+	
+	while(raw_value < distance1_table[i][0])
+	{
+		i++;
+	}
+	
+	if (i > 2)
+	return 0xFF;
+	else if (raw_value > distance1_table[i][0])
+	return distance1_table[i - 1][1];
+	else
+	return distance1_table[i][1];
+};
+
+int main(void)
+{
+	volatile uint8_t test = 0;
+	volatile uint8_t test2 = 130;
+	volatile uint8_t test3 = 134;
+	
+	while(1)
+	{
+		test = lookUpDistance(test2);
+		//TODO:: Please write your application code
+	}
+}
+
+// end test
+
+const uint8_t distance1_table[][] PROGMEM =
+{
+	{136.15}, {.}
+};
+
 const uint8_t distance2_table[256] PROGMEM =
 {0};
 const uint8_t distance3_table[256] PROGMEM =
