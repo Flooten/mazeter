@@ -38,6 +38,8 @@ volatile SensorData current_sensor_data;
 volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
+volatile uint8_t mah_2nd_const = 129;
+
 void parseCommand(uint8_t cmd);
 
 ISR(SPI_STC_vect)
@@ -74,10 +76,13 @@ ISR(SPI_STC_vect)
             
             SPDR = buffer[current_byte++];
 			
-			if (current_byte == buffer_size && spi_status == SPI_RECEIVING_SENSOR_DATA)
+			if (current_byte == buffer_size)
 			{
-				new_sensor_data = 1;
-			}				
+				spi_status = SPI_READY;
+				buffer = NULL;
+				buffer_size = 0;
+				current_byte = 0;
+			}			
         }
         else
         {
@@ -95,7 +100,7 @@ void parseCommand(uint8_t cmd)
             buffer = &current_sensor_data.distance1;
             buffer_size = sizeof(current_sensor_data);
             current_byte = 0;
-            spi_status = SPI_RECEIVING_SENSOR_DATA;
+            spi_status = SPI_RECEIVING_DATA;
 			new_sensor_data = 0;
 			previous_sensor_data = current_sensor_data;
             break;
@@ -192,6 +197,13 @@ void parseCommand(uint8_t cmd)
 			buffer_size = sizeof(control_parameters);
 			current_byte = 0;
 			spi_status = SPI_RECEIVING_DATA;
+			break;
+			
+		case 0x96:
+			SPDR = 0x96;
+			buffer = &mah_2nd_const;
+			buffer_size = 1;
+			current_byte = 0;
 			break;
 
         default:

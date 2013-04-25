@@ -46,9 +46,7 @@ void initGYRO()
 
 void convertAllData()
 {
-
-	//convertRawDataGyro(gyro_sample1);
-	sensor_data.angle = 123;
+	convertRawDataGyro(gyro_sample1);
 
 	/* punktberäkning av linjesensor, kanske bara göra det i linjeföljande läge?  */
 	

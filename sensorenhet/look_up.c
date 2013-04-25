@@ -16,11 +16,7 @@
 
 /*
 const uint8_t distance1_table[3][2] =
-{
-{136,15},
-{134,16},
-{132,17}
-};
+{0};
 
 uint8_t lookUpDistance(uint8_t raw_value)
 {

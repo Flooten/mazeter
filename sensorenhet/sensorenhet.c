@@ -11,6 +11,7 @@
 
 #include "sensorenhet.h"
 #include "line_calibration.h"
+#include <util/atomic.h>
 
 #ifndef F_CPU
 #define F_CPU 8000000UL
@@ -19,6 +20,7 @@
 
 /* för test */
 volatile uint8_t tmp = 1;
+
 volatile uint8_t my_const = 121;
 
 void ioInit()
@@ -100,6 +102,16 @@ void readGyroData()
 void readGyroTemp()
 {
 	PORTD = 0xFC;
+}
+
+void disableADC()
+{
+	ADCSRA &= 0x7F;
+}
+
+void enableADC()
+{
+	ADCSRA |= (1 << ADEN) | (1 << ADSC);
 }
 
 ISR(ADC_vect)
@@ -301,10 +313,11 @@ ISR(SPI_STC_vect)
 		}
 		
 		buffer[current_byte++] = received;
+		SPDR = 0;
 		
 		if (current_byte == buffer_size)
 		{
-			resumeADC();
+			enableADC();
 			spi_status = SPI_READY;
 			buffer = NULL;
 			buffer_size = 0;
@@ -325,7 +338,7 @@ ISR(SPI_STC_vect)
 			
 			if (current_byte == buffer_size)
 			{
-				resumeADC();
+				enableADC();
 				spi_status = SPI_READY;
 				buffer = NULL;
 				buffer_size = 0;
@@ -346,6 +359,7 @@ void parseCommand(uint8_t cmd)
 	switch (cmd)
 	{
 		case SENSOR_DATA_ALL:
+			disableADC();
 			SPDR = SENSOR_DATA_ALL;
 			sensor_data_copy = sensor_data;
 			buffer = &sensor_data_copy.distance1;
@@ -405,7 +419,6 @@ int main()
 	
 	while (1)
 	{
-
 		if (calibrate_line_sensor)
 		{
 			uint8_t tape_value = calibrateLineSensorTape((const RawLineData*)&line_sensor);
@@ -416,7 +429,11 @@ int main()
 			calibrate_line_sensor = 0;
 		}
 		
-		convertAllData();
+		ATOMIC_BLOCK(ATOMIC_FORCEON)
+		{
+			convertAllData();
+		}			
+		
 	//	convertLineData((RawLineData*)&line_sensor);
 	}
 }
