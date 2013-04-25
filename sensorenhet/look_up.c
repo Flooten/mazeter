@@ -108,6 +108,12 @@ uint8_t lookUp(uint8_t raw_value, uint8_t size, const uint8_t table[][2])
 {
 	volatile uint8_t i= 0;
 	
+	if (raw_value > pgm_read_byte_near(&table[0][1]))
+	{
+		return 0x02; // För nära
+	}
+	
+	
 	while(raw_value < pgm_read_byte_near(&table[i][1]))
 	{
 		i++;
@@ -115,7 +121,7 @@ uint8_t lookUp(uint8_t raw_value, uint8_t size, const uint8_t table[][2])
 	
 	if (i > size)
 	{
-		return 0xFF;
+		return 0xFF; // För stort 
 	}
 	else if (pgm_read_byte_near(&table[i][1]) == raw_value)
 	{

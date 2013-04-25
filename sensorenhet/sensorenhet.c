@@ -417,6 +417,7 @@ int main()
 	
 	while (1)
 	{
+		// Kalibrering av linjesensor
 		if (calibrate_line_sensor)
 		{
 			uint8_t tape_value = calibrateLineSensorTape((const RawLineData*)&line_sensor);

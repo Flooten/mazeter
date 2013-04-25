@@ -46,15 +46,14 @@ void initGYRO()
 
 void convertAllData()
 {
-	//convertRawDataGyro(gyro_sample1);
-	sensor_data.angle=11;
+	convertRawDataGyro(gyro_sample1);
+	//sensor_data.angle=11;
 	/* punktberäkning av linjesensor, kanske bara göra det i linjeföljande läge?  */
 	
 	convertRawData(distance1);
 	convertRawData(distance2);
 	convertRawData(distance3);
 	convertRawData(distance4);
-	
 	convertRawData(distance5);
 	convertRawData(distance6);
 	convertRawData(distance7);
@@ -62,81 +61,39 @@ void convertAllData()
 
 void convertRawData(RawData data)
 {
-	if (1 )//! data.is_converted)
+	if (!data.is_converted)
 	{
 		switch (data.sensor_type)
 		{
 			case DISTANCE_1:
-				sensor_data.distance1 = 01;
+				sensor_data.distance1 = lookUpDistance(data.value, data.sensor_type);
 				break;
 			case DISTANCE_2:
-				sensor_data.distance2 = 02;
+				sensor_data.distance2 = lookUpDistance(data.value, data.sensor_type);
 				break;
 			case DISTANCE_3:
-				sensor_data.distance3 = 03;
+				sensor_data.distance3 = lookUpDistance(data.value, data.sensor_type);
 				break;
 			case DISTANCE_4:
-				sensor_data.distance4 = 04;
+				sensor_data.distance4 = lookUpDistance(data.value, data.sensor_type);
 				break;
 			case DISTANCE_7:
-				//convertDistanceLong(data);
-				sensor_data.distance7 = 07;
+				sensor_data.distance7 = lookUpDistance(data.value, data.sensor_type);
 				break;
 				
 			case DISTANCE_5:
-				sensor_data.distance5 = 05;
+				sensor_data.distance5 = lookUpDistance(data.value, data.sensor_type);
 				break;
 			case DISTANCE_6:
-				//convertDistanceShort(data);
-				sensor_data.distance6 = 06;
+				sensor_data.distance6 = lookUpDistance(data.value, data.sensor_type);
 				break;
 		
 			default:
 				conversion_status = CONVERSION_ERROR;
 				break;
-		}	
-	} 
-	else
-	{
-		// Datan är redan converterad
-	}
-	
-}
-
-void convertDistanceLong(RawData data)
-{	
-	if (data.value < 138)
-	{
-		if (data.value > 79) /* V [1.55,2.7] */
-		{
-		} 
-		else if (data.value > 64) /* V [1.25,1.55] */
-		{
 		}
-		else if (data.value > 46) /* V [0.9,1.25] */
-		{
-		}
-		else if (data.value > 36) /* V [0.7,0.9] */
-		{
-		}
-		else if (data.value > 20) /* V [0.4,0.7] */
-		{
-		}
-		else
-		{
-			// underflow
-		}
-	} 
-	else
-	{
-		// overflow
-	}
-		
-}
-
-void convertDistanceShort(RawData data)
-{
-	
+		data.is_converted = 1;	
+	}	
 }
 
 void convertRawDataGyro(RawDataGyro data)
@@ -234,7 +191,7 @@ uint8_t calculateAverage(const uint8_t* data)
 	{
 		if(data[i] >= sensor_parameters.tape_threshold)
 		{
-		sum_line_ = sum_line_ + data[i];
+			sum_line_ = sum_line_ + data[i];
 		}		
 	}
 	
