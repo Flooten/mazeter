@@ -1,0 +1,119 @@
+﻿/*
+ * FILNAMN:       turn_stack.c
+ * PROJEKT:       Mazeter
+ * PROGRAMMERARE: Martin Andersson
+ *				  Joel Davidsson
+ * DATUM:         2013-04-25
+ *
+ * BESKRIVNING: 
+ *
+ */
+
+
+#include "turn_stack.h"
+#include <stdio.h>
+#include <string.h>
+
+
+/*
+ *	TurnNode
+ */
+
+/*
+ *	Skapar en ny nod och allokerar utrymme size för ett meddelande.
+ */
+TurnNode* newTurnNode(uint8_t turn)
+{
+	TurnNode* new_node = (TurnNode*)malloc(sizeof(TurnNode));
+	
+	new_node->turn = turn;
+	new_node->next = NULL;
+
+	return new_node;
+}
+
+/*
+ *	Återlämnar minne.
+ */
+void freeTurnNode(TurnNode* node)
+{
+	if (node == NULL)
+		return;
+	freeTurnNode(node->next);
+	free(node);
+}
+
+/*
+ *	Stack
+ */
+
+/*
+ *	Skapar och initialiserar en ny kö.
+ */
+TurnStack createTurnStack()
+{
+	TurnStack stack;
+
+	stack.first = NULL;
+
+	return stack;
+}
+
+/*
+ *	Återlämnar minne.
+ */
+void freeTurnStack(volatile TurnStack* stack)
+{
+	freeTurnNode(stack->first);
+	stack->first = NULL;
+}
+
+/*
+ *	Pushar node på queue.
+ */
+void pushTurnStack(volatile TurnStack* stack, TurnNode* node)
+{
+	if (empty(stack))
+	{
+		stack->first = node;
+	}
+	else
+	{
+		node->next = stack->first;
+		stack->first = node;
+	}
+}
+
+/*
+ *	Returnerar det första elementet och tar bort det första elementet.
+ */
+uint8_t popTurnStack(volatile TurnStack* stack)
+{
+	if (empty(stack) == 1)
+		return 0xEE;
+		
+	uint8_t turn = stack->first->turn;
+	
+	if (stack->first->next == NULL)
+	{
+		freeTurnStack(stack);
+	}
+	else
+	{
+		TurnNode* temp = stack->first;
+		stack->first = stack->first->next;
+		temp->next = NULL;
+		freeTurnNode(temp);
+	}
+	
+	return turn;
+}
+
+/*
+ *	Kontrollerar om kön är tom.
+ */
+uint8_t empty(const volatile TurnStack* stack)
+{
+	return (stack->first == NULL) ? 1 : 0;
+}
+
