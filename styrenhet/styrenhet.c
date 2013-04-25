@@ -12,7 +12,7 @@
 #include <string.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-//#include "styrenhet.h"
+#include "styrenhet.h"
 #include "spi.h"
 #include "PWM.h"
 #include "controlsignals.h"
@@ -37,6 +37,8 @@ volatile ControlSignals control_signals;
 volatile SensorData current_sensor_data;
 volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
+
+volatile TurnStack turn_stack;
 
 volatile uint8_t mah_2nd_const = 129;
 

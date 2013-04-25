@@ -50,21 +50,21 @@ void convertAllData()
 	sensor_data.angle=11;
 	/* punktberäkning av linjesensor, kanske bara göra det i linjeföljande läge?  */
 	
-	convertRawData(distance1);
-	convertRawData(distance2);
-	convertRawData(distance3);
-	convertRawData(distance4);
+	convertRawData((const RawData*)&distance1);
+	convertRawData((const RawData*)&distance2);
+	convertRawData((const RawData*)&distance3);
+	convertRawData((const RawData*)&distance4);
 	
-	convertRawData(distance5);
-	convertRawData(distance6);
-	convertRawData(distance7);
+	convertRawData((const RawData*)&distance5);
+	convertRawData((const RawData*)&distance6);
+	convertRawData((const RawData*)&distance7);
 }
 
-void convertRawData(RawData data)
+void convertRawData(const RawData* data)
 {
 	if (1 )//! data.is_converted)
 	{
-		switch (data.sensor_type)
+		switch (data->sensor_type)
 		{
 			case DISTANCE_1:
 				sensor_data.distance1 = 01;

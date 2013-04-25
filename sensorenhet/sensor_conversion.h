@@ -57,7 +57,7 @@ volatile int filter_coeff[10];
 
 void initGYRO();
 void convertAllData();
-void convertRawData(RawData data);
+void convertRawData(const RawData* data);
 
 void convertDistanceLong(RawData data);
 void convertDistanceShort(RawData data);

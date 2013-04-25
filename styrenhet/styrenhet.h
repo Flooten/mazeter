@@ -16,6 +16,8 @@
 #include "controlsignals.h"
 #include "sensor_data.h"
 #include "control_parameters.h"
+#include "turn_detection.h"
+#include "turn_stack.h"
 
 extern volatile uint8_t control_mode_flag;
 extern volatile uint8_t current_command;
