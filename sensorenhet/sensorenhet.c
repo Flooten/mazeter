@@ -27,21 +27,6 @@ void ioInit()
 	DDRA = 0x00; // Sätter upp så att sensorerna kan avläsas.
 }
 
-void test_timer_init()
-{
-	TCCR3B |= (1 << WGM32); // Sätter upp CTC-mode för timer 3
-	TIMSK3 |= (1 << OCIE3A); // Tillåter CTC interupt
-
-	OCR3A = 35000; // Sätter vad den ska räkna till.
-
-	TCCR3B |= ((1 << CS30) | (0 << CS31) | (1 << CS32)); // Sätter prescaler 
-}
-
-ISR(TIMER3_COMPA_vect)
-{
-	tmp = 0; 
-}
-
 void initADC()
 {
 	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1); // Prescaler, ADPS1 kan sättas till 0 om snabbare konvertering krävs 
@@ -83,6 +68,16 @@ void startADC()
 	
 	current_sensor = GYRO_SAMPLE_1;
 	
+}
+
+void pauseADC()
+{
+	ADCSRA = (0 << ADEN);
+}
+
+void resumeADC()
+{
+	ADCSRA = (1 << ADEN) | (1 << ADSC);	
 }
 
 void readLine(uint8_t diod)
@@ -309,6 +304,7 @@ ISR(SPI_STC_vect)
 		
 		if (current_byte == buffer_size)
 		{
+			resumeADC();
 			spi_status = SPI_READY;
 			buffer = NULL;
 			buffer_size = 0;
@@ -329,6 +325,7 @@ ISR(SPI_STC_vect)
 			
 			if (current_byte == buffer_size)
 			{
+				resumeADC();
 				spi_status = SPI_READY;
 				buffer = NULL;
 				buffer_size = 0;
@@ -344,12 +341,15 @@ ISR(SPI_STC_vect)
 
 void parseCommand(uint8_t cmd)
 {
+	pauseADC();
+	
 	switch (cmd)
 	{
 		case SENSOR_DATA_ALL:
 			SPDR = SENSOR_DATA_ALL;
-			buffer = &sensor_data.distance1;
-			buffer_size = sizeof(sensor_data);
+			sensor_data_copy = sensor_data;
+			buffer = &sensor_data_copy.distance1;
+			buffer_size = sizeof(sensor_data_copy);
 			current_byte = 0;
 			break;
 		

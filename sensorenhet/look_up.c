@@ -14,6 +14,7 @@
 //test
 #include <avr/pgmspace.h>
 
+/*
 const uint8_t distance1_table[3][2] =
 {
 {136,15},
@@ -110,3 +111,4 @@ uint8_t lookUpDistance(uint8_t raw_value, uint8_t sensor)
 	return 0;
 }
 
+*/
