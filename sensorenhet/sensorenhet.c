@@ -74,12 +74,12 @@ void startADC()
 
 void pauseADC()
 {
-	ADCSRA = (0 << ADEN);
+//	ADCSRA &= 0x7F;
 }
 
 void resumeADC()
 {
-	ADCSRA = (1 << ADEN) | (1 << ADSC);	
+//	ADCSRA = (1 << ADEN) | (1 << ADSC);	
 }
 
 void readLine(uint8_t diod)
@@ -102,16 +102,6 @@ void readGyroData()
 void readGyroTemp()
 {
 	PORTD = 0xFC;
-}
-
-void disableADC()
-{
-	ADCSRA &= 0x7F;
-}
-
-void enableADC()
-{
-	ADCSRA |= (1 << ADEN) | (1 << ADSC);
 }
 
 ISR(ADC_vect)
@@ -317,7 +307,7 @@ ISR(SPI_STC_vect)
 		
 		if (current_byte == buffer_size)
 		{
-			enableADC();
+			resumeADC();
 			spi_status = SPI_READY;
 			buffer = NULL;
 			buffer_size = 0;
@@ -338,7 +328,7 @@ ISR(SPI_STC_vect)
 			
 			if (current_byte == buffer_size)
 			{
-				enableADC();
+				resumeADC();
 				spi_status = SPI_READY;
 				buffer = NULL;
 				buffer_size = 0;
@@ -359,7 +349,6 @@ void parseCommand(uint8_t cmd)
 	switch (cmd)
 	{
 		case SENSOR_DATA_ALL:
-			disableADC();
 			SPDR = SENSOR_DATA_ALL;
 			sensor_data_copy = sensor_data;
 			buffer = &sensor_data_copy.distance1;
@@ -409,13 +398,22 @@ int main()
 	sensor_parameters.horizontal_to_vertical_threshold = 30;
 
 	ioInit();
-	initADC();
+	//initADC();
 	initGYRO();
 	
 	spiSlaveInit();
 	sei();
 	
-	startADC();
+	/* endast för test */
+					sensor_data.distance1 = 0xFF;
+					sensor_data.distance2 = 0xFF;
+					sensor_data.distance3 = 0xFF;
+					sensor_data.distance4 = 0xFF;
+					sensor_data.distance7 = 0xFF;
+					sensor_data.distance5 = 05;
+					sensor_data.distance6 = 06;
+	
+	//startADC();
 	
 	while (1)
 	{
