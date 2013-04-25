@@ -17,7 +17,7 @@ void spiMasterInit()
 	DDRB = (1 << DDB5) | (1 << DDB4) | (1 << DDB3) | (1 << DDB7);
     
 	// SPE = SPI enable, MSTR = master select, SPR0 = 1 -> sck = f_osc/16
-	SPCR = (1 << SPE) | (1 << MSTR) | (0 << SPR1) | (1 << SPR0) | (1 << CPHA); /* spr1 = 0 i original */
+	SPCR = (1 << SPE) | (1 << MSTR) | (0 << SPR1) | (1 << SPR0); /* spr1 = 0 i original */
 }
 
 void spiSlaveInit()
@@ -26,7 +26,7 @@ void spiSlaveInit()
 	DDRB = (1 << DDB6);
     
 	// SPE = SPI enable, SPIE = SPI enable interrupt
-	SPCR = (1 << SPE) | (1 << SPIE) | (0 << CPHA);
+	SPCR = (1 << SPE) | (1 << SPIE);
 }
 
 void spiSelectSlave(uint8_t slave)

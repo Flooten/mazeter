@@ -102,15 +102,15 @@ int main(void)
 	
     while(1)
     {
-		PORTA = control_signals.right_value;
+		PORTA = sizeof(sensor_data);
 		
 		if (timer_internal_ready)
 		{
 			// Läs sensordata
-			if (spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
-			{
-				//btSendString("Failed to fetch the sensor data from the sensor device.");
-			}
+			//if (spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
+			//{
+				////btSendString("Failed to fetch the sensor data from the sensor device.");
+			//}
 			
 			spiSendData(control_mode_flag, STYR_ENHET, NULL, 0);
 			
@@ -127,19 +127,20 @@ int main(void)
 			{
 				if (start == 1)
 				{
-					if (spiSendData(SENSOR_DATA_ALL, SENSOR_ENHET, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
+					if (spiSendData(SENSOR_DATA_ALL, STYR_ENHET, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
 					{
 						btSendString("Failed to send the sensor data to the control device.");
 					}
 				}
 			}
 			
+			spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			timer_internal_ready = 0;
 		}		
 		
 		if (timer_external_ready)
-		{
+		{	
 			btSendData(CONTROL_SIGNALS, (const uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			btSendData(SENSOR_DATA_ALL, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			btSendData(control_mode_flag, NULL, 0);
