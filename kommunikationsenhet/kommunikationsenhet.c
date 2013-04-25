@@ -112,7 +112,7 @@ int main(void)
 				//btSendString("Failed to fetch the sensor data from the sensor device.");
 			}
 			
-			spiSendData(control_mode_flag, STYR_ENHET,NULL,0);
+			spiSendData(control_mode_flag, STYR_ENHET, NULL, 0);
 			
 			if (control_mode_flag == FLAG_MANUAL)
 			{
@@ -136,7 +136,7 @@ int main(void)
 			
 			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			timer_internal_ready = 0;
-		}
+		}		
 		
 		if (timer_external_ready)
 		{
