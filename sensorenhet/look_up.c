@@ -11,43 +11,7 @@
 #include "sensor_names.h"
 #include <avr/pgmspace.h> 
 
-//test
-#include <avr/pgmspace.h>
-
-const uint8_t distance1_table[3][2] =
-{0};
-
-uint8_t lookUpDistance(uint8_t raw_value)
-{
-	int i= 0;
-	
-	while(raw_value < distance1_table[i][0])
-	{
-		i++;
-	}
-	
-	if (i > 2)
-	return 0xFF;
-	else if (raw_value > distance1_table[i][0])
-	return distance1_table[i - 1][1];
-	else
-	return distance1_table[i][1];
-};
-
-int main(void)
-{
-	volatile uint8_t test = 0;
-	volatile uint8_t test2 = 130;
-	volatile uint8_t test3 = 134;
-	
-	while(1)
-	{
-		test = lookUpDistance(test2);
-		//TODO:: Please write your application code
-	}
-}
-
-// end test
+#define ELEM_CNT(x)  (sizeof(x) / sizeof(x[0]))
 
 const uint8_t distance1_table[][] PROGMEM =
 {
@@ -72,11 +36,11 @@ uint8_t lookUpDistance(uint8_t raw_value, uint8_t sensor)
 	switch(sensor)
 	{
 		case DISTANCE_1:
-			return distance1_table[raw_value];
+			return lookUp(raw_value, ELEM_CNT(distance1_table), distance1_table);
 			break;
 		
 		case DISTANCE_2:
-			return distance2_table[raw_value];
+			return lookUp(raw_value, ELEM_CNT(distance2_table), distance2_table);
 			break;
 		
 		case DISTANCE_3:
@@ -106,3 +70,34 @@ uint8_t lookUpDistance(uint8_t raw_value, uint8_t sensor)
 	return 0;
 }
 
+uint8_t lookUp(uint8_t raw_value, uint8_t size, const uint8_t table[][2])
+{
+	volatile uint8_t i= 0;
+	
+	while(raw_value < pgm_read_byte_near(&table[i][0]))
+	{
+		i++;
+	}
+	
+	if (i > size)
+	{
+		return 0xFF;
+	}
+	else if (pgm_read_byte_near(&table[i][0]) == raw_value)
+	{
+		return pgm_read_byte_near(&table[i][1]);
+	}
+	else
+	{
+		uint8_t previous_voltage = pgm_read_byte_near(&table[i - 1][0]);
+		uint8_t previous_distance = pgm_read_byte_near(&table[i - 1][1]);
+		
+		uint8_t next_voltage = pgm_read_byte_near(&table[i][0]);
+		uint8_t next_distance = pgm_read_byte_near(&table[i][1]);
+		
+		volatile float slope = ((float)previous_distance - (float)next_distance)/((float)previous_voltage - (float)next_voltage);
+		
+		uint8_t res = previous_distance + slope*(raw_value - previous_voltage);
+		return res;
+	}
+};
