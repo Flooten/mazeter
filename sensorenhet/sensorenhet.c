@@ -31,7 +31,7 @@ void ioInit()
 
 void initADC()
 {
-	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1); // Prescaler, ADPS1 kan sättas till 0 om snabbare konvertering krävs 
+	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1);// | (1 << ADPS0); // Prescaler, ADPS1 kan sättas till 0 om snabbare konvertering krävs 
 	ADMUX = (1 << ADLAR);
 }
 
@@ -74,12 +74,14 @@ void startADC()
 
 void pauseADC()
 {
-//	ADCSRA &= 0x7F;
+	//ADCSRA &= ~(1 << ADIE);
+	ADCSRA &= 0x7F;
 }
 
 void resumeADC()
 {
-//	ADCSRA = (1 << ADEN) | (1 << ADSC);	
+	//ADCSRA |= (1 << ADIE) | (1 << ADSC);
+	ADCSRA |= (1 << ADEN) | (1 << ADSC);	
 }
 
 void readLine(uint8_t diod)
@@ -116,7 +118,8 @@ ISR(ADC_vect)
 			distance1.sensor_type = DISTANCE_1;
 		
 			current_sensor = DISTANCE_2;
-			ADMUX = 0x21; // Ingång ADC1 
+			ADMUX = 0x23; // Ingång ADC1
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case DISTANCE_2:
@@ -125,7 +128,8 @@ ISR(ADC_vect)
 			distance2.sensor_type = DISTANCE_2;
 		
 			current_sensor = DISTANCE_3;
-			ADMUX = 0x22; // Ingång ADC2
+			ADMUX = 0x24; // Ingång ADC2
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case DISTANCE_3:
@@ -134,7 +138,8 @@ ISR(ADC_vect)
 			distance3.sensor_type = DISTANCE_3;
 		
 			current_sensor = DISTANCE_4;
-			ADMUX = 0x23; // Ingång ADC3
+			ADMUX = 0x25; // Ingång ADC3
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case DISTANCE_4:
@@ -143,8 +148,9 @@ ISR(ADC_vect)
 			distance4.sensor_type = DISTANCE_4;
 
 			current_sensor = DISTANCE_5;
-			ADMUX = 0x24; // Ingång ADC5
+			ADMUX = 0x20; // Ingång ADC5
 			readLine(0xFF); // Avaktiverar muxarna
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case DISTANCE_5:
@@ -153,7 +159,8 @@ ISR(ADC_vect)
 			distance5.sensor_type = DISTANCE_5;
 				
 			current_sensor = DISTANCE_6;
-			ADMUX = 0x25; // Ingång ADC5
+			ADMUX = 0x21; // Ingång ADC5
+			ADCSRA |= (1 << ADSC);
 			break;
 				
 		case DISTANCE_6:
@@ -163,6 +170,7 @@ ISR(ADC_vect)
 				
 			current_sensor = DISTANCE_7;
 			ADMUX = 0x26; // Ingång ADC6
+			ADCSRA |= (1 << ADSC);
 			break;
 				
 		case DISTANCE_7:
@@ -182,6 +190,7 @@ ISR(ADC_vect)
 			current_sensor = LINE_SENSOR_5;
 			ADMUX = 0x27; // Ingång ADC7
 			readLine(LINE_SENSOR_5);
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case LINE_SENSOR_1:
@@ -189,6 +198,7 @@ ISR(ADC_vect)
 			current_sensor = LINE_SENSOR_6;
 			ADMUX = 0x27; // Ingång ADC7
 			readLine(LINE_SENSOR_6);
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case LINE_SENSOR_2:
@@ -196,6 +206,7 @@ ISR(ADC_vect)
 			current_sensor = LINE_SENSOR_7;
 			ADMUX = 0x27; // Ingång ADC7
 			readLine(LINE_SENSOR_7);
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case LINE_SENSOR_3:
@@ -203,6 +214,7 @@ ISR(ADC_vect)
 			current_sensor = LINE_SENSOR_8;
 			ADMUX = 0x27; // Ingång ADC7
 			readLine(LINE_SENSOR_8);
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case LINE_SENSOR_4:
@@ -210,6 +222,7 @@ ISR(ADC_vect)
 			current_sensor = LINE_SENSOR_9;
 			ADMUX = 0x27; // Ingång ADC7
 			readLine(LINE_SENSOR_9);
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case LINE_SENSOR_5:
@@ -217,6 +230,7 @@ ISR(ADC_vect)
 			current_sensor = LINE_SENSOR_1;
 			ADMUX = 0x27; // Ingång ADC7
 			readLine(LINE_SENSOR_1);
+			ADCSRA |= (1 << ADSC);
 			break;		
 		
 		case LINE_SENSOR_6:
@@ -224,6 +238,7 @@ ISR(ADC_vect)
 			current_sensor = LINE_SENSOR_2;
 			ADMUX = 0x27; // Ingång ADC7
 			readLine(LINE_SENSOR_2);
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case LINE_SENSOR_7:
@@ -231,6 +246,7 @@ ISR(ADC_vect)
 			current_sensor = LINE_SENSOR_3;
 			ADMUX = 0x27; // Ingång ADC7
 			readLine(LINE_SENSOR_3);
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case LINE_SENSOR_8:
@@ -242,14 +258,16 @@ ISR(ADC_vect)
 			current_sensor = LINE_SENSOR_4;
 			ADMUX = 0x27;
 			readLine(LINE_SENSOR_4);
+			ADCSRA |= (1 << ADSC);
 			break;
 		
 		case LINE_SENSOR_9:
 			line_sensor.value[9] = ADCH;
 			line_sensor.is_converted = 0;
 			current_sensor = DISTANCE_1;
-			ADMUX = 0x20; // Ingång ADC0
+			ADMUX = 0x22; // Ingång ADC0
 			readLine(0xFF); // Avaktiverar muxarna
+			ADCSRA |= (1 << ADSC);
 			//current_sensor = LINE_SENSOR_1;
 			//ADMUX = 0x27; // Ingång ADC7
 			//readLine(LINE_SENSOR_1);
@@ -260,6 +278,7 @@ ISR(ADC_vect)
 			current_sensor = LINE_SENSOR_0;
 			ADMUX = 0x27; // Ingång ADC7
 			readLine(LINE_SENSOR_0);
+			ADCSRA |= (1 << ADSC);
 			break;		
 		
 		// --------------- Gyro ---------------
@@ -273,6 +292,7 @@ ISR(ADC_vect)
 		current_sensor = GYRO_TEMP;
 		ADMUX = 0x27; // Ingång ADC7
 		readGyroTemp();
+		ADCSRA |= (1 << ADSC);
 		break;
 		
 		case GYRO_TEMP:
@@ -283,11 +303,12 @@ ISR(ADC_vect)
 		current_sensor = LINE_SENSOR_10;
 		ADMUX = 0x27;
 		readLine(LINE_SENSOR_10);
+		ADCSRA |= (1 << ADSC);
 		break;
 		
 	} 
 	
-	ADCSRA |= (1 << ADSC); // Startar en ny AD-omvandling
+	//ADCSRA |= (1 << ADSC); // Startar en ny AD-omvandling
 }
 
 ISR(SPI_STC_vect)
@@ -307,7 +328,6 @@ ISR(SPI_STC_vect)
 		
 		if (current_byte == buffer_size)
 		{
-			resumeADC();
 			spi_status = SPI_READY;
 			buffer = NULL;
 			buffer_size = 0;
@@ -328,7 +348,7 @@ ISR(SPI_STC_vect)
 			
 			if (current_byte == buffer_size)
 			{
-				resumeADC();
+				ADCSRA |= (1 << ADSC);
 				spi_status = SPI_READY;
 				buffer = NULL;
 				buffer_size = 0;
@@ -344,15 +364,12 @@ ISR(SPI_STC_vect)
 
 void parseCommand(uint8_t cmd)
 {
-	pauseADC();
-	
 	switch (cmd)
 	{
 		case SENSOR_DATA_ALL:
 			SPDR = SENSOR_DATA_ALL;
-			sensor_data_copy = sensor_data;
-			buffer = &sensor_data_copy.distance1;
-			buffer_size = sizeof(sensor_data_copy);
+			buffer = &sensor_data.distance1;
+			buffer_size = sizeof(sensor_data);
 			current_byte = 0;
 			break;
 		
@@ -398,39 +415,50 @@ int main()
 	sensor_parameters.horizontal_to_vertical_threshold = 30;
 
 	ioInit();
-	//initADC();
+	initADC();
 	initGYRO();
 	
 	spiSlaveInit();
 	sei();
 	
 	/* endast för test */
-					sensor_data.distance1 = 0xFF;
-					sensor_data.distance2 = 0xFF;
-					sensor_data.distance3 = 0xFF;
-					sensor_data.distance4 = 0xFF;
-					sensor_data.distance7 = 0xFF;
-					sensor_data.distance5 = 05;
-					sensor_data.distance6 = 06;
-	
-	//startADC();
+	sensor_data.distance1 = 0xFF;
+	sensor_data.distance2 = 0xFF;
+	sensor_data.distance3 = 0xFF;
+	sensor_data.distance4 = 0xFF;
+	sensor_data.distance5 = 05;
+	sensor_data.distance6 = 06;
+	sensor_data.distance7 = 0xFF;
+	sensor_data.angle = 0x6400;
+	startADC();
 	
 	while (1)
 	{
-		if (calibrate_line_sensor)
-		{
-			uint8_t tape_value = calibrateLineSensorTape((const RawLineData*)&line_sensor);
-			waitFiveSeconds();
-			uint8_t floor_value = calibrateLineSensorFloor((const RawLineData*)&line_sensor);
-			uint16_t sum = tape_value + floor_value;
-			sensor_parameters.tape_threshold = sum / 2;
-			calibrate_line_sensor = 0;
-		}
+		//if (calibrate_line_sensor)
+		//{
+			//uint8_t tape_value = calibrateLineSensorTape((const RawLineData*)&line_sensor);
+			//waitFiveSeconds();
+			//uint8_t floor_value = calibrateLineSensorFloor((const RawLineData*)&line_sensor);
+			//uint16_t sum = tape_value + floor_value;
+			//sensor_parameters.tape_threshold = sum / 2;
+			//calibrate_line_sensor = 0;
+		//}
 		
-		ATOMIC_BLOCK(ATOMIC_FORCEON)
-		{
-			convertAllData();
-		}			
+		//while (!(ADCSRA & (1 << ADIF)));
+		
+		//ATOMIC_BLOCK(ATOMIC_FORCEON)
+		//{
+			//convertAllData();
+			sensor_data.distance1 = distance1.value;
+			sensor_data.distance2 = distance1.value;
+			sensor_data.distance3 = distance1.value;
+			sensor_data.distance4 = distance1.value;
+			sensor_data.distance5 = distance1.value;
+			sensor_data.distance6 = distance1.value;
+			sensor_data.distance7 = distance1.value;
+			sensor_data.
+			//_delay_ms(2);
+		//}
 		
 	//	convertLineData((RawLineData*)&line_sensor);
 	}

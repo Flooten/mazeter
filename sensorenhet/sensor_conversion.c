@@ -47,24 +47,24 @@ void initGYRO()
 void convertAllData()
 {
 	//convertRawDataGyro(gyro_sample1);
-	sensor_data.angle=11;
+	sensor_data.angle = 11;
 	/* punktberäkning av linjesensor, kanske bara göra det i linjeföljande läge?  */
 	
-	convertRawData(distance1);
-	convertRawData(distance2);
-	convertRawData(distance3);
-	convertRawData(distance4);
-	
-	convertRawData(distance5);
-	convertRawData(distance6);
-	convertRawData(distance7);
+	//convertRawData((RawData*)&distance1);
+	//convertRawData((RawData*)&distance2);
+	//convertRawData((RawData*)&distance3);
+	//convertRawData((RawData*)&distance4);
+	//
+	//convertRawData((RawData*)&distance5);
+	//convertRawData((RawData*)&distance6);
+	//convertRawData((RawData*)&distance7);
 }
 
-void convertRawData(RawData data)
+void convertRawData(RawData* data)
 {
-	if (1 )//! data.is_converted)
+	if (1 )//!data.is_converted)
 	{
-		switch (data.sensor_type)
+		switch (data->sensor_type)
 		{
 			case DISTANCE_1:
 				sensor_data.distance1 = 01;
@@ -103,64 +103,64 @@ void convertRawData(RawData data)
 	
 }
 
-void convertDistanceLong(RawData data)
+void convertDistanceLong(RawData* data)
 {	
-	if (data.value < 138)
-	{
-		if (data.value > 79) /* V [1.55,2.7] */
-		{
-		} 
-		else if (data.value > 64) /* V [1.25,1.55] */
-		{
-		}
-		else if (data.value > 46) /* V [0.9,1.25] */
-		{
-		}
-		else if (data.value > 36) /* V [0.7,0.9] */
-		{
-		}
-		else if (data.value > 20) /* V [0.4,0.7] */
-		{
-		}
-		else
-		{
-			// underflow
-		}
-	} 
-	else
-	{
-		// overflow
-	}
+	//if (data.value < 138)
+	//{
+		//if (data.value > 79) /* V [1.55,2.7] */
+		//{
+		//} 
+		//else if (data.value > 64) /* V [1.25,1.55] */
+		//{
+		//}
+		//else if (data.value > 46) /* V [0.9,1.25] */
+		//{
+		//}
+		//else if (data.value > 36) /* V [0.7,0.9] */
+		//{
+		//}
+		//else if (data.value > 20) /* V [0.4,0.7] */
+		//{
+		//}
+		//else
+		//{
+			//// underflow
+		//}
+	//} 
+	//else
+	//{
+		//// overflow
+	//}
 		
 }
 
-void convertDistanceShort(RawData data)
+void convertDistanceShort(RawData* data)
 {
 	
 }
 
-void convertRawDataGyro(RawDataGyro data)
+void convertRawDataGyro(RawDataGyro* data)
 {	
 		//* --- FIR filter, uint16_t angle ---------- */
-	if (! data.is_converted)
+	if (!data->is_converted)
 	{
 		uint8_t i;
-		long int time_in_micros = ((long)data.time + 4) / 8; /* tid i mikrosekunder */
+		long int time_in_micros = ((long)data->time + 4) / 8; /* tid i mikrosekunder */
 	
 		for (i = 0; i < NR_OF_GYRO_SAMPLES-1; i++)
 		{
 			gyro_samples[i] = gyro_samples[i+1];
 		}
 	
-		if (data.value >= GYRO_REF_LEVEL)
+		if (data->value >= GYRO_REF_LEVEL)
 		{
 			/* positiv ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data.value - GYRO_REF_LEVEL) * 3 + 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 + 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 		else
 		{
 			/* negativ ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data.value - GYRO_REF_LEVEL) * 3 - 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 - 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 	
 		for (i=0; i < NR_OF_GYRO_SAMPLES ; i++)
@@ -196,7 +196,7 @@ void convertRawDataGyro(RawDataGyro data)
 				sensor_data.angle -= 29536;
 			}
 		}		
-		data.is_converted = 1;
+		data->is_converted = 1;
 		gyro_filtered = 0;		
 	}
 	
