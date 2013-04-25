@@ -11,6 +11,7 @@
 
 #include "sensorenhet.h"
 #include "line_calibration.h"
+#include "look_up.h"
 #include <util/atomic.h>
 
 #ifndef F_CPU
@@ -401,6 +402,7 @@ void parseCommand(uint8_t cmd)
 	}
 }
 
+
 int main()
 {
 	spi_status = SPI_READY;
@@ -431,6 +433,7 @@ int main()
 	sensor_data.distance7 = 0xFF;
 	sensor_data.angle = 0x6400;
 	startADC();
+
 	
 	while (1)
 	{
@@ -444,10 +447,7 @@ int main()
 			sensor_parameters.tape_threshold = sum / 2;
 			calibrate_line_sensor = 0;
 		}
-		
-		ATOMIC_BLOCK(ATOMIC_FORCEON)
-		{
 			convertAllData();
-		}
+			//sensor_data.distance1 = lookUpTemp(distance1.value, 34, distance_table);
 	}
 }

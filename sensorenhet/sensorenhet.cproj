@@ -29,7 +29,7 @@
       </OverrideVtorValue>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1107</port>
+        <port>1330</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>

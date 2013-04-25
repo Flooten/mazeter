@@ -47,24 +47,24 @@ void initGYRO()
 
 void convertAllData()
 {
-	//convertRawDataGyro(gyro_sample1);
-	sensor_data.angle = 11;
+	convertRawDataGyro((RawDataGyro*)&gyro_sample1);
+	//sensor_data.angle = 11;
 	/* punktberäkning av linjesensor, kanske bara göra det i linjeföljande läge?  */
 	
-	//convertRawData((RawData*)&distance1);
-	//convertRawData((RawData*)&distance2);
-	//convertRawData((RawData*)&distance3);
-	//convertRawData((RawData*)&distance4);
-	//
-	//convertRawData((RawData*)&distance5);
-	//convertRawData((RawData*)&distance6);
-	//convertRawData((RawData*)&distance7);
+	convertRawData((RawData*)&distance1);
+	convertRawData((RawData*)&distance2);
+	convertRawData((RawData*)&distance3);
+	convertRawData((RawData*)&distance4);
+	
+	convertRawData((RawData*)&distance5);
+	convertRawData((RawData*)&distance6);
+	convertRawData((RawData*)&distance7);
 }
 
 void convertRawData(RawData* data)
 {
-	if (!data->is_converted)
-	{
+	//if (!data->is_converted)
+	//{
 		switch (data->sensor_type)
 		{
 			case DISTANCE_1:
@@ -87,7 +87,7 @@ void convertRawData(RawData* data)
 				sensor_data.distance5 = lookUpDistance(data->value, data->sensor_type);
 				break;
 			case DISTANCE_6:
-				sensor_data.distance6 = lookUpDistance(data->value, data->sensor_type);
+				sensor_data.distance6 = data->value; //lookUpDistance(data->value, data->sensor_type);
 				break;
 		
 			default:
@@ -95,8 +95,8 @@ void convertRawData(RawData* data)
 				break;
 		}
 		
-		data->is_converted = 1;
-	}
+		//data->is_converted = 1;
+	//}
 }
 
 void convertRawDataGyro(RawDataGyro* data)
