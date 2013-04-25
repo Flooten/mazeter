@@ -13,7 +13,6 @@
 
 #define ELEM_CNT(x)  (sizeof(x) / sizeof(x[0]))
 
-
 // LUTs {cm,volt}
 
 const uint8_t distance1_table[34][2] PROGMEM =
@@ -103,6 +102,7 @@ uint8_t lookUpDistance(uint8_t raw_value, uint8_t sensor)
 	
 	return 0;
 }
+
 
 uint8_t lookUp(uint8_t raw_value, uint8_t size, const uint8_t table[][2])
 {

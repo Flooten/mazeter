@@ -12,7 +12,7 @@
 #include <string.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "styrenhet.h"
+//#include "styrenhet.h"
 #include "spi.h"
 #include "PWM.h"
 #include "controlsignals.h"

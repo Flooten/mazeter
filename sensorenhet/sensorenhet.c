@@ -72,6 +72,16 @@ void startADC()
 	
 }
 
+void pauseADC()
+{
+//	ADCSRA &= 0x7F;
+}
+
+void resumeADC()
+{
+//	ADCSRA = (1 << ADEN) | (1 << ADSC);	
+}
+
 void readLine(uint8_t diod)
 {
 	if (diod <= 11 && diod >= 0)
@@ -92,16 +102,6 @@ void readGyroData()
 void readGyroTemp()
 {
 	PORTD = 0xFC;
-}
-
-void disableADC()
-{
-	ADCSRA &= 0x7F;
-}
-
-void enableADC()
-{
-	ADCSRA |= (1 << ADEN) | (1 << ADSC);
 }
 
 ISR(ADC_vect)
@@ -307,7 +307,7 @@ ISR(SPI_STC_vect)
 		
 		if (current_byte == buffer_size)
 		{
-			enableADC();
+			resumeADC();
 			spi_status = SPI_READY;
 			buffer = NULL;
 			buffer_size = 0;
@@ -328,7 +328,7 @@ ISR(SPI_STC_vect)
 			
 			if (current_byte == buffer_size)
 			{
-				enableADC();
+				resumeADC();
 				spi_status = SPI_READY;
 				buffer = NULL;
 				buffer_size = 0;
@@ -344,13 +344,15 @@ ISR(SPI_STC_vect)
 
 void parseCommand(uint8_t cmd)
 {
+	pauseADC();
+	
 	switch (cmd)
 	{
 		case SENSOR_DATA_ALL:
-			disableADC();
 			SPDR = SENSOR_DATA_ALL;
-			buffer = &sensor_data.distance1;
-			buffer_size = sizeof(sensor_data);
+			sensor_data_copy = sensor_data;
+			buffer = &sensor_data_copy.distance1;
+			buffer_size = sizeof(sensor_data_copy);
 			current_byte = 0;
 			break;
 		
@@ -396,24 +398,22 @@ int main()
 	sensor_parameters.horizontal_to_vertical_threshold = 30;
 
 	ioInit();
-	initADC();
+	//initADC();
 	initGYRO();
 	
 	spiSlaveInit();
 	sei();
 	
-	startADC();
+	/* endast för test */
+					sensor_data.distance1 = 0xFF;
+					sensor_data.distance2 = 0xFF;
+					sensor_data.distance3 = 0xFF;
+					sensor_data.distance4 = 0xFF;
+					sensor_data.distance7 = 0xFF;
+					sensor_data.distance5 = 05;
+					sensor_data.distance6 = 06;
 	
-	sensor_data.distance1 = 0x01; /* endast för test */
-	sensor_data.distance2 = 0x02;
-	sensor_data.distance3 = 0x03;
-	sensor_data.distance4 = 0x04;
-	sensor_data.distance5 = 0x05;
-	sensor_data.distance6 = 0x06;
-	sensor_data.distance7 = 0x07;
-	sensor_data.angle = 0x0008;
-	sensor_data.line_deviation = 0x09;
-	sensor_data.line_type = 0x0A;
+	//startADC();
 	
 	while (1)
 	{

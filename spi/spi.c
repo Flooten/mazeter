@@ -26,7 +26,7 @@ void spiSlaveInit()
 	DDRB = (1 << DDB6);
     
 	// SPE = SPI enable, SPIE = SPI enable interrupt
-	SPCR = (1 << SPE) | (1 << SPIE) | (1 << CPHA);
+	SPCR = (1 << SPE) | (1 << SPIE) | (0 << CPHA);
 }
 
 void spiSelectSlave(uint8_t slave)

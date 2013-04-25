@@ -44,6 +44,7 @@ volatile RawData distance7;
 volatile RawLineData line_sensor;
 volatile SensorParameters sensor_parameters;
 volatile SensorData sensor_data;
+volatile SensorData sensor_data_copy;
 
 volatile RawDataGyro gyro_sample1;
 volatile RawDataGyro gyro_sample2;
@@ -55,6 +56,8 @@ void initADC();
 void startTimer();
 uint16_t restartTimer();
 void startADC();
+void pauseADC();
+void resumeADC();
 void readLine(uint8_t diod);
 void readGyroData();
 void readGyroTemp();
