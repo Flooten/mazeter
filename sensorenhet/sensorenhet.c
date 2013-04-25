@@ -434,32 +434,20 @@ int main()
 	
 	while (1)
 	{
-		//if (calibrate_line_sensor)
-		//{
-			//uint8_t tape_value = calibrateLineSensorTape((const RawLineData*)&line_sensor);
-			//waitFiveSeconds();
-			//uint8_t floor_value = calibrateLineSensorFloor((const RawLineData*)&line_sensor);
-			//uint16_t sum = tape_value + floor_value;
-			//sensor_parameters.tape_threshold = sum / 2;
-			//calibrate_line_sensor = 0;
-		//}
+		// Kalibrering av linjesensor
+		if (calibrate_line_sensor)
+		{
+			uint8_t tape_value = calibrateLineSensorTape((const RawLineData*)&line_sensor);
+			waitFiveSeconds();
+			uint8_t floor_value = calibrateLineSensorFloor((const RawLineData*)&line_sensor);
+			uint16_t sum = tape_value + floor_value;
+			sensor_parameters.tape_threshold = sum / 2;
+			calibrate_line_sensor = 0;
+		}
 		
-		//while (!(ADCSRA & (1 << ADIF)));
-		
-		//ATOMIC_BLOCK(ATOMIC_FORCEON)
-		//{
-			//convertAllData();
-			sensor_data.distance1 = distance1.value;
-			sensor_data.distance2 = distance1.value;
-			sensor_data.distance3 = distance1.value;
-			sensor_data.distance4 = distance1.value;
-			sensor_data.distance5 = distance1.value;
-			sensor_data.distance6 = distance1.value;
-			sensor_data.distance7 = distance1.value;
-			sensor_data.
-			//_delay_ms(2);
-		//}
-		
-	//	convertLineData((RawLineData*)&line_sensor);
+		ATOMIC_BLOCK(ATOMIC_FORCEON)
+		{
+			convertAllData();
+		}
 	}
 }
