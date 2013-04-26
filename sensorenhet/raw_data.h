@@ -28,11 +28,5 @@ typedef struct
 	uint8_t is_converted;
 } RawLineData;
 
-void accumulateData(RawData* raw_data, uint8_t number_of_accumulations)
-{
-	raw_data->value = raw_data->accumulator / number_of_accumulations;
-	raw_data->accumulator = 0;
-	raw_data->is_converted = 0;
-}
 
 #endif /* RAW_DATA_H_ */

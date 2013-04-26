@@ -88,7 +88,7 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 		//}
 	//}
 }
-
+/**
 void makeTurn(uint8_t turn)
 {
 	uint16_t angle1 = current_sensor_data.angle;
@@ -122,3 +122,5 @@ void makeTurn(uint8_t turn)
 		break;
 	}
 }
+
+**/

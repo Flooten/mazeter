@@ -107,6 +107,13 @@ void readGyroTemp()
 	PORTD = 0xFC;
 }
 
+void accumulateData(RawData* raw_data, uint8_t number_of_accumulations)
+{
+	raw_data->value = raw_data->accumulator / number_of_accumulations;
+	raw_data->accumulator = 0;
+	raw_data->is_converted = 0;
+}
+
 ISR(ADC_vect)
 {
 	switch (current_sensor)
@@ -134,8 +141,8 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_3:
-			distance3.value = ADCH;
-			distance3.is_converted = 0;
+			distance3.accumulator += ADCH;
+			//distance3.is_converted = 0;
 			distance3.sensor_type = DISTANCE_3;
 		
 			current_sensor = DISTANCE_4;
@@ -144,8 +151,8 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_4:
-			distance4.value = ADCH;
-			distance4.is_converted = 0;
+			distance4.accumulator +=  ADCH;
+			//distance4.is_converted = 0;
 			distance4.sensor_type = DISTANCE_4;
 
 			current_sensor = DISTANCE_5;
@@ -155,8 +162,8 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_5:
-			distance5.value = ADCH;
-			distance5.is_converted = 0;
+			distance5.accumulator +=  ADCH;
+			//distance5.is_converted = 0;
 			distance5.sensor_type = DISTANCE_5;
 				
 			current_sensor = DISTANCE_6;
@@ -165,8 +172,8 @@ ISR(ADC_vect)
 			break;
 				
 		case DISTANCE_6:
-			distance6.value = ADCH;
-			distance6.is_converted = 0;
+			distance6.accumulator += ADCH;
+			//distance6.is_converted = 0;
 			distance6.sensor_type = DISTANCE_6;
 				
 			current_sensor = DISTANCE_7;
@@ -175,8 +182,8 @@ ISR(ADC_vect)
 			break;
 				
 		case DISTANCE_7:
-			distance7.value = ADCH;
-			distance7.is_converted = 0;
+			distance7.accumulator += ADCH;
+			//distance7.is_converted = 0;
 			distance7.sensor_type = DISTANCE_7;
 				
 			current_sensor = GYRO_SAMPLE_1;
@@ -191,6 +198,11 @@ ISR(ADC_vect)
 			{
 				accumulateData((RawData*)&distance1, number_of_adc);
 				accumulateData((RawData*)&distance2, number_of_adc);
+				accumulateData((RawData*)&distance3, number_of_adc);
+				accumulateData((RawData*)&distance4, number_of_adc);
+				accumulateData((RawData*)&distance5, number_of_adc);
+				accumulateData((RawData*)&distance6, number_of_adc);
+				accumulateData((RawData*)&distance7, number_of_adc);
 			}
 			break;
 		
