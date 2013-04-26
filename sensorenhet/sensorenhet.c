@@ -447,12 +447,6 @@ int main()
 	//sensor_data.distance7 = 0xFF;
 	//sensor_data.angle = 0x6400;
 	startADC();
-
-	gyro_sample1.value = 227;
-	gyro_sample1.is_converted = 0;
-	gyro_sample1.time = 20000;
-	
-	convertRawDataGyro(&gyro_sample1);
 	
 	while (1)
 	{
