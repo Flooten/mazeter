@@ -63,8 +63,8 @@ void convertAllData()
 
 void convertRawData(RawData* data)
 {
-	//if (!data->is_converted)
-	//{
+	if (!data->is_converted)
+	{
 		switch (data->sensor_type)
 		{
 			case DISTANCE_1:
@@ -87,7 +87,7 @@ void convertRawData(RawData* data)
 				sensor_data.distance5 = lookUpDistance(data->value, data->sensor_type);
 				break;
 			case DISTANCE_6:
-				sensor_data.distance6 = data->value; //lookUpDistance(data->value, data->sensor_type);
+				sensor_data.distance6 = lookUpDistance(data->value, data->sensor_type);
 				break;
 		
 			default:
@@ -95,8 +95,8 @@ void convertRawData(RawData* data)
 				break;
 		}
 		
-		//data->is_converted = 1;
-	//}
+		data->is_converted = 1;
+	}
 }
 
 void convertRawDataGyro(RawDataGyro* data)
