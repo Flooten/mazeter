@@ -9,7 +9,8 @@
 
 #include "pd_control.h"
 #include "control_parameters.h"
-//#include "styrenhet.h"
+#include "styrenhet.h"
+#include "spi_commands.h"
 #include <util/atomic.h>
 #include <stdint.h>
 
