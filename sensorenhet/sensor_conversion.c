@@ -99,13 +99,12 @@ void convertRawData(RawData* data)
 	}
 }
 
-void convertRawDataGyro(RawDataGyro* data)
+void convertRawDataGyro(volatile RawDataGyro* data)
 {	
 	//* --- FIR filter, uint16_t angle ---------- */
 	if (!data->is_converted)
 	{
 		uint8_t i;
-		long int time_in_micros = ((long)data->time + 4) / 8; /* tid i mikrosekunder */
 	
 		for (i = 0; i < NR_OF_GYRO_SAMPLES-1; i++)
 		{
@@ -115,29 +114,30 @@ void convertRawDataGyro(RawDataGyro* data)
 		if (data->value >= GYRO_REF_LEVEL)
 		{
 			/* positiv ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 + 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (data->time * ((long)data->value - GYRO_REF_LEVEL) * 3 + 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 		else
 		{
 			/* negativ ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 - 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (data->time * ((long)data->value - GYRO_REF_LEVEL) * 3 - 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 	
+		/* FIR-filtrering */
 		for (i=0; i < NR_OF_GYRO_SAMPLES ; i++)
 		{
 			long int tmp;
-			tmp = 3 * (long int)filter_coeff[i] * (long int)gyro_samples[NR_OF_GYRO_SAMPLES - 1 - i];
+			tmp = 1 * (long int)filter_coeff[i] * (long int)gyro_samples[NR_OF_GYRO_SAMPLES - 1 - i];
 			
 			if ( tmp >= 0)
 			{
-				tmp += 25000;
+				tmp += 5000;
 			}
 			else
 			{
-				tmp -= 25000;
+				tmp -= 5000;
 			}
 							
-			gyro_filtered += tmp * 1 / 50000; /* original tmp / 10000, infogat normeringsfaktor 3/5 */
+			gyro_filtered += tmp * 1 / 10000; /* original tmp / 10000, infogat normeringsfaktor 3/5 */
 		}
 		
 		sensor_data.angle += gyro_filtered;

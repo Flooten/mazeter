@@ -38,7 +38,7 @@ void initADC()
 
 void startTimer()
 {	
-	TCCR1B = 1 << CS10;
+	TCCR1B = (0 << CS10) | (1 << CS11) | (0 << CS12); /* Prescaler på 8 fcp, resulterar i att timern räknar upp varje mikrosekund */
 }
 
 void stopTimer()
@@ -448,6 +448,11 @@ int main()
 	//sensor_data.angle = 0x6400;
 	startADC();
 
+	gyro_sample1.value = 227;
+	gyro_sample1.is_converted = 0;
+	gyro_sample1.time = 20000;
+	
+	convertRawDataGyro(&gyro_sample1);
 	
 	while (1)
 	{
