@@ -61,7 +61,7 @@ void convertRawData(RawData* data);
 
 void convertDistanceLong(RawData* data);
 void convertDistanceShort(RawData* data);
-void convertRawDataGyro(RawDataGyro* data);
+void convertRawDataGyro(volatile RawDataGyro* data);
 
 int8_t calculateCenter(const uint8_t* data);
 // calcute_center ger ett värde mellan -5 och 5
