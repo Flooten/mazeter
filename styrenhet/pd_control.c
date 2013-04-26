@@ -90,7 +90,7 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 		//}
 	//}
 }
-/**
+
 void makeTurn(uint8_t turn)
 {
 	uint16_t angle1 = current_sensor_data.angle;
@@ -136,7 +136,7 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 {
 	//uint16_t timer_count = 8000000/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
 	
-	//while(timervärde < timer_count)
+	//while(timervärde < timer_count) 
 	//{}
 		
 	switch(turn)
