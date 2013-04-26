@@ -30,5 +30,6 @@ extern volatile ControlParameters control_parameters;
 
 // Funktioner
 void parseCommand(uint8_t cmd);
+void commandToControlSignal(uint8_t cmd);
 
 #endif /* STYRENHET_H_ */
