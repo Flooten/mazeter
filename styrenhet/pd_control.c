@@ -91,10 +91,34 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 
 void makeTurn(uint8_t turn)
 {
-	// Kör tills mitten av korsningen
-	// while (angle_diff < 90)
-	//   rotate(turn)
-	// (finjustera med rätt avståndssensorer)
-	// Kör framåt ut ur korsningen
-	// Gå över i straightRegulation
+	uint16_t angle1 = current_sensor_data.angle;
+	uint16_t angle2 = current_sensor_data.angle;
+	
+	switch(turn)
+	{
+		case LEFT_TURN:
+		
+		angle1 += 9000;
+		if (angle1 >= 36000)
+		angle1 -= 36000;
+		
+		commandToControlSignal(STEER_ROTATE_LEFT);
+		
+		while (current_sensor_data.angle < angle1 || current_sensor_data.angle >= angle2)
+		{}
+		commandToControlSignal(STEER_STOP);
+		
+		break;
+		
+		case RIGHT_TURN:
+		
+		break;
+		
+		case STRAIGHT:
+		
+		break;
+		
+		default:
+		break;
+	}
 }

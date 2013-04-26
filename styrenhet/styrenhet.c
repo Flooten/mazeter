@@ -283,6 +283,8 @@ void commandToControlSignal(uint8_t cmd)
 	}
 }
 
+
+
 int main()
 {
 	memset((void*)&control_signals, 0, sizeof(control_signals));
