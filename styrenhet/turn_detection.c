@@ -13,8 +13,9 @@
 #include "turn_detection.h"
 #include "turn_stack.h"
 #include "styrenhet.h"
+#include "pd_control.h"
 
-void detect_turn(TurnStack* turn_stack)
+void detectTurn(volatile TurnStack* turn_stack)
 {
 	
 	if (current_sensor_data.distance3 > THRESHOLD_CONTACT)
@@ -27,7 +28,7 @@ void detect_turn(TurnStack* turn_stack)
 			{
 				// Fall 2
 				pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
-				// make_turn(LEFT_TURN)
+				makeTurn(LEFT_TURN);
 			}
 			// else fortsätt PD-reglera rakt fram (fall 4)
 		}
@@ -38,13 +39,13 @@ void detect_turn(TurnStack* turn_stack)
 			{
 				// Fall 7
 				pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
-				// make_turn(RIGHT_TURN)
+				makeTurn(RIGHT_TURN);
 			}
 			else
 			{
 				// Fall 1 eller 3
 				pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
-				// make_turn(LEFT_TURN)
+				makeTurn(LEFT_TURN);
 			}
 		}
 	} 
@@ -58,7 +59,7 @@ void detect_turn(TurnStack* turn_stack)
 			{
 				// Fall 6
 				pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
-				// make_turn(RIGHT_TURN)
+				makeTurn(RIGHT_TURN);
 			}
 			// else fortsätt PD-reglera rakt fram (fall 8)
 		}
@@ -66,7 +67,7 @@ void detect_turn(TurnStack* turn_stack)
 		{
 			// Fall 5
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
-			// make_turn(RIGHT_TURN)
+			makeTurn(RIGHT_TURN);
 		}
 	}
 		

@@ -11,6 +11,7 @@
 #include "control_parameters.h"
 #include "styrenhet.h"
 #include "spi_commands.h"
+#include "turn_detection.h"
 #include <util/atomic.h>
 #include <stdint.h>
 
@@ -98,28 +99,66 @@ void makeTurn(uint8_t turn)
 	switch(turn)
 	{
 		case LEFT_TURN:
+			angle1 += 9000;
+			if (angle1 >= 36000)
+			angle1 -= 36000;
 		
-		angle1 += 9000;
-		if (angle1 >= 36000)
-		angle1 -= 36000;
-		
-		commandToControlSignal(STEER_ROTATE_LEFT);
-		
-		while (current_sensor_data.angle < angle1 || current_sensor_data.angle >= angle2)
-		{}
-		commandToControlSignal(STEER_STOP);
-		
-		break;
+			commandToControlSignal(STEER_ROTATE_LEFT);
+			while (current_sensor_data.angle < angle1 || current_sensor_data.angle >= angle2)
+			{}
+			commandToControlSignal(STEER_STOP); // commandToControlSignal(STEER_STRAIGHT);
+			while (current_sensor_data.distance3 > THRESHOLD_CONTACT && current_sensor_data.distance4 > THRESHOLD_CONTACT)
+			{}
+			break;
 		
 		case RIGHT_TURN:
-		
-		break;
+			angle1 -= 9000;
+			if (angle1 >= 36000)
+			angle1 = 36000 - (9000 - angle2);
+			
+			commandToControlSignal(STEER_ROTATE_RIGHT);
+			while (current_sensor_data.angle > angle1 || current_sensor_data.angle <= angle2)
+			{}
+			commandToControlSignal(STEER_STOP); // commandToControlSignal(STEER_STRAIGHT);
+			while (current_sensor_data.distance3 > THRESHOLD_CONTACT && current_sensor_data.distance4 > THRESHOLD_CONTACT)
+			{}
+			break;
 		
 		case STRAIGHT:
-		
-		break;
+			break;
 		
 		default:
-		break;
+			break;
 	}
+}
+
+void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
+{
+	//uint16_t timer_count = 8000000/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
+	
+	//while(timervärde < timer_count)
+	//{}
+		
+	switch(turn)
+	{
+		case LEFT_TURN:
+			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
+			makeTurn(LEFT_TURN);
+			break;
+			
+		case RIGHT_TURN:
+			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
+			makeTurn(RIGHT_TURN);
+			break;
+			
+		case STRAIGHT:
+			pushTurnStack(turn_stack, newTurnNode(STRAIGHT));
+			makeTurn(STRAIGHT);
+			break;
+			
+		default:
+			break;
+	}
+	
+		
 }

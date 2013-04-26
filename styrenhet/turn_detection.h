@@ -30,7 +30,7 @@
 /* Avståndsvärde när man ska rotera  om det är en återvändsgränd man mäter mot*/
 #define THRESHOLD_STOP_DEAD_END 110
 
-void detect_turn(TurnStack* turn_stack);
+void detectTurn(volatile TurnStack* turn_stack);
 
 
 
