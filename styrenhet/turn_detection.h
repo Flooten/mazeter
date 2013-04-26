@@ -16,7 +16,6 @@
 #include "sensor_data.h"
 #include "turn_stack.h"
 
-
 #define LEFT_TURN 1
 #define RIGHT_TURN 2
 #define STRAIGHT 3

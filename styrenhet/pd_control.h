@@ -12,5 +12,6 @@
 
 #include "sensor_data.h"
 void sensorDataToControlSignal(const SensorData* current, const SensorData* previous);
+void makeTurn(uint8_t turn);
 
 #endif /* PD_CONTROL_H_ */
