@@ -328,7 +328,9 @@ int main()
 				new_sensor_data = 0;
 			}
 			
-			detectTurn(turn_stack);
+			//detectTurn(turn_stack);
+			//makeTurn(LEFT_TURN);
+			//makeTurn(RIGHT_TURN);
 		}
 		
 		pwmWheels(control_signals);

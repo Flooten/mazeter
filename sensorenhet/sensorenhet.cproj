@@ -29,7 +29,7 @@
       </OverrideVtorValue>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1610</port>
+        <port>1141</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
@@ -41,9 +41,9 @@
           <JtagInChain>false</JtagInChain>
           <JtagEnableExtResetOnStartSession>false</JtagEnableExtResetOnStartSession>
           <JtagDevicesBefore>0</JtagDevicesBefore>
-          <JtagDevicesAfter>0</JtagDevicesAfter>
+          <JtagDevicesAfter>1</JtagDevicesAfter>
           <JtagInstrBitsBefore>0</JtagInstrBitsBefore>
-          <JtagInstrBitsAfter>0</JtagInstrBitsAfter>
+          <JtagInstrBitsAfter>4</JtagInstrBitsAfter>
         </InterfaceProperties>
       </ToolOptions>
     </com_atmel_avrdbg_tool_jtagicemk3>

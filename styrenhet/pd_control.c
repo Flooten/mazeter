@@ -21,6 +21,18 @@ typedef struct
 	int8_t right_value;
 } RegulatorSignals;
 
+void startTimer()
+{
+	TCCR1B = (1 << CS10) | (0 << CS11) | (1 << CS12); // Prescaler 1024, ändra i pd_control.c i handleTape om prescalern ändras
+}
+
+void resetTimer()
+{
+	TCCR1B = 0x00;
+	TCNT1 = 0x0000;
+	TIFR1 |= (1 << TOV1);
+}
+
 //RegulatorSignals regulatorSignalDeltaLeft(const int16_t* delta_left, const int16_t* delta_left_previous)
 //{
 	//RegulatorSignals ret;
@@ -106,9 +118,7 @@ void makeTurn(uint8_t turn)
 			commandToControlSignal(STEER_ROTATE_LEFT);
 			while (current_sensor_data.angle < angle1 || current_sensor_data.angle >= angle2)
 			{}
-			commandToControlSignal(STEER_STOP); // commandToControlSignal(STEER_STRAIGHT);
-			while (current_sensor_data.distance3 > THRESHOLD_CONTACT && current_sensor_data.distance4 > THRESHOLD_CONTACT)
-			{}
+			commandToControlSignal(STEER_STOP); // för test ska vara: commandToControlSignal(STEER_STRAIGHT);
 			break;
 		
 		case RIGHT_TURN:
@@ -119,25 +129,30 @@ void makeTurn(uint8_t turn)
 			commandToControlSignal(STEER_ROTATE_RIGHT);
 			while (current_sensor_data.angle > angle1 || current_sensor_data.angle <= angle2)
 			{}
-			commandToControlSignal(STEER_STOP); // commandToControlSignal(STEER_STRAIGHT);
-			while (current_sensor_data.distance3 > THRESHOLD_CONTACT && current_sensor_data.distance4 > THRESHOLD_CONTACT)
-			{}
+			commandToControlSignal(STEER_STOP); // för test ska vara: commandToControlSignal(STEER_STRAIGHT);
 			break;
 		
 		case STRAIGHT:
+			commandToControlSignal(STEER_STRAIGHT);
 			break;
 		
 		default:
 			break;
 	}
+	
+	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att PD-reglera på.
+	while (current_sensor_data.distance3 > THRESHOLD_CONTACT && current_sensor_data.distance4 > THRESHOLD_CONTACT)
+	{}
 }
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 {
-	//uint16_t timer_count = 8000000/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
+	uint16_t timer_count = 800000000/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
 	
-	//while(timervärde < timer_count) 
-	//{}
+	startTimer();
+	
+	while(TCNT1 < timer_count) 
+	{}
 		
 	switch(turn)
 	{
@@ -159,6 +174,5 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 		default:
 			break;
 	}
-	
-		
+	resetTimer();
 }

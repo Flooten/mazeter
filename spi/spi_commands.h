@@ -53,7 +53,7 @@
 // Lägg dessa i sin egna header?
 #define LINE_TURN_LEFT 0x51
 #define LINE_TURN_RIGHT 0x52
-#define LINE_STRIGHT 0x53
+#define LINE_STRAIGHT 0x53
 #define LINE_GOAL 0x54
 #define LINE_GOAL_STOP 0x55
 #define LINE_STOP 0x56

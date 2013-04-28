@@ -47,7 +47,7 @@ void initGYRO()
 
 void convertAllData()
 {
-	//convertRawDataGyro((RawDataGyro*)&gyro_sample1);
+	convertRawDataGyro((RawDataGyro*)&gyro_sample1);
 	
 	convertRawData((RawData*)&distance1);
 	convertRawData((RawData*)&distance2);
@@ -253,7 +253,7 @@ void compareLines(uint8_t first, uint8_t second)
 	//! Helt godtyckligt
 	if (diff < sensor_parameters.line_diff_threshold)
 	{
-		sensor_data.line_type = LINE_STRIGHT;
+		sensor_data.line_type = LINE_STRAIGHT;
 	}
 	else if (first > second)
 	{

@@ -70,7 +70,6 @@ void startADC()
 	startTimer();
 	
 	current_sensor = GYRO_SAMPLE_1;
-	
 }
 
 void pauseADC()
@@ -462,5 +461,6 @@ int main()
 		}
 			convertAllData();
 			//sensor_data.distance1 = lookUpTemp(distance1.value, 34, distance_table);
+			
 	}
 }
