@@ -40,6 +40,7 @@ volatile uint8_t control_mode_flag;
 volatile uint8_t current_command;
 volatile uint8_t throttle;
 volatile uint8_t new_sensor_data = 0;
+volatile uint8_t reciving_sensor_data = 0;
 
 volatile ControlSignals control_signals;
 volatile SensorData current_sensor_data;
@@ -72,6 +73,13 @@ ISR(SPI_STC_vect)
             buffer = NULL;
             buffer_size = 0;
             current_byte = 0;
+			
+			if(reciving_sensor_data == 1)
+			{
+				new_sensor_data = 1;
+				reciving_sensor_data = 0;
+			}
+			
         }
     }
     else
@@ -112,6 +120,7 @@ void parseCommand(uint8_t cmd)
             current_byte = 0;
             spi_status = SPI_RECEIVING_DATA;
 			new_sensor_data = 0;
+			reciving_sensor_data = 1;
 			previous_sensor_data = current_sensor_data;
             break;
 
@@ -302,6 +311,7 @@ int main()
     buffer = NULL;
     buffer_size = 0;
     current_byte = 0;
+	new_sensor_data = 0; 
 	
 	current_command = STEER_STOP;
 	throttle = 0;
@@ -339,7 +349,7 @@ int main()
 		{
 			if (new_sensor_data == 1)
 			{
-				//sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+ 				sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 				new_sensor_data = 0;
 				
 				commandToControlSignal(STEER_STRAIGHT);

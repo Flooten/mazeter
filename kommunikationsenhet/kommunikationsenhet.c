@@ -77,7 +77,8 @@ ISR (INT0_vect)
 
 ISR (INT1_vect)
 {
-	start = 1;
+	if (control_mode_flag == FLAG_AUTO)
+		start = 1;
 }
 
 ISR(TIMER1_COMPA_vect)
