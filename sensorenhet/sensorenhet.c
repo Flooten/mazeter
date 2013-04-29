@@ -57,6 +57,7 @@ uint16_t restartTimer()
 	TCNT1 = 0x0000;
 	TIFR1 |= (1 << TOV1); 
 
+	
 	startTimer();
 	return tmp;
 }
@@ -429,7 +430,7 @@ int main()
 	sensor_parameters.horizontal_to_vertical_threshold = 30;
 
 	ioInit();
-//	initADC();
+	initADC();
 	initGYRO();
 	
 	spiSlaveInit();
@@ -444,6 +445,7 @@ int main()
 	//sensor_data.distance6 = 06;
 	//sensor_data.distance7 = 0xFF;
 	//sensor_data.angle = 0x6400;
+	startADC();
 	
 	while (1)
 	{
