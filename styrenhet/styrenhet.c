@@ -38,7 +38,7 @@ volatile SensorData current_sensor_data;
 volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
-volatile TurnStack turn_stack;
+volatile TurnStack* turn_stack;
 
 volatile uint8_t mah_2nd_const = 129;
 
@@ -327,6 +327,10 @@ int main()
 				sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 				new_sensor_data = 0;
 			}
+			
+			//detectTurn(turn_stack);
+			//makeTurn(LEFT_TURN);
+			//makeTurn(RIGHT_TURN);
 		}
 		
 		pwmWheels(control_signals);

@@ -9,7 +9,9 @@
 
 #include "pd_control.h"
 #include "control_parameters.h"
-//#include "styrenhet.h"
+#include "styrenhet.h"
+#include "spi_commands.h"
+#include "turn_detection.h"
 #include <util/atomic.h>
 #include <stdint.h>
 
@@ -18,6 +20,18 @@ typedef struct
 	int8_t left_value;
 	int8_t right_value;
 } RegulatorSignals;
+
+void startTimer()
+{
+	TCCR1B = (1 << CS10) | (0 << CS11) | (1 << CS12); // Prescaler 1024, ändra i pd_control.c i handleTape om prescalern ändras
+}
+
+void resetTimer()
+{
+	TCCR1B = 0x00;
+	TCNT1 = 0x0000;
+	TIFR1 |= (1 << TOV1);
+}
 
 //RegulatorSignals regulatorSignalDeltaLeft(const int16_t* delta_left, const int16_t* delta_left_previous)
 //{
@@ -91,10 +105,74 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 
 void makeTurn(uint8_t turn)
 {
-	// Kör tills mitten av korsningen
-	// while (angle_diff < 90)
-	//   rotate(turn)
-	// (finjustera med rätt avståndssensorer)
-	// Kör framåt ut ur korsningen
-	// Gå över i straightRegulation
+	uint16_t angle1 = current_sensor_data.angle;
+	uint16_t angle2 = current_sensor_data.angle;
+	
+	switch(turn)
+	{
+		case LEFT_TURN:
+			angle1 += 9000;
+			if (angle1 >= 36000)
+			angle1 -= 36000;
+		
+			commandToControlSignal(STEER_ROTATE_LEFT);
+			while (current_sensor_data.angle < angle1 || current_sensor_data.angle >= angle2)
+			{}
+			commandToControlSignal(STEER_STOP); // för test ska vara: commandToControlSignal(STEER_STRAIGHT);
+			break;
+		
+		case RIGHT_TURN:
+			angle1 -= 9000;
+			if (angle1 >= 36000)
+			angle1 = 36000 - (9000 - angle2);
+			
+			commandToControlSignal(STEER_ROTATE_RIGHT);
+			while (current_sensor_data.angle > angle1 || current_sensor_data.angle <= angle2)
+			{}
+			commandToControlSignal(STEER_STOP); // för test ska vara: commandToControlSignal(STEER_STRAIGHT);
+			break;
+		
+		case STRAIGHT:
+			commandToControlSignal(STEER_STRAIGHT);
+			break;
+		
+		default:
+			break;
+	}
+	
+	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att PD-reglera på.
+	while (current_sensor_data.distance3 > THRESHOLD_CONTACT && current_sensor_data.distance4 > THRESHOLD_CONTACT)
+	{}
+}
+
+void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
+{
+	uint16_t timer_count = 800000000/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
+	
+	startTimer();
+	
+	while(TCNT1 < timer_count) 
+	{}
+		
+	switch(turn)
+	{
+		case LEFT_TURN:
+			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
+			makeTurn(LEFT_TURN);
+			break;
+			
+		case RIGHT_TURN:
+			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
+			makeTurn(RIGHT_TURN);
+			break;
+			
+		case STRAIGHT:
+			pushTurnStack(turn_stack, newTurnNode(STRAIGHT));
+			makeTurn(STRAIGHT);
+			break;
+			
+		default:
+			break;
+	}
+	resetTimer();
 }

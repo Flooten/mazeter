@@ -3,6 +3,7 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Martin Andersson
  *				  Joel Davidsson
+ *				  Fredrik Stenmark
  * DATUM:         2013-04-25
  *
  * BESKRIVNING: 
@@ -13,8 +14,9 @@
 #include "turn_detection.h"
 #include "turn_stack.h"
 #include "styrenhet.h"
+#include "pd_control.h"
 
-void detect_turn(TurnStack* turn_stack)
+void detectTurn(volatile TurnStack* turn_stack)
 {
 	
 	if (current_sensor_data.distance3 > THRESHOLD_CONTACT)
@@ -27,9 +29,14 @@ void detect_turn(TurnStack* turn_stack)
 			{
 				// Fall 2
 				pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
-				// make_turn(LEFT_TURN)
+				makeTurn(LEFT_TURN);
 			}
-			// else fortsätt PD-reglera rakt fram (fall 4)
+			else //fortsätt PD-reglera rakt fram (fall 4)
+			{
+				// Fall 4
+				pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
+				makeTurn(STRAIGHT);
+			}
 		}
 		else if (current_sensor_data.distance1 < THRESHOLD_STOP)
 		{
@@ -38,13 +45,13 @@ void detect_turn(TurnStack* turn_stack)
 			{
 				// Fall 7
 				pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
-				// make_turn(RIGHT_TURN)
+				makeTurn(RIGHT_TURN);
 			}
 			else
 			{
 				// Fall 1 eller 3
 				pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
-				// make_turn(LEFT_TURN)
+				makeTurn(LEFT_TURN);
 			}
 		}
 	} 
@@ -58,15 +65,20 @@ void detect_turn(TurnStack* turn_stack)
 			{
 				// Fall 6
 				pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
-				// make_turn(RIGHT_TURN)
+				makeTurn(RIGHT_TURN);
 			}
-			// else fortsätt PD-reglera rakt fram (fall 8)
+			else // fortsätt PD-reglera rakt fram (fall 8)
+			{
+				// Fall 8
+				pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
+				makeTurn(STRAIGHT);
+			}
 		}
 		else
 		{
 			// Fall 5
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
-			// make_turn(RIGHT_TURN)
+			makeTurn(RIGHT_TURN);
 		}
 	}
 		

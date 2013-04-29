@@ -48,8 +48,6 @@ void initGYRO()
 void convertAllData()
 {
 	convertRawDataGyro((RawDataGyro*)&gyro_sample1);
-	//sensor_data.angle = 11;
-	/* punktberäkning av linjesensor, kanske bara göra det i linjeföljande läge?  */
 	
 	convertRawData((RawData*)&distance1);
 	convertRawData((RawData*)&distance2);
@@ -63,8 +61,8 @@ void convertAllData()
 
 void convertRawData(RawData* data)
 {
-	//if (!data->is_converted)
-	//{
+	if (!data->is_converted)
+	{
 		switch (data->sensor_type)
 		{
 			case DISTANCE_1:
@@ -87,7 +85,7 @@ void convertRawData(RawData* data)
 				sensor_data.distance5 = lookUpDistance(data->value, data->sensor_type);
 				break;
 			case DISTANCE_6:
-				sensor_data.distance6 = data->value; //lookUpDistance(data->value, data->sensor_type);
+				sensor_data.distance6 = lookUpDistance(data->value, data->sensor_type);
 				break;
 		
 			default:
@@ -95,8 +93,8 @@ void convertRawData(RawData* data)
 				break;
 		}
 		
-		//data->is_converted = 1;
-	//}
+		data->is_converted = 1;
+	}
 }
 
 void convertRawDataGyro(volatile RawDataGyro* data)
@@ -105,7 +103,6 @@ void convertRawDataGyro(volatile RawDataGyro* data)
 	if (!data->is_converted)
 	{
 		uint8_t i;
-		uint32_t time_in_micros = ((uint32_t)data->time * 1024 + 4) / 8; /* tid i mikrosekunder */
 	
 		for (i = 0; i < NR_OF_GYRO_SAMPLES-1; i++)
 		{
@@ -115,29 +112,30 @@ void convertRawDataGyro(volatile RawDataGyro* data)
 		if (data->value >= GYRO_REF_LEVEL)
 		{
 			/* positiv ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 + 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (data->time * ((long)data->value - GYRO_REF_LEVEL) * 3 + 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 		else
 		{
 			/* negativ ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 - 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (data->time * ((long)data->value - GYRO_REF_LEVEL) * 3 - 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 	
+		/* FIR-filtrering */
 		for (i=0; i < NR_OF_GYRO_SAMPLES ; i++)
 		{
 			long int tmp;
-			tmp = 3 * (long int)filter_coeff[i] * (long int)gyro_samples[NR_OF_GYRO_SAMPLES - 1 - i];
+			tmp = 1 * (long int)filter_coeff[i] * (long int)gyro_samples[NR_OF_GYRO_SAMPLES - 1 - i];
 			
 			if ( tmp >= 0)
 			{
-				tmp += 25000;
+				tmp += 5000;
 			}
 			else
 			{
-				tmp -= 25000;
+				tmp -= 5000;
 			}
 							
-			gyro_filtered += tmp * 1 / 50000; /* original tmp / 10000, infogat normeringsfaktor 3/5 */
+			gyro_filtered += tmp * 1 / 10000; /* original tmp / 10000, infogat normeringsfaktor 3/5 */
 		}
 		
 		sensor_data.angle += gyro_filtered;
@@ -255,7 +253,7 @@ void compareLines(uint8_t first, uint8_t second)
 	//! Helt godtyckligt
 	if (diff < sensor_parameters.line_diff_threshold)
 	{
-		sensor_data.line_type = LINE_STRIGHT;
+		sensor_data.line_type = LINE_STRAIGHT;
 	}
 	else if (first > second)
 	{
@@ -344,7 +342,9 @@ void convertLineData(RawLineData* data)
 				current_line = SPACE_2;
 				line_detections = 0;
 				
-				compareLines(first_line_val, second_line_val);
+				sensor_data.line_type = first_line_val;
+				sensor_data.line_deviation = second_line_val;
+				//compareLines(first_line_val, second_line_val);
 			}
 			else
 			{

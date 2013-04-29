@@ -42,17 +42,17 @@ const uint8_t distance4_table[34][2] PROGMEM =
 {26,110},{27,107},{28,104},{29,102},{30,99},{31,96},{32,94},{33,92},{34,89},{35,87},{37,83},
 {40,76},{45,69},{50,58},{55,56},{60,47},{65,43},{70,42},{75,38},{80,38},{90,33},{100,31},{110,29}
 };
-const uint8_t distance5_table[29][2] PROGMEM =
+const uint8_t distance5_table[27][2] PROGMEM =
 {
 	//Kort vänster
 {4,137},{5,117},{6,99},{7,88},{8,77},{9,67},{10,63},{11,57},{12,53},{13,49},{14,46},{15,43},{16,38},
 {17,36},{18,34},{19,33},{20,31},{21,29},{22,28},{23,27},{24,26},{25,25},{26,23},{27,21},{28,20},{29,19},{30,18}
 };
-const uint8_t distance6_table[29][2] PROGMEM =
+const uint8_t distance6_table[27][2] PROGMEM =
 {
 	//Kort höger
-{4,120},{5,106},{6,90},{7,81},{8,73},{9,64},{10,59},{11,54},{12,51},{13,49},{14,47},{15,45},{16,44},
-{17,43},{18,42},{19,41},{20,39},{21,38},{22,37},{23,36},{24,35},{25,35},{26,34},{27,33},{28,32},{29,32},{30,31}
+{4,120},{5,106},{6,90},{7,81},{8,73},{9,64},{10,59},{11,54},{12,51},{13,49},{14,47},{15,45},{16,44}, //13
+{17,43},{18,42},{19,41},{20,39},{21,38},{22,37},{23,36},{24,35},{25,35},{26,34},{27,33},{28,32},{29,32},{30,31} //14
 };
 const uint8_t distance7_table[34][2] PROGMEM =
 {
@@ -106,14 +106,21 @@ uint8_t lookUp(uint8_t raw_value, uint8_t size, const uint8_t table[][2])
 {
 	volatile uint8_t i= 0;
 	
+	// Täcker bara om vi får ett värde som är på toppen av spänningskurvan, 
+	// vi vet inte om vi är 2 cm från väggen eller 45 cm, se till att aldrig hamna i ett sådant läge
 	if (raw_value > pgm_read_byte_near(&table[0][1]))
 	{
-		return 0x02; // För nära
+		return 0x00; // För nära
 	}
-	
 	
 	while(raw_value < pgm_read_byte_near(&table[i][1]))
 	{
+		// Kollar att man inte går utanför tabellen!!! (vilket vi gjorde tidigare)
+		if (i > size)
+		{
+			return 0xFF; // För stort
+		}
+		
 		i++;
 	}
 	

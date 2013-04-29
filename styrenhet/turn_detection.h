@@ -16,7 +16,6 @@
 #include "sensor_data.h"
 #include "turn_stack.h"
 
-
 #define LEFT_TURN 1
 #define RIGHT_TURN 2
 #define STRAIGHT 3
@@ -31,7 +30,7 @@
 /* Avståndsvärde när man ska rotera  om det är en återvändsgränd man mäter mot*/
 #define THRESHOLD_STOP_DEAD_END 110
 
-void detect_turn(TurnStack* turn_stack);
+void detectTurn(volatile TurnStack* turn_stack);
 
 
 

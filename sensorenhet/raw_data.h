@@ -18,6 +18,7 @@ typedef struct
 {
 	uint8_t sensor_type;
 	uint8_t value;
+	uint16_t accumulator;
 	uint8_t is_converted;
 } RawData;
 
@@ -26,5 +27,6 @@ typedef struct
 	uint8_t value[11];
 	uint8_t is_converted;
 } RawLineData;
+
 
 #endif /* RAW_DATA_H_ */

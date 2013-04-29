@@ -10,7 +10,14 @@
 #ifndef PD_CONTROL_H_
 #define PD_CONTROL_H_
 
-#include "sensor_data.h"
+#include "pd_control.h"
+#include "control_parameters.h"
+#include "styrenhet.h"
+#include "spi_commands.h"
+#include "turn_detection.h"
+
 void sensorDataToControlSignal(const SensorData* current, const SensorData* previous);
+void makeTurn(uint8_t turn);
+void handleTape(volatile TurnStack* turn_stack, uint8_t turn);
 
 #endif /* PD_CONTROL_H_ */

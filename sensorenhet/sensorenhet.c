@@ -1,9 +1,11 @@
 /*
  * FILNAMN:       sensorenheten.c
  * PROJEKT:       Mazeter
- * PROGRAMMERARE: Fredrik Stenmark och Herman Ekwall
+ * PROGRAMMERARE: Fredrik Stenmark
+ *                Herman Ekwall
+ *                Mattias Fransson
  *                
- * DATUM:         2013-04-02
+ * DATUM:         2013-04-26
  *
  * BESKRIVNING:
  *
@@ -19,12 +21,8 @@
 #endif
 #include <util/delay.h>
 
-volatile uint8_t overflow_count = 0;
-
-/* för test */
-volatile uint8_t tmp = 1;
-
-volatile uint8_t my_const = 121;
+volatile uint8_t number_of_adc = 7;
+volatile uint8_t current_adc = 0;
 
 void ioInit()
 {
@@ -36,12 +34,11 @@ void initADC()
 {
 	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1);// | (1 << ADPS0); // Prescaler, ADPS1 kan sättas till 0 om snabbare konvertering krävs 
 	ADMUX = (1 << ADLAR);
-	TIMSK1 = (1 << TOIE1); /* Tillåter interrupt vid overflow för timer */
 }
 
 void startTimer()
 {	
-	TCCR1B = (1 << CS12) | (0 << CS11) |(1 << CS10); /*Prescale fcp/1024 */
+	TCCR1B = (0 << CS10) | (1 << CS11) | (0 << CS12); /* Prescaler på 8 fcp, resulterar i att timern räknar upp varje mikrosekund */
 }
 
 void stopTimer()
@@ -60,7 +57,6 @@ uint16_t restartTimer()
 	TCNT1 = 0x0000;
 	TIFR1 |= (1 << TOV1); 
 
-	overflow_count = 0;
 	startTimer();
 	return tmp;
 }
@@ -73,7 +69,6 @@ void startADC()
 	startTimer();
 	
 	current_sensor = GYRO_SAMPLE_1;
-	
 }
 
 void pauseADC()
@@ -82,10 +77,10 @@ void pauseADC()
 	ADCSRA &= 0x7F;
 }
 
-void resumeADC()
+void restartADC()
 {
-	//ADCSRA |= (1 << ADIE) | (1 << ADSC);
-	ADCSRA |= (1 << ADEN) | (1 << ADSC);	
+	current_adc = 0;
+	ADCSRA |= (1 << ADSC);
 }
 
 void readLine(uint8_t diod)
@@ -110,9 +105,11 @@ void readGyroTemp()
 	PORTD = 0xFC;
 }
 
-ISR(TIMER1_OVF_vect)
+void accumulateData(RawData* raw_data, uint8_t number_of_accumulations)
 {
-	++overflow_count;
+	raw_data->value = raw_data->accumulator / number_of_accumulations;
+	raw_data->accumulator = 0;
+	raw_data->is_converted = 0;
 }
 
 ISR(ADC_vect)
@@ -122,8 +119,8 @@ ISR(ADC_vect)
 		// --------------- Avståndssensorer ---------------
 		
 		case DISTANCE_1:
-			distance1.value = ADCH;
-			distance1.is_converted = 0;
+			distance1.accumulator += ADCH;
+			//distance1.is_converted = 0;
 			distance1.sensor_type = DISTANCE_1;
 		
 			current_sensor = DISTANCE_2;
@@ -132,8 +129,8 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_2:
-			distance2.value = ADCH;
-			distance2.is_converted = 0;
+			distance2.accumulator += ADCH;
+			//distance2.is_converted = 0;
 			distance2.sensor_type = DISTANCE_2;
 		
 			current_sensor = DISTANCE_3;
@@ -142,8 +139,8 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_3:
-			distance3.value = ADCH;
-			distance3.is_converted = 0;
+			distance3.accumulator += ADCH;
+			//distance3.is_converted = 0;
 			distance3.sensor_type = DISTANCE_3;
 		
 			current_sensor = DISTANCE_4;
@@ -152,8 +149,8 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_4:
-			distance4.value = ADCH;
-			distance4.is_converted = 0;
+			distance4.accumulator +=  ADCH;
+			//distance4.is_converted = 0;
 			distance4.sensor_type = DISTANCE_4;
 
 			current_sensor = DISTANCE_5;
@@ -163,8 +160,8 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_5:
-			distance5.value = ADCH;
-			distance5.is_converted = 0;
+			distance5.accumulator +=  ADCH;
+			//distance5.is_converted = 0;
 			distance5.sensor_type = DISTANCE_5;
 				
 			current_sensor = DISTANCE_6;
@@ -173,8 +170,8 @@ ISR(ADC_vect)
 			break;
 				
 		case DISTANCE_6:
-			distance6.value = ADCH;
-			distance6.is_converted = 0;
+			distance6.accumulator += ADCH;
+			//distance6.is_converted = 0;
 			distance6.sensor_type = DISTANCE_6;
 				
 			current_sensor = DISTANCE_7;
@@ -183,13 +180,28 @@ ISR(ADC_vect)
 			break;
 				
 		case DISTANCE_7:
-			distance7.value = ADCH;
-			distance7.is_converted = 0;
+			distance7.accumulator += ADCH;
+			//distance7.is_converted = 0;
 			distance7.sensor_type = DISTANCE_7;
 				
 			current_sensor = GYRO_SAMPLE_1;
 			ADMUX = 0x27; // Ingång ADC7
 			readGyroData();
+			++current_adc;
+			if (current_adc < number_of_adc)
+			{
+				ADCSRA |= (1 << ADSC);
+			}
+			else if (current_adc == number_of_adc)
+			{
+				accumulateData((RawData*)&distance1, number_of_adc);
+				accumulateData((RawData*)&distance2, number_of_adc);
+				accumulateData((RawData*)&distance3, number_of_adc);
+				accumulateData((RawData*)&distance4, number_of_adc);
+				accumulateData((RawData*)&distance5, number_of_adc);
+				accumulateData((RawData*)&distance6, number_of_adc);
+				accumulateData((RawData*)&distance7, number_of_adc);
+			}
 			break;
 		
 		// --------------- Linjesensor ---------------
@@ -293,30 +305,29 @@ ISR(ADC_vect)
 		// --------------- Gyro ---------------
 		
 		case GYRO_SAMPLE_1:
-		gyro_sample1.value = ADCH;
-		gyro_sample1.is_converted = 0;
-		gyro_sample1.sensor_type = GYRO_SAMPLE_1;
-		gyro_sample1.time = overflow_count * 65536;
-		gyro_sample1.time = restartTimer();
+			gyro_sample1.value = ADCH;
+			gyro_sample1.is_converted = 0;
+			gyro_sample1.sensor_type = GYRO_SAMPLE_1;
+			gyro_sample1.time = restartTimer();
 
-		current_sensor = GYRO_TEMP;
-		ADMUX = 0x27; // Ingång ADC7
-		readGyroTemp();
-		ADCSRA |= (1 << ADSC);
-		break;
+			current_sensor = GYRO_TEMP;
+			ADMUX = 0x27; // Ingång ADC7
+			readGyroTemp();
+			ADCSRA |= (1 << ADSC);
+			break;
 		
 		case GYRO_TEMP:
-		gyro_temp.value = ADCH;
-		gyro_temp.is_converted = 0;
-		gyro_temp.sensor_type = GYRO_TEMP;
+			gyro_temp.value = ADCH;
+			gyro_temp.is_converted = 0;
+			gyro_temp.sensor_type = GYRO_TEMP;
+			
+			current_sensor = LINE_SENSOR_10;
+			ADMUX = 0x27;
+			readLine(LINE_SENSOR_10);
+			ADCSRA |= (1 << ADSC);
+			break;
 		
-		current_sensor = LINE_SENSOR_10;
-		ADMUX = 0x27;
-		readLine(LINE_SENSOR_10);
-		ADCSRA |= (1 << ADSC);
-		break;
-		
-	} 
+	}
 	
 	//ADCSRA |= (1 << ADSC); // Startar en ny AD-omvandling
 }
@@ -358,7 +369,7 @@ ISR(SPI_STC_vect)
 			
 			if (current_byte == buffer_size)
 			{
-				ADCSRA |= (1 << ADSC);
+				restartADC();
 				spi_status = SPI_READY;
 				buffer = NULL;
 				buffer_size = 0;
@@ -394,13 +405,6 @@ void parseCommand(uint8_t cmd)
 			SPDR = CALIBRATE_LINE_SENSOR;
 			calibrate_line_sensor = 1;
 			break;
-			
-		case 0x95:
-			SPDR = 0x95;
-			buffer = &my_const;
-			buffer_size = 1;
-			current_byte = 0;
-			break;
 		
 		default:
 			SPDR = ERROR_UNKNOWN_SPI_COMMAND;
@@ -410,7 +414,6 @@ void parseCommand(uint8_t cmd)
 			break;
 	}
 }
-
 
 int main()
 {
@@ -433,22 +436,14 @@ int main()
 	sei();
 	
 	/* endast för test */
-	sensor_data.distance1 = 0xFF;
-	sensor_data.distance2 = 0xFF;
-	sensor_data.distance3 = 0xFF;
-	sensor_data.distance4 = 0xFF;
-	sensor_data.distance5 = 05;
-	sensor_data.distance6 = 06;
-	sensor_data.distance7 = 0xFF;
-	sensor_data.angle = 0x6400;
-//	startADC();
-
-	gyro_sample1.value = 227;
-	gyro_sample1.is_converted = 0;
-	gyro_sample1.time = 390625;
-	
-	convertRawDataGyro(&gyro_sample1);
-	
+	//sensor_data.distance1 = 0xFF;
+	//sensor_data.distance2 = 0xFF;
+	//sensor_data.distance3 = 0xFF;
+	//sensor_data.distance4 = 0xFF;
+	//sensor_data.distance5 = 05;
+	//sensor_data.distance6 = 06;
+	//sensor_data.distance7 = 0xFF;
+	//sensor_data.angle = 0x6400;
 	
 	while (1)
 	{
@@ -464,5 +459,6 @@ int main()
 		}
 			convertAllData();
 			//sensor_data.distance1 = lookUpTemp(distance1.value, 34, distance_table);
+			
 	}
 }
