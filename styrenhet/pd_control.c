@@ -80,7 +80,7 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 		
 		regulator_signals = regulatorSignalDeltaFront(&delta_front, &delta_front_previous);
 		
-		if (regulator_signals.left_value > control_signals.left_value)
+		if (regulator_signals.left_value + (int8_t)control_signals.left_value < 0)
 		{
 			control_signals.left_value = 0;
 		}
@@ -93,9 +93,9 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 			}
 		}
 		
-		if (regulator_signals.right_value > control_signals.right_value)
+		if (regulator_signals.right_value +  (int8_t)control_signals.right_value < 0)
 		{
-			control_signals.left_value = 0;
+			control_signals.right_value = 0;
 		}
 		else
 		{
@@ -162,7 +162,15 @@ void makeTurn(uint8_t turn)
 	
 	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att PD-reglera på.
 	while (current_sensor_data.distance3 > THRESHOLD_CONTACT && current_sensor_data.distance4 > THRESHOLD_CONTACT)
-	{}
+	{
+		// Stannar roboten om vi är på väg att köra in i något.
+		if (current_sensor_data.distance1 < THRESHOLD_STOP - 5 || current_sensor_data.distance2 < THRESHOLD_STOP -5)
+		{
+			commandToControlSignal(STEER_STOP);
+			pwmWheels(control_signals);
+			return;
+		}
+	}
 }
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
