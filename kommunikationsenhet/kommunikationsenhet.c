@@ -19,13 +19,22 @@
 #include "timer.h"
 #include "sensor_data.h"
 #include "controlsignals.h"
+#include "sensor_parameters.h"
+#include "control_parameters.h"
 
 volatile uint8_t control_mode_flag;
 volatile uint8_t control_command;
+volatile uint8_t sensor_command;
 volatile SensorData sensor_data;
 volatile ControlSignals control_signals;
+volatile SensorParameters sensor_parameters;
+volatile ControlParameters control_parameters;
+
 volatile uint8_t throttle;
 volatile uint8_t start;
+
+volatile uint8_t from_styr;
+
 
 // Funktioner som initierar kommunikationsenheten
 void ioInit()
@@ -102,7 +111,7 @@ int main(void)
 	
     while(1)
     {
-		PORTA = sizeof(sensor_data);
+
 		
 		if (timer_internal_ready)
 		{
@@ -122,6 +131,18 @@ int main(void)
 				{
 					btSendString("Failed to send control commands to the control device.");
 				}
+				
+				if(sensor_command != 0)
+				{
+					spiSendCommand(sensor_command, SENSOR_ENHET);
+					sensor_command = 0;
+				}
+				
+				if (spiSendData(CONTROL_PARAMETERS_ALL, STYR_ENHET, (const uint8_t*)&control_parameters.right_kp, sizeof(control_parameters)) != CONTROL_PARAMETERS_ALL)
+				{
+					btSendString("Failed to send the control parameters to the control device.");
+				}
+				
 			}
 			else
 			{
@@ -136,6 +157,7 @@ int main(void)
 			
 			spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));
+			spiReadData(0x96, STYR_ENHET, (uint8_t*)&from_styr, 1);
 			timer_internal_ready = 0;
 		}		
 		
@@ -144,6 +166,7 @@ int main(void)
 			btSendData(CONTROL_SIGNALS, (const uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			btSendData(SENSOR_DATA_ALL, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			btSendData(control_mode_flag, NULL, 0);
+			btSendData(0x96, (const uint8_t*)&from_styr, 1);
 			timer_external_ready = 0;
 		}
 		
@@ -203,6 +226,20 @@ int main(void)
 					case CLAW_CLOSE:
 						control_command = CLAW_CLOSE;
 						break;
+					
+					case CALIBRATE_LINE_SENSOR:
+						sensor_command = CALIBRATE_LINE_SENSOR;
+						break;
+						
+					case CONTROL_PARAMETERS_ALL:
+						control_command = CONTROL_PARAMETERS_ALL;
+						control_parameters.right_kp = tmp->data[0];
+						control_parameters.right_kd = tmp->data[1];
+						control_parameters.left_kp = tmp->data[2];
+						control_parameters.left_kd = tmp->data[3];
+						break;						
+						
+						
 
 					default:
 						btSendString("Unknown command");

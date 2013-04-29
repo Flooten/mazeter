@@ -426,7 +426,7 @@ int main()
 	sensor_parameters.tape_threshold = 100;
 	sensor_parameters.horizontal_line_threshold = 4;
 	sensor_parameters.no_line_detection_threshold = 100;
-	sensor_parameters.line_diff_threshold = 5;
+	sensor_parameters.line_diff_threshold = 4;
 	sensor_parameters.horizontal_to_vertical_threshold = 30;
 
 	ioInit();
@@ -458,6 +458,7 @@ int main()
 			uint16_t sum = tape_value + floor_value;
 			sensor_parameters.tape_threshold = sum / 2;
 			calibrate_line_sensor = 0;
+			sensor_data.line_type = sensor_parameters.tape_threshold;
 		}
 			convertAllData();
 			//sensor_data.distance1 = lookUpTemp(distance1.value, 34, distance_table);
