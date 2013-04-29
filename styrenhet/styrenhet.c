@@ -332,8 +332,11 @@ int main()
 	control_parameters.right_kd = 1;
 	control_parameters.right_kp = 1;
 	
+	throttle = 20;
+	
     while (1)
     {
+	
 		// Låt inte Joel köra för fort...
 		if (throttle > 100)
 		{
@@ -343,16 +346,15 @@ int main()
 		if (control_mode_flag == FLAG_MANUAL)
 		{
 			commandToControlSignal(current_command);
-			detectTurn(turn_stack);
 		}
 		else if (control_mode_flag == FLAG_AUTO)
 		{
 			if (new_sensor_data == 1)
 			{
- 				sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+ 				//sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 				new_sensor_data = 0;
+				commandToControlSignal(CLAW_CLOSE);
 				
-				commandToControlSignal(STEER_STRAIGHT);
 				detectTurn(turn_stack);
 			}
 		}
