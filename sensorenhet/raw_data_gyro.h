@@ -19,7 +19,7 @@ typedef struct
 	uint8_t sensor_type;
 	uint8_t value;
 	uint8_t is_converted;
-	uint16_t time; // Antal klockcykler från förra konverteringen
+	uint32_t time; // Antal klockcykler/1024 från förra konverteringen
 } RawDataGyro;
 
 

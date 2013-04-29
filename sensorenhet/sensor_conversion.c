@@ -41,7 +41,7 @@ void initGYRO()
 	uint8_t i;
 	for (i = 0; i < NR_OF_GYRO_SAMPLES; i++)
 	{
-		gyro_samples[i]=0;
+		gyro_samples[i]=10; /* = 0 vid skarpt läge */
 	}
 }
 
@@ -99,13 +99,13 @@ void convertRawData(RawData* data)
 	//}
 }
 
-void convertRawDataGyro(RawDataGyro* data)
+void convertRawDataGyro(volatile RawDataGyro* data)
 {	
 	//* --- FIR filter, uint16_t angle ---------- */
 	if (!data->is_converted)
 	{
 		uint8_t i;
-		long int time_in_micros = ((long)data->time + 4) / 8; /* tid i mikrosekunder */
+		uint32_t time_in_micros = ((uint32_t)data->time * 1024 + 4) / 8; /* tid i mikrosekunder */
 	
 		for (i = 0; i < NR_OF_GYRO_SAMPLES-1; i++)
 		{
@@ -115,12 +115,12 @@ void convertRawDataGyro(RawDataGyro* data)
 		if (data->value >= GYRO_REF_LEVEL)
 		{
 			/* positiv ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 + 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 + 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 		else
 		{
 			/* negativ ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 - 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 - 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 	
 		for (i=0; i < NR_OF_GYRO_SAMPLES ; i++)

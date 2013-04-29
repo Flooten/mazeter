@@ -19,6 +19,8 @@
 #endif
 #include <util/delay.h>
 
+volatile uint8_t overflow_count = 0;
+
 /* för test */
 volatile uint8_t tmp = 1;
 
@@ -34,11 +36,12 @@ void initADC()
 {
 	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1);// | (1 << ADPS0); // Prescaler, ADPS1 kan sättas till 0 om snabbare konvertering krävs 
 	ADMUX = (1 << ADLAR);
+	TIMSK1 = (1 << TOIE1); /* Tillåter interrupt vid overflow för timer */
 }
 
 void startTimer()
 {	
-	TCCR1B = 1 << CS10;
+	TCCR1B = (1 << CS12) | (0 << CS11) |(1 << CS10); /*Prescale fcp/1024 */
 }
 
 void stopTimer()
@@ -57,7 +60,7 @@ uint16_t restartTimer()
 	TCNT1 = 0x0000;
 	TIFR1 |= (1 << TOV1); 
 
-	
+	overflow_count = 0;
 	startTimer();
 	return tmp;
 }
@@ -105,6 +108,11 @@ void readGyroData()
 void readGyroTemp()
 {
 	PORTD = 0xFC;
+}
+
+ISR(TIMER1_OVF_vect)
+{
+	++overflow_count;
 }
 
 ISR(ADC_vect)
@@ -288,6 +296,7 @@ ISR(ADC_vect)
 		gyro_sample1.value = ADCH;
 		gyro_sample1.is_converted = 0;
 		gyro_sample1.sensor_type = GYRO_SAMPLE_1;
+		gyro_sample1.time = overflow_count * 65536;
 		gyro_sample1.time = restartTimer();
 
 		current_sensor = GYRO_TEMP;
@@ -417,7 +426,7 @@ int main()
 	sensor_parameters.horizontal_to_vertical_threshold = 30;
 
 	ioInit();
-	initADC();
+//	initADC();
 	initGYRO();
 	
 	spiSlaveInit();
@@ -432,8 +441,14 @@ int main()
 	sensor_data.distance6 = 06;
 	sensor_data.distance7 = 0xFF;
 	sensor_data.angle = 0x6400;
-	startADC();
+//	startADC();
 
+	gyro_sample1.value = 227;
+	gyro_sample1.is_converted = 0;
+	gyro_sample1.time = 390625;
+	
+	convertRawDataGyro(&gyro_sample1);
+	
 	
 	while (1)
 	{
