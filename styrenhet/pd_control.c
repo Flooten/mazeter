@@ -12,6 +12,8 @@
 #include "styrenhet.h"
 #include "spi_commands.h"
 #include "turn_detection.h"
+#include "PWM.h"
+#include "controlsignals.h"
 #include <util/atomic.h>
 #include <stdint.h>
 
@@ -108,40 +110,55 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 
 void makeTurn(uint8_t turn)
 {
-	uint16_t angle1 = current_sensor_data.angle;
-	uint16_t angle2 = current_sensor_data.angle;
+	uint16_t angle_end = current_sensor_data.angle;
+	uint16_t angle_start = angle_end;
 	
 	switch(turn)
 	{
 		case LEFT_TURN:
-			angle1 += 9000;
-			if (angle1 >= 36000)
-			angle1 -= 36000;
-		
+			angle_end += 9000;
 			commandToControlSignal(STEER_ROTATE_LEFT);
-			while (current_sensor_data.angle < angle1 || current_sensor_data.angle >= angle2)
-			{}
-			commandToControlSignal(STEER_STOP); // för test ska vara: commandToControlSignal(STEER_STRAIGHT);
+			pwmWheels(control_signals);
+			if (angle_end >= 36000)
+			{
+				angle_end -= 36000;
+				while (current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start)
+				{}	
+			}
+			else
+			{
+				while (current_sensor_data.angle < angle_end)
+				{}
+			}
 			break;
 		
 		case RIGHT_TURN:
-			angle1 -= 9000;
-			if (angle1 >= 36000)
-			angle1 = 36000 - (9000 - angle2);
-			
+			angle_end -= 9000;
 			commandToControlSignal(STEER_ROTATE_RIGHT);
-			while (current_sensor_data.angle > angle1 || current_sensor_data.angle <= angle2)
-			{}
-			commandToControlSignal(STEER_STOP); // för test ska vara: commandToControlSignal(STEER_STRAIGHT);
+			pwmWheels(control_signals);
+			if (angle_end >= 36000)
+			{
+				angle_end = 36000 - (9000 - angle_start);
+				while (current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start)
+				{}		
+			}
+			else
+			{
+				while (current_sensor_data.angle > angle_end)
+				{}
+			}
 			break;
 		
 		case STRAIGHT:
-			commandToControlSignal(STEER_STRAIGHT);
 			break;
 		
 		default:
 			break;
 	}
+	
+	commandToControlSignal(STEER_STOP); // för test ska vara: commandToControlSignal(STEER_STRAIGHT);
+	pwmWheels(control_signals);
+	
 	
 	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att PD-reglera på.
 	while (current_sensor_data.distance3 > THRESHOLD_CONTACT && current_sensor_data.distance4 > THRESHOLD_CONTACT)
@@ -177,10 +194,10 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 			break;
 			
 		case LINE_STRAIGHT:
-			startTimer();
-		
-			while(TCNT1 < 2*timer_count)
-			{}
+			//startTimer();
+		//
+			//while(TCNT1 < 2*timer_count)
+			//{}
 			pushTurnStack(turn_stack, newTurnNode(STRAIGHT));
 			makeTurn(STRAIGHT);
 			break;
