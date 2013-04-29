@@ -57,6 +57,10 @@ void convertAllData()
 	convertRawData((RawData*)&distance5);
 	convertRawData((RawData*)&distance6);
 	convertRawData((RawData*)&distance7);
+	
+	convertLineData((RawLineData*)&line_sensor);
+	
+	
 }
 
 void convertRawData(RawData* data)
@@ -356,7 +360,7 @@ void convertLineData(RawLineData* data)
 					no_line_detections = 0;
 					line_detections = 0;
 					current_line = 0;
-					sensor_data.line_type = LINE_NONE;
+					//sensor_data.line_type = LINE_NONE;
 				}
 			}
 			
