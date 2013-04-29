@@ -52,15 +52,15 @@
     <OverrideVtorValue />
     <eraseonlaunchrule>0</eraseonlaunchrule>
     <com_atmel_avrdbg_tool_simulator>
-      <ToolType>com.atmel.avrdbg.tool.simulator</ToolType>
-      <ToolName>AVR Simulator</ToolName>
-      <ToolNumber>
+      <ToolType xmlns="">com.atmel.avrdbg.tool.simulator</ToolType>
+      <ToolName xmlns="">AVR Simulator</ToolName>
+      <ToolNumber xmlns="">
       </ToolNumber>
-      <KeepTimersRunning>true</KeepTimersRunning>
-      <OverrideVtor>false</OverrideVtor>
-      <OverrideVtorValue>
+      <KeepTimersRunning xmlns="">true</KeepTimersRunning>
+      <OverrideVtor xmlns="">false</OverrideVtor>
+      <OverrideVtorValue xmlns="">
       </OverrideVtorValue>
-      <Channel>
+      <Channel xmlns="">
         <host>127.0.0.1</host>
         <port>1111</port>
         <ssl>False</ssl>

@@ -33,74 +33,77 @@ void resetTimer()
 	TIFR1 |= (1 << TOV1);
 }
 
-//RegulatorSignals regulatorSignalDeltaLeft(const int16_t* delta_left, const int16_t* delta_left_previous)
-//{
-	//RegulatorSignals ret;
-	//ret.left_value = control_parameters.left_kp * delta_left + control_parameters.left_kd * (delta_left - delta_left_previous));
-	//ret.right_value = -(control_parameters.right_kp * delta_left + control_parameters.right_kd * (delta_left - delta_left_previous)));
-	//return ret;
-//}
-//
-//RegulatorSignals regulatorSignalDeltaRight(const int16_t* delta_right, const int16_t* delta_right_previous)
-//{
-	//RegulatorSignals ret;
-	//ret.left_value = -(control_parameters.left_kp * delta_right + control_parameters.left_kd * (delta_right - delta_right_previous)));
-	//ret.right_value = control_parameters.right_kp * delta_right + control_parameters.right_kd * (delta_right - delta_right_previous));
-	//return ret;
-//}
-//
-//RegulatorSignals regulatorSignalDeltaFront(const int16_t* delta_front, const int16_t* delta_front_previous)
-//{
-	//RegulatorSignals ret;
-	//ret.left_value = -(control_parameters.left_kp * delta_front + control_parameters.left_kd * (delta_front - delta_front_previous)));
-	//ret.right_value = control_parameters.right_kp * delta_front + control_parameters.right_kd * (delta_front - delta_front_previous)));
-	//return ret;
-//}
-//
-//RegulatorSignals regulatorSignalDeltaBack(const int16_t* delta_back, const int16_t* delta_back_previous)
-//{
-	//RegulatorSignals ret;
-	//ret.left_value = control_parameters.left_kp * delta_back + control_parameters.left_kd * (delta_back - delta_back_previous));
-	//ret.right_value = -(control_parameters.right_kp * delta_back + control_parameters.right_kd * (delta_back - delta_back_previous)));
-	//return ret;
-//}
+RegulatorSignals regulatorSignalDeltaLeft(const int16_t* delta_left, const int16_t* delta_left_previous)
+{
+	RegulatorSignals ret;
+	ret.left_value = control_parameters.left_kp * *delta_left + control_parameters.left_kd * (*delta_left - *delta_left_previous);
+	ret.right_value = -(control_parameters.right_kp * *delta_left + control_parameters.right_kd * (*delta_left - *delta_left_previous));
+	return ret;
+}
+
+RegulatorSignals regulatorSignalDeltaRight(const int16_t* delta_right, const int16_t* delta_right_previous)
+{
+	RegulatorSignals ret;
+	ret.left_value = -(control_parameters.left_kp * *delta_right + control_parameters.left_kd * (*delta_right - *delta_right_previous));
+	ret.right_value = control_parameters.right_kp * *delta_right + control_parameters.right_kd * (*delta_right - *delta_right_previous);
+	return ret;
+}
+
+RegulatorSignals regulatorSignalDeltaFront(const int16_t* delta_front, const int16_t* delta_front_previous)
+{
+	RegulatorSignals ret;
+	ret.left_value = -(control_parameters.left_kp * *delta_front + control_parameters.left_kd * (*delta_front - *delta_front_previous));
+	ret.right_value = control_parameters.right_kp * *delta_front + control_parameters.right_kd * (*delta_front - *delta_front_previous);
+	return ret;
+}
+
+RegulatorSignals regulatorSignalDeltaBack(const int16_t* delta_back, const int16_t* delta_back_previous)
+{
+	RegulatorSignals ret;
+	ret.left_value = control_parameters.left_kp * *delta_back + control_parameters.left_kd * (*delta_back - *delta_back_previous);
+	ret.right_value = -(control_parameters.right_kp * *delta_back + control_parameters.right_kd * (*delta_back - *delta_back_previous));
+	return ret;
+}
 
 void sensorDataToControlSignal(const SensorData* current, const SensorData* previous)
 {
-	//ATOMIC_BLOCK(ATOMIC_FORCEON)
-	//{
-		//RegulatorSignals regulator_signals;
-		//
-		//// switch
-		//
-		//regulator_signals = regulatorSignalDeltaFront(current->distance3 - current.distance4, previous.distance3 - previous.distance4);
-		//
-		//if (regulator_signals.left_value > control_signals.left_value)
-		//{
-			//control_signals.left_value = 0;
-		//}
-		//else
-		//{
-			//control_signals.left_value += regulator_signals.left_value;
-			//if (control_signals.left_value > 100)
-			//{
-				//control_signals.left_value = 100;
-			//}
-		//}
-		//
-		//if (regulator_signals.right_value > control_signals.right_value)
-		//{
-			//control_signals.left_value = 0;
-		//}
-		//else
-		//{
-			//control_signals.right_value += regulator_signals.right_value;
-			//if (control_signals.right_value > 100)
-			//{
-				//control_signals.right_value = 100;
-			//}
-		//}
-	//}
+	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	{
+		RegulatorSignals regulator_signals;
+		
+		// switch
+		
+		int16_t delta_front = current->distance3 - current->distance4;
+		int16_t delta_front_previous = previous->distance3 - previous->distance4;
+		
+		regulator_signals = regulatorSignalDeltaFront(&delta_front, &delta_front_previous);
+		
+		if (regulator_signals.left_value > control_signals.left_value)
+		{
+			control_signals.left_value = 0;
+		}
+		else
+		{
+			control_signals.left_value += regulator_signals.left_value;
+			if (control_signals.left_value > 100)
+			{
+				control_signals.left_value = 100;
+			}
+		}
+		
+		if (regulator_signals.right_value > control_signals.right_value)
+		{
+			control_signals.left_value = 0;
+		}
+		else
+		{
+			control_signals.right_value += regulator_signals.right_value;
+			if (control_signals.right_value > 100)
+			{
+				control_signals.right_value = 100;
+			}
+		}
+	}
 }
 
 void makeTurn(uint8_t turn)
@@ -148,25 +151,36 @@ void makeTurn(uint8_t turn)
 void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 {
 	uint16_t timer_count = 800000000/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
-	
-	startTimer();
-	
-	while(TCNT1 < timer_count) 
-	{}
 		
 	switch(turn)
 	{
-		case LEFT_TURN:
+		case LINE_GOAL:
+			// algo mål
+			break;
+			
+		case LINE_TURN_LEFT:
+			startTimer();
+		
+			while(TCNT1 < timer_count)
+			{}
 			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 			makeTurn(LEFT_TURN);
 			break;
 			
-		case RIGHT_TURN:
+		case LINE_TURN_RIGHT:
+			startTimer();
+		
+			while(TCNT1 < timer_count)
+			{}	
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
 			break;
 			
-		case STRAIGHT:
+		case LINE_STRAIGHT:
+			startTimer();
+		
+			while(TCNT1 < 2*timer_count)
+			{}
 			pushTurnStack(turn_stack, newTurnNode(STRAIGHT));
 			makeTurn(STRAIGHT);
 			break;

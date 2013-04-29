@@ -57,6 +57,7 @@ uint16_t restartTimer()
 	TCNT1 = 0x0000;
 	TIFR1 |= (1 << TOV1); 
 
+	
 	startTimer();
 	return tmp;
 }
@@ -444,22 +445,8 @@ int main()
 	//sensor_data.distance6 = 06;
 	//sensor_data.distance7 = 0xFF;
 	//sensor_data.angle = 0x6400;
+	startADC();
 	
-	gyro_sample1.value = 227;
-	gyro_sample1.time = 20000;
-	gyro_sample1.is_converted = 0;
-	
-	uint8_t i;
-	for (i = 0; i < 12; i++)
-	{
-		convertRawDataGyro((RawDataGyro*)&gyro_sample1);
-		gyro_sample1.is_converted = 0;
-	}
-	for (i = 0; i < 12; i++)
-	{
-		convertRawDataGyro((RawDataGyro*)&gyro_sample1);
-		gyro_sample1.is_converted = 0;
-	}
 	while (1)
 	{
 		// Kalibrering av linjesensor
@@ -473,7 +460,6 @@ int main()
 			calibrate_line_sensor = 0;
 		}
 			convertAllData();
-			sensor_data.line_type = gyro_sample1.value;
 			//sensor_data.distance1 = lookUpTemp(distance1.value, 34, distance_table);
 			
 	}
