@@ -17,8 +17,9 @@
     <RootNamespace>sensorenhet</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <AsfVersion>3.1.3</AsfVersion>
-    <avrtoolinterface>JTAG</avrtoolinterface>
-    <avrtool>com.atmel.avrdbg.tool.jtagicemk3</avrtool>
+    <avrtoolinterface>
+    </avrtoolinterface>
+    <avrtool>com.atmel.avrdbg.tool.simulator</avrtool>
     <com_atmel_avrdbg_tool_jtagicemk3>
       <ToolType>com.atmel.avrdbg.tool.jtagicemk3</ToolType>
       <ToolName>JTAGICE3</ToolName>
@@ -62,6 +63,7 @@
       </OverrideVtorValue>
       <Channel xmlns="">
         <host>127.0.0.1</host>
+        <port>4243</port>
         <port>1610</port>
         <ssl>False</ssl>
       </Channel>

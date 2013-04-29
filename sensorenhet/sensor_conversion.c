@@ -41,7 +41,7 @@ void initGYRO()
 	uint8_t i;
 	for (i = 0; i < NR_OF_GYRO_SAMPLES; i++)
 	{
-		gyro_samples[i]=0;
+		gyro_samples[i]=10; /* = 0 vid skarpt läge */
 	}
 }
 
