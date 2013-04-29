@@ -316,7 +316,11 @@ int main()
 	pwmWheels(control_signals);
 	pwmClaw(control_signals);
 	
-	uint8_t test = 0;
+	
+	control_parameters.left_kd = 1;
+	control_parameters.left_kp = 1;
+	control_parameters.right_kd = 1;
+	control_parameters.right_kp = 1;
 	
     while (1)
     {
@@ -337,31 +341,6 @@ int main()
 				sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 				new_sensor_data = 0;
 			}
-			
-			
-			/* TEST --------------*/
-				uint8_t i;
-				for (i = 0; i < 70; ++i)
-				{
-					_delay_ms(30);
-				}
-			
-			if (test)
-			{
-				makeTurn(LEFT_TURN);
-				test = 0;
-			}
-			else
-			{
-				makeTurn(RIGHT_TURN);
-				test = 1;
-			}				
-				
-			//detectTurn(turn_stack);
-			//makeTurn(LEFT_TURN);
-			//makeTurn(RIGHT_TURN);
-			/* TEST --------------- */
-			
 		}
 		
 		pwmWheels(control_signals);

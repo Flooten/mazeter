@@ -80,7 +80,7 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 		
 		regulator_signals = regulatorSignalDeltaFront(&delta_front, &delta_front_previous);
 		
-		if (regulator_signals.left_value > control_signals.left_value)
+		if (regulator_signals.left_value + (int8_t)control_signals.left_value < 0)
 		{
 			control_signals.left_value = 0;
 		}
@@ -93,9 +93,9 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 			}
 		}
 		
-		if (regulator_signals.right_value > control_signals.right_value)
+		if (regulator_signals.right_value +  (int8_t)control_signals.right_value < 0)
 		{
-			control_signals.left_value = 0;
+			control_signals.right_value = 0;
 		}
 		else
 		{
