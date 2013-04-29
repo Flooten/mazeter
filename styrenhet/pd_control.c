@@ -162,7 +162,15 @@ void makeTurn(uint8_t turn)
 	
 	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att PD-reglera på.
 	while (current_sensor_data.distance3 > THRESHOLD_CONTACT && current_sensor_data.distance4 > THRESHOLD_CONTACT)
-	{}
+	{
+		// Stannar roboten om vi är på väg att köra in i något.
+		if (current_sensor_data.distance1 < THRESHOLD_STOP - 5 || current_sensor_data.distance2 < THRESHOLD_STOP -5)
+		{
+			commandToControlSignal(STEER_STOP);
+			pwmWheels(control_signals);
+			return;
+		}
+	}
 }
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
