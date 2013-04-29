@@ -459,8 +459,6 @@ int main()
 			sensor_parameters.tape_threshold = sum / 2;
 			calibrate_line_sensor = 0;
 		}
-			convertAllData();
-			//sensor_data.distance1 = lookUpTemp(distance1.value, 34, distance_table);
-			
+		convertAllData();
 	}
 }
