@@ -63,11 +63,8 @@
       </OverrideVtorValue>
       <Channel xmlns="">
         <host>127.0.0.1</host>
-<<<<<<< HEAD
         <port>4243</port>
-=======
         <port>1610</port>
->>>>>>> origin/master
         <ssl>False</ssl>
       </Channel>
     </com_atmel_avrdbg_tool_simulator>
