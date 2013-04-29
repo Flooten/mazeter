@@ -33,7 +33,10 @@
 #define LINE_FOLLOWING 0x05
 
 #define NR_OF_GYRO_SAMPLES 10
-#define GYRO_REF_LEVEL 128 // 127
+#define GYRO_REF_LEVEL 128
+/* Kompensering för att gyrot driver:
+  hundradelsgrader/sample * 10340 = GYRO_COMP  */
+#define GYRO_COMP 0 //-20000
 
 #define CONVERSION_ERROR 1;
 

@@ -31,11 +31,10 @@ void detectTurn(volatile TurnStack* turn_stack)
 				pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 				makeTurn(LEFT_TURN);
 			}
-			else //fortsätt PD-reglera rakt fram (fall 4)
+			else if (previous_sensor_data.distance3 > current_sensor_data.distance3 + 40)
 			{
 				// Fall 4
 				pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
-				makeTurn(STRAIGHT);
 			}
 		}
 		else if (current_sensor_data.distance1 < THRESHOLD_STOP)
@@ -67,11 +66,10 @@ void detectTurn(volatile TurnStack* turn_stack)
 				pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 				makeTurn(RIGHT_TURN);
 			}
-			else // fortsätt PD-reglera rakt fram (fall 8)
+			else if (previous_sensor_data.distance4 > current_sensor_data.distance4 + 40)
 			{
 				// Fall 8
 				pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
-				makeTurn(STRAIGHT);
 			}
 		}
 		else

@@ -20,6 +20,14 @@
 #include "control_parameters.h"
 #include "pd_control.h"
 
+/* TEST  ---------------- */
+#ifndef F_CPU
+#define F_CPU 8000000UL
+#endif
+#include <util/delay.h> 
+/* TEST ----------------- */
+
+
 #define SPI_RECEIVING_SENSOR_DATA 0x03
 
 // SPI-variabler
@@ -308,6 +316,8 @@ int main()
 	pwmWheels(control_signals);
 	pwmClaw(control_signals);
 	
+	uint8_t test = 0;
+	
     while (1)
     {
 		// Låt inte Joel köra för fort...
@@ -328,9 +338,30 @@ int main()
 				new_sensor_data = 0;
 			}
 			
+			
+			/* TEST --------------*/
+				uint8_t i;
+				for (i = 0; i < 70; ++i)
+				{
+					_delay_ms(30);
+				}
+			
+			if (test)
+			{
+				makeTurn(LEFT_TURN);
+				test = 0;
+			}
+			else
+			{
+				makeTurn(RIGHT_TURN);
+				test = 1;
+			}				
+				
 			//detectTurn(turn_stack);
 			//makeTurn(LEFT_TURN);
 			//makeTurn(RIGHT_TURN);
+			/* TEST --------------- */
+			
 		}
 		
 		pwmWheels(control_signals);
