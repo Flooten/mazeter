@@ -33,7 +33,8 @@
 #define LINE_FOLLOWING 0x05
 
 #define NR_OF_GYRO_SAMPLES 10
-#define GYRO_REF_LEVEL 128 // 127
+#define GYRO_REF_LEVEL 127
+#define GYRO_COMPENSATION 0 // används för att kompensera för att gyrot driver
 
 #define CONVERSION_ERROR 1;
 
