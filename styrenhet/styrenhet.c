@@ -211,7 +211,7 @@ void parseCommand(uint8_t cmd)
 			
 		case 0x96:
 			SPDR = 0x96;
-			buffer = &mah_2nd_const;
+			buffer = &control_parameters.left_kd;
 			buffer_size = 1;
 			current_byte = 0;
 			break;

@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include "sensor_conversion.h"
 #include "look_up.h"
+#include "line_calibration.h"
 
 volatile uint8_t conversion_status;
 uint8_t line_detections = 0;
@@ -346,9 +347,7 @@ void convertLineData(RawLineData* data)
 				current_line = SPACE_2;
 				line_detections = 0;
 				
-				sensor_data.line_type = first_line_val;
-				sensor_data.line_deviation = second_line_val;
-				//compareLines(first_line_val, second_line_val);
+				compareLines(first_line_val, second_line_val);
 			}
 			else
 			{
