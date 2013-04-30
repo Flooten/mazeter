@@ -323,13 +323,16 @@ int main()
 	pwmWheels(control_signals);
 	pwmClaw(control_signals);
 	
-	
+	/* TEST ---------------- */
 	control_parameters.left_kd = 0;
 	control_parameters.left_kp = 1;
 	control_parameters.right_kd = 0;
 	control_parameters.right_kp = 1;
 	
-	throttle = 20;
+	control_signals.left_direction = 1;
+	control_signals.right_direction = 1;
+	/* TEST --------------- */
+	
 	
     while (1)
     {
@@ -358,11 +361,10 @@ int main()
 		{
 			if (new_sensor_data == 1)
 			{
- 				sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+ 				//sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 				new_sensor_data = 0;
-				commandToControlSignal(CLAW_CLOSE);
 				
-				//detectTurn(turn_stack);
+				detectTurn(turn_stack);
 			}
 		}
 		
