@@ -41,6 +41,7 @@ volatile uint8_t current_command;
 volatile uint8_t throttle;
 volatile uint8_t new_sensor_data = 0;
 volatile uint8_t reciving_sensor_data = 0;
+volatile uint8_t abort_flag = 0;	
 
 volatile ControlSignals control_signals;
 volatile SensorData current_sensor_data;
@@ -48,8 +49,6 @@ volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
 volatile TurnStack* turn_stack;
-
-volatile uint8_t mah_2nd_const = 129;
 
 void parseCommand(uint8_t cmd);
 
@@ -212,17 +211,14 @@ void parseCommand(uint8_t cmd)
 			
 		case CONTROL_PARAMETERS_ALL:
 			SPDR = CONTROL_PARAMETERS_ALL;
-			buffer = &control_parameters.right_kp;
+			buffer = (uint8_t*)&control_parameters.right_kp;
 			buffer_size = sizeof(control_parameters);
 			current_byte = 0;
 			spi_status = SPI_RECEIVING_DATA;
 			break;
 			
-		case 0x96:
-			SPDR = 0x96;
-			buffer = &control_parameters.left_kd;
-			buffer_size = 1;
-			current_byte = 0;
+		case ABORT:
+			abort_flag = 1;
 			break;
 
         default:
@@ -327,9 +323,9 @@ int main()
 	pwmClaw(control_signals);
 	
 	/* TEST ---------------- */
-	control_parameters.left_kd = 1;
+	control_parameters.left_kd = 0;
 	control_parameters.left_kp = 1;
-	control_parameters.right_kd = 1;
+	control_parameters.right_kd = 0;
 	control_parameters.right_kp = 1;
 	
 	control_signals.left_direction = 1;
@@ -339,11 +335,11 @@ int main()
 	
     while (1)
     {
-		// Undvik att köra in i väggar rakt fram
-		if (current_sensor_data.distance1 < THRESHOLD_STOP - 5 || current_sensor_data.distance2 < THRESHOLD_STOP - 5)
+		if (abort_flag)
 		{
 			commandToControlSignal(STEER_STOP);
 			pwmWheels(control_signals);
+			continue;
 		}
 	
 		// Låt inte Joel köra för fort...
