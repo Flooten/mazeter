@@ -219,7 +219,9 @@ void parseCommand(uint8_t cmd)
 			break;
 			
 		case ABORT:
+			SPDR = ABORT;
 			abort_flag = 1;
+			new_sensor_data = 0;
 			break;
 
         default:
@@ -325,9 +327,9 @@ int main()
 	
 	/* TEST ---------------- */
 	control_parameters.left_kd = 0;
-	control_parameters.left_kp = 1;
+	control_parameters.left_kp = 0;
 	control_parameters.right_kd = 0;
-	control_parameters.right_kp = 1;
+	control_parameters.right_kp = 0;
 	
 	control_signals.left_direction = 1;
 	control_signals.right_direction = 1;
@@ -361,10 +363,10 @@ int main()
 		{
 			if (new_sensor_data == 1)
 			{
- 				//sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+ 				sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 				new_sensor_data = 0;
 				
-				detectTurn(turn_stack);
+				//detectTurn(turn_stack);
 			}
 		}
 		

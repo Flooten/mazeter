@@ -241,6 +241,7 @@ int main(void)
 						
 					case ABORT:
 						control_command = ABORT;
+						start = 0;
 						break;
 					
 					case CALIBRATE_LINE_SENSOR:
