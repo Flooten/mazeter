@@ -326,16 +326,25 @@ int main()
 	pwmWheels(control_signals);
 	pwmClaw(control_signals);
 	
-	
+	/* TEST ---------------- */
 	control_parameters.left_kd = 1;
 	control_parameters.left_kp = 1;
 	control_parameters.right_kd = 1;
 	control_parameters.right_kp = 1;
 	
-	throttle = 20;
+	control_signals.left_direction = 1;
+	control_signals.right_direction = 1;
+	/* TEST --------------- */
+	
 	
     while (1)
     {
+		// Undvik att köra in i väggar rakt fram
+		if (current_sensor_data.distance1 < THRESHOLD_STOP - 5 || current_sensor_data.distance2 < THRESHOLD_STOP - 5)
+		{
+			commandToControlSignal(STEER_STOP);
+			pwmWheels(control_signals);
+		}
 	
 		// Låt inte Joel köra för fort...
 		if (throttle > 100)
@@ -353,7 +362,6 @@ int main()
 			{
  				//sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 				new_sensor_data = 0;
-				commandToControlSignal(CLAW_CLOSE);
 				
 				detectTurn(turn_stack);
 			}

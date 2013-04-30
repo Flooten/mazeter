@@ -17,6 +17,10 @@
 #include <util/atomic.h>
 #include <stdint.h>
 
+#ifndef F_CPU
+#define F_CPU 8000000UL
+#endif
+
 typedef struct  
 {
 	int8_t left_value;
@@ -112,6 +116,7 @@ void makeTurn(uint8_t turn)
 {
 	uint16_t angle_end = current_sensor_data.angle;
 	uint16_t angle_start = angle_end;
+	throttle = 50; // TEST
 	
 	switch(turn)
 	{
@@ -150,6 +155,8 @@ void makeTurn(uint8_t turn)
 			break;
 		
 		case STRAIGHT:
+			while (current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT)
+			{}
 			break;
 		
 		default:
@@ -175,12 +182,20 @@ void makeTurn(uint8_t turn)
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 {
-	uint16_t timer_count = 800000000/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
+	uint16_t timer_count = 100*F_CPU/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
 		
 	switch(turn)
 	{
 		case LINE_GOAL:
 			// algo mål
+			break;
+		
+		case LINE_GOAL_STOP:
+			// stanna och plocka upp muggen
+			commandToControlSignal(STEER_STOP);
+			pwmWheels(control_signals);
+			commandToControlSignal(CLAW_CLOSE);
+			pwmClaw(control_signals);
 			break;
 			
 		case LINE_TURN_LEFT:
@@ -202,14 +217,17 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 			break;
 			
 		case LINE_STRAIGHT:
-			//startTimer();
-		//
-			//while(TCNT1 < 2*timer_count)
-			//{}
+			startTimer();
+		
+			while(TCNT1 < timer_count)
+			{}
 			pushTurnStack(turn_stack, newTurnNode(STRAIGHT));
 			makeTurn(STRAIGHT);
 			break;
 			
+		case LINE_START:
+			// linjen vi passerar när vi går in och ut ur labyrinten
+				
 		default:
 			break;
 	}

@@ -15,6 +15,7 @@
 #include "turn_stack.h"
 #include "styrenhet.h"
 #include "pd_control.h"
+#include "PWM.h"
 
 void detectTurn(volatile TurnStack* turn_stack)
 {
@@ -48,6 +49,9 @@ void detectTurn(volatile TurnStack* turn_stack)
 			}
 			else
 			{
+				commandToControlSignal(CLAW_CLOSE);
+				pwmClaw(control_signals);
+				
 				// Fall 1 eller 3
 				pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 				makeTurn(LEFT_TURN);
