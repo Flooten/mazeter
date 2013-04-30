@@ -212,17 +212,10 @@ void parseCommand(uint8_t cmd)
 			
 		case CONTROL_PARAMETERS_ALL:
 			SPDR = CONTROL_PARAMETERS_ALL;
-			buffer = &control_parameters.right_kp;
+			buffer = (uint8_t*)&control_parameters.right_kp;
 			buffer_size = sizeof(control_parameters);
 			current_byte = 0;
 			spi_status = SPI_RECEIVING_DATA;
-			break;
-			
-		case 0x96:
-			SPDR = 0x96;
-			buffer = &control_parameters.left_kd;
-			buffer_size = 1;
-			current_byte = 0;
 			break;
 
         default:
@@ -327,9 +320,9 @@ int main()
 	pwmClaw(control_signals);
 	
 	
-	control_parameters.left_kd = 1;
+	control_parameters.left_kd = 0;
 	control_parameters.left_kp = 1;
-	control_parameters.right_kd = 1;
+	control_parameters.right_kd = 0;
 	control_parameters.right_kp = 1;
 	
 	throttle = 20;
@@ -351,11 +344,11 @@ int main()
 		{
 			if (new_sensor_data == 1)
 			{
- 				//sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+ 				sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 				new_sensor_data = 0;
 				commandToControlSignal(CLAW_CLOSE);
 				
-				detectTurn(turn_stack);
+				//detectTurn(turn_stack);
 			}
 		}
 		

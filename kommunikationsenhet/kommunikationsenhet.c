@@ -22,6 +22,8 @@
 #include "sensor_parameters.h"
 #include "control_parameters.h"
 
+#define DELTA_T 2 // i ms 
+
 volatile uint8_t control_mode_flag;
 volatile uint8_t control_command;
 volatile uint8_t sensor_command;
@@ -30,10 +32,11 @@ volatile ControlSignals control_signals;
 volatile SensorParameters sensor_parameters;
 volatile ControlParameters control_parameters;
 
+uint8_t new_control_parameters = 0;
+
 volatile uint8_t throttle;
 volatile uint8_t start;
 
-volatile uint8_t from_styr;
 
 
 // Funktioner som initierar kommunikationsenheten
@@ -72,6 +75,7 @@ ISR (INT0_vect)
 		{
 			control_mode_flag = FLAG_MANUAL;
 			start = 0;
+			control_command = STEER_STOP;
 		}
 }
 
@@ -79,6 +83,8 @@ ISR (INT1_vect)
 {
 	if (control_mode_flag == FLAG_AUTO)
 		start = 1;
+
+
 }
 
 ISR(TIMER1_COMPA_vect)
@@ -139,11 +145,13 @@ int main(void)
 					sensor_command = 0;
 				}
 				
-				if (spiSendData(CONTROL_PARAMETERS_ALL, STYR_ENHET, (const uint8_t*)&control_parameters.right_kp, sizeof(control_parameters)) != CONTROL_PARAMETERS_ALL)
+				if (new_control_parameters)
 				{
-					btSendString("Failed to send the control parameters to the control device.");
-				}
-				
+					if (spiSendData(CONTROL_PARAMETERS_ALL, STYR_ENHET, (const uint8_t*)&control_parameters.right_kp, sizeof(control_parameters)) != CONTROL_PARAMETERS_ALL)
+					{
+						btSendString("Failed to send the control parameters to the control device.");
+					}
+				}				
 			}
 			else
 			{
@@ -158,7 +166,6 @@ int main(void)
 			
 			spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));
-			spiReadData(0x96, STYR_ENHET, (uint8_t*)&from_styr, 1);
 			timer_internal_ready = 0;
 		}		
 		
@@ -167,7 +174,6 @@ int main(void)
 			btSendData(CONTROL_SIGNALS, (const uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			btSendData(SENSOR_DATA_ALL, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			btSendData(control_mode_flag, NULL, 0);
-			btSendData(0x96, (const uint8_t*)&from_styr, 1);
 			timer_external_ready = 0;
 		}
 		
@@ -233,13 +239,33 @@ int main(void)
 						break;
 						
 					case CONTROL_PARAMETERS_ALL:
-						control_command = CONTROL_PARAMETERS_ALL;
 						control_parameters.right_kp = tmp->data[0];
 						control_parameters.right_kd = tmp->data[1];
 						control_parameters.left_kp = tmp->data[2];
 						control_parameters.left_kd = tmp->data[3];
-						break;						
+						break;
+					
+					case PARA_KD_LEFT:
+						control_parameters.left_kd = tmp->data[0];
+						control_parameters.left_kd = control_parameters.left_kd; 
+						new_control_parameters = 1;
+						break;
 						
+					case PARA_KP_LEFT:
+						control_parameters.left_kp = tmp->data[0];
+						new_control_parameters = 1;
+						break;
+					
+					case PARA_KD_RIGHT:
+						control_parameters.right_kd = tmp->data[0];
+						new_control_parameters = 1;
+						control_parameters.right_kd = control_parameters.right_kd; 
+						break;
+					
+					case PARA_KP_RIGHT:
+						control_parameters.right_kp = tmp->data[0];
+						new_control_parameters = 1;
+						break;	
 						
 
 					default:

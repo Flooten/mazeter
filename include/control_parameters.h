@@ -15,12 +15,12 @@
 
 typedef struct  
 {
-	uint8_t right_kp;
-	uint8_t right_kd;
-	uint8_t left_kp;
-	uint8_t left_kd;
-	uint8_t line_kp;
-	uint8_t line_kd;
+	uint16_t right_kp;
+	uint16_t right_kd;
+	uint16_t left_kp;
+	uint16_t left_kd;
+	uint16_t line_kp;
+	uint16_t line_kd;
 } ControlParameters;
 
 #endif /* CONTROL_PARAMETERS_H_ */
