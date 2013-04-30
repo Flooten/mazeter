@@ -1,6 +1,8 @@
 # AVR Studio #
 Debug
 *.csv
+*.atsuo
+
 
 # Merge
 *.orig
