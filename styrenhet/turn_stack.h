@@ -31,7 +31,7 @@ TurnNode* newTurnNode(uint8_t turn);
 void freeTurnNode(TurnNode* node);
 
 /* Stack */
-TurnStack createTurnStack();
+volatile TurnStack createTurnStack();
 void freeTurnStack(volatile TurnStack* stack);
 void pushTurnStack(volatile TurnStack* stack, TurnNode* node);
 uint8_t popTurnStack(volatile TurnStack* stack);

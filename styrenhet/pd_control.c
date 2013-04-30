@@ -130,7 +130,7 @@ void makeTurn(uint8_t turn)
 	switch(turn)
 	{
 		case LEFT_TURN:
-			angle_end += 9000;
+			angle_end += DEGREES_90;
 			commandToControlSignal(STEER_ROTATE_LEFT);
 			pwmWheels(control_signals);
 			if (angle_end >= 36000)
@@ -147,12 +147,12 @@ void makeTurn(uint8_t turn)
 			break;
 		
 		case RIGHT_TURN:
-			angle_end -= 9000;
+			angle_end -= DEGREES_90;
 			commandToControlSignal(STEER_ROTATE_RIGHT);
 			pwmWheels(control_signals);
 			if (angle_end >= 36000)
 			{
-				angle_end = 36000 - (9000 - angle_start);
+				angle_end = 36000 - (DEGREES_90 - angle_start);
 				while (current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start)
 				{}		
 			}
@@ -172,7 +172,7 @@ void makeTurn(uint8_t turn)
 			break;
 	}
 	
-	commandToControlSignal(STEER_STOP); // för test ska vara: commandToControlSignal(STEER_STRAIGHT);
+	commandToControlSignal(STEER_STRAIGHT);
 	pwmWheels(control_signals);
 	
 	
@@ -180,13 +180,17 @@ void makeTurn(uint8_t turn)
 	while (current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT)
 	{
 		// Stannar roboten om vi är på väg att köra in i något.
-		if (current_sensor_data.distance1 < THRESHOLD_STOP - 5 || current_sensor_data.distance2 < THRESHOLD_STOP -5)
+		if (current_sensor_data.distance1 < THRESHOLD_ABORT || current_sensor_data.distance2 < THRESHOLD_ABORT)
 		{
 			commandToControlSignal(STEER_STOP);
 			pwmWheels(control_signals);
 			return;
 		}
 	}
+	
+	// TEST
+	commandToControlSignal(CLAW_CLOSE);
+	pwmClaw(control_signals);
 }
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
