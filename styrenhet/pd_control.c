@@ -116,8 +116,7 @@ void makeTurn(uint8_t turn)
 {
 	uint16_t angle_end = current_sensor_data.angle;
 	uint16_t angle_start = angle_end;
-	throttle = 50; // TEST
-	
+		
 	switch(turn)
 	{
 		case LEFT_TURN:
@@ -168,7 +167,7 @@ void makeTurn(uint8_t turn)
 	
 	
 	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att PD-reglera på.
-	while (current_sensor_data.distance3 > THRESHOLD_CONTACT && current_sensor_data.distance4 > THRESHOLD_CONTACT)
+	while (current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT)
 	{
 		// Stannar roboten om vi är på väg att köra in i något.
 		if (current_sensor_data.distance1 < THRESHOLD_STOP - 5 || current_sensor_data.distance2 < THRESHOLD_STOP -5)

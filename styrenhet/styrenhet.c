@@ -48,7 +48,7 @@ volatile SensorData current_sensor_data;
 volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
-volatile TurnStack* turn_stack;
+volatile TurnStack* turn_stack = createTurnStack();
 
 void parseCommand(uint8_t cmd);
 
@@ -330,8 +330,15 @@ int main()
 	
 	control_signals.left_direction = 1;
 	control_signals.right_direction = 1;
-	/* TEST --------------- */
 	
+	
+	uint8_t i;
+	for (i = 0; i < 20; ++i)
+	{
+		_delay_ms(30);
+	}
+	
+	/* TEST --------------- */
 	
     while (1)
     {
@@ -354,13 +361,13 @@ int main()
 		}
 		else if (control_mode_flag == FLAG_AUTO)
 		{
-			if (new_sensor_data == 1)
-			{
- 				//sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-				new_sensor_data = 0;
-				
-				detectTurn(turn_stack);
-			}
+			detectTurn(turn_stack);
+			
+			//if (new_sensor_data == 1)
+			//{
+ 				////sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+				//new_sensor_data = 0;
+			//}
 		}
 		
 		pwmWheels(control_signals);
