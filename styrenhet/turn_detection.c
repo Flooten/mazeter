@@ -72,7 +72,7 @@ void detectTurn(volatile TurnStack* turn_stack)
 				pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
 			}
 		}
-		else
+		else if (current_sensor_data.distance1 < THRESHOLD_STOP)
 		{
 			// Fall 5
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));

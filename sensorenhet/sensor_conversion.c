@@ -117,12 +117,12 @@ void convertRawDataGyro(volatile RawDataGyro* data)
 		if (data->value >= GYRO_REF_LEVEL)
 		{
 			/* positiv ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (data->time * ((long)data->value - GYRO_REF_LEVEL) * 3 + 5170 + GYRO_COMP) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (data->time * ((long)data->value - gyro_temp.value) * 3 + 5170 + GYRO_COMP) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 		else
 		{
 			/* negativ ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (data->time * ((long)data->value - GYRO_REF_LEVEL) * 3 - 5170 + GYRO_COMP) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (data->time * ((long)data->value - gyro_temp.value) * 3 - 5170 - GYRO_COMP) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 	
 		/* FIR-filtrering */
