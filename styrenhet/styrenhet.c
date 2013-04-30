@@ -144,6 +144,7 @@ void parseCommand(uint8_t cmd)
 			
 		case FLAG_MANUAL:
 			control_mode_flag = FLAG_MANUAL;
+			abort_flag = 0;
 			break;
 
 		case STEER_STRAIGHT:
@@ -334,7 +335,11 @@ int main()
     {
 		if (abort_flag)
 		{
-			commandToControlSignal(STEER_STOP);
+			memset((void*)&control_signals, 0, sizeof(control_signals));
+			memset((void*)&control_parameters, 0, sizeof(control_parameters));
+			memset((void*)&current_sensor_data, 0, sizeof(current_sensor_data));
+			memset((void*)&previous_sensor_data, 0, sizeof(previous_sensor_data));
+
 			pwmWheels(control_signals);
 			continue;
 		}

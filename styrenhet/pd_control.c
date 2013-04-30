@@ -75,10 +75,13 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 		
 		// switch
 		
-		int16_t delta_front = current->distance3 - current->distance4;
-		int16_t delta_front_previous = previous->distance3 - previous->distance4;
+		//int16_t delta_front = current->distance3 - current->distance4;
+		//int16_t delta_front_previous = previous->distance3 - previous->distance4;
 		
-		regulator_signals = regulatorSignalDeltaFront(&delta_front, &delta_front_previous);
+		int16_t delta_left = current->distance3 - current->distance5;
+		int16_t delta_left_previous = previous->distance3 - previous->distance5;
+		
+		regulator_signals = regulatorSignalDeltaLeft(&delta_left, &delta_left_previous);
 		
 		if (regulator_signals.left_value + (int8_t)control_signals.left_value < 0)
 		{
@@ -87,9 +90,9 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 		else
 		{
 			control_signals.left_value += regulator_signals.left_value;
-			if (control_signals.left_value > 100)
+			if (control_signals.left_value > 60)
 			{
-				control_signals.left_value = 100;
+				control_signals.left_value = 60;
 			}
 		}
 		
@@ -100,9 +103,9 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 		else
 		{
 			control_signals.right_value += regulator_signals.right_value;
-			if (control_signals.right_value > 100)
+			if (control_signals.right_value > 60)
 			{
-				control_signals.right_value = 100;
+				control_signals.right_value = 60;
 			}
 		}
 	}
