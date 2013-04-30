@@ -38,13 +38,13 @@
         <InterfaceProperties>
           <JtagDbgClock>250000</JtagDbgClock>
           <JtagProgClock>1000000</JtagProgClock>
-          <IspClock>150000</IspClock>
+          <IspClock>250000</IspClock>
           <JtagInChain>true</JtagInChain>
           <JtagEnableExtResetOnStartSession>false</JtagEnableExtResetOnStartSession>
-          <JtagDevicesBefore>0</JtagDevicesBefore>
-          <JtagDevicesAfter>1</JtagDevicesAfter>
-          <JtagInstrBitsBefore>0</JtagInstrBitsBefore>
-          <JtagInstrBitsAfter>4</JtagInstrBitsAfter>
+          <JtagDevicesBefore>1</JtagDevicesBefore>
+          <JtagDevicesAfter>0</JtagDevicesAfter>
+          <JtagInstrBitsBefore>4</JtagInstrBitsBefore>
+          <JtagInstrBitsAfter>0</JtagInstrBitsAfter>
         </InterfaceProperties>
       </ToolOptions>
     </com_atmel_avrdbg_tool_jtagicemk3>
@@ -62,7 +62,7 @@
       </OverrideVtorValue>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1348</port>
+        <port>1124</port>
         <ssl>False</ssl>
       </Channel>
     </com_atmel_avrdbg_tool_simulator>

@@ -327,7 +327,7 @@ void convertLineData(RawLineData* data)
 				goal_mode = 1;
 				current_line = LINE_FOLLOWING;
 				sensor_data.line_type = LINE_GOAL;
-				//sensor_data.line_deviation = calculateCenter(data->value);
+				sensor_data.line_deviation = calculateCenter(data->value);
 			}
 			
 			break;
@@ -347,11 +347,9 @@ void convertLineData(RawLineData* data)
 				current_line = SPACE_2;
 				line_detections = 0;
 				
-				//compareLines(first_line_val, second_line_val);
+				compareLines(first_line_val, second_line_val);
 				
-				sensor_data.line_deviation = second_line_val;
-				sensor_data.line_type = first_line_val;
-				
+
 			}
 			else
 			{
@@ -363,7 +361,7 @@ void convertLineData(RawLineData* data)
 					no_line_detections = 0;
 					line_detections = 0;
 					current_line = 0;
-					//sensor_data.line_type = LINE_NONE;
+					sensor_data.line_type = LINE_NONE;
 				}
 			}
 			

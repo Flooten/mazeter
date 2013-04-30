@@ -21,7 +21,7 @@
 #define F_CPU 8000000UL
 #endif
 
-typedef struct  
+typedef struct
 {
 	int8_t left_value;
 	int8_t right_value;
@@ -58,8 +58,8 @@ RegulatorSignals regulatorSignalDeltaRight(const int16_t* delta_right, const int
 RegulatorSignals regulatorSignalDeltaFront(const int16_t* delta_front, const int16_t* delta_front_previous)
 {
 	RegulatorSignals ret;
-	ret.left_value = -(control_parameters.left_kp * *delta_front + control_parameters.left_kd * (*delta_front - *delta_front_previous));
-	ret.right_value = control_parameters.right_kp * *delta_front + control_parameters.right_kd * (*delta_front - *delta_front_previous);
+	ret.left_value = -((float)control_parameters.left_kp / 10 * (*delta_front) + (float)control_parameters.left_kd / 10 * (*delta_front - *delta_front_previous));
+	ret.right_value = (float)control_parameters.right_kp / 10 * *delta_front + (float)control_parameters.right_kd / 10 * (*delta_front - *delta_front_previous);
 	return ret;
 }
 
@@ -75,47 +75,70 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		RegulatorSignals regulator_signals;
-		
-		// switch
-		
-		
+		//volatile RegulatorSignals regulator_signals;
 		
 		int16_t delta_front = current->distance3 - current->distance4;
 		int16_t delta_front_previous = previous->distance3 - previous->distance4;
 		
+		int8_t regulator_value = (float)control_parameters.left_kp / 10 * delta_front + (float)control_parameters.left_kd / 10 * (delta_front - delta_front_previous);
+		
 		//int16_t delta_left = current->distance3 - current->distance5;
 		//int16_t delta_left_previous = previous->distance3 - previous->distance5;
-		
-		
+
 		//regulator_signals = regulatorSignalDeltaLeft(&delta_left, &delta_left_previous);
-		regulator_signals = regulatorSignalDeltaFront(&delta_front, &delta_front_previous);
+		//regulator_signals = regulatorSignalDeltaFront(&delta_front, &delta_front_previous);
 		
-		if (regulator_signals.left_value + (int8_t)control_signals.left_value < 0)
+		if (regulator_value > 100)
 		{
-			control_signals.left_value = 0;
+			regulator_value = 100;
+		}
+		else if (regulator_value < -100)
+		{
+			regulator_value = -100;
+		}
+		
+		if (regulator_value < 0)
+		{
+			// Sväng åt höger
+			control_signals.right_value = 100 + regulator_value;
+			control_signals.left_value = 100;
 		}
 		else
 		{
-			control_signals.left_value = 40 + regulator_signals.left_value;
-			if (control_signals.left_value > 100)
-			{
-				control_signals.left_value = 100;
-			}
+			control_signals.right_value = 100;
+			control_signals.left_value = 100 - regulator_value;
 		}
 		
-		if (regulator_signals.right_value + (int8_t)control_signals.right_value < 0)
+		if (control_signals.right_value > 100)
 		{
-			control_signals.right_value = 0;
+			
 		}
-		else
-		{
-			control_signals.right_value = 40 + regulator_signals.right_value;
-			if (control_signals.right_value > 100)
-			{
-				control_signals.right_value = 100;
-			}
-		}
+		
+		//if (regulator_signals.left_value + 80 < 0)
+		//{
+			//control_signals.left_value = 0;
+		//}
+		//else
+		//{
+			//control_signals.left_value = 80 + regulator_signals.left_value;
+			//if (control_signals.left_value > 100)
+			//{
+				//control_signals.left_value = 100;
+			//}
+		//}
+		//
+		//if (regulator_signals.right_value + 80 < 0)
+		//{
+			//control_signals.right_value = 0;
+		//}
+		//else
+		//{
+			//control_signals.right_value = 80 + regulator_signals.right_value;
+			//if (control_signals.right_value > 100)
+			//{
+				//control_signals.right_value = 100;
+			//}
+		//}
 		
 		control_signals.left_direction = 1;
 		control_signals.right_direction = 1;

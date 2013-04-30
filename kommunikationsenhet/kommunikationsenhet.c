@@ -151,6 +151,7 @@ int main(void)
 					{
 						btSendString("Failed to send the control parameters to the control device.");
 					}
+					new_control_parameters = 0;
 				}				
 			}
 			else

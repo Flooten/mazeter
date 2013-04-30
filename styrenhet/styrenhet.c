@@ -27,14 +27,11 @@
 #include <util/delay.h> 
 /* TEST ----------------- */
 
-
-#define SPI_RECEIVING_SENSOR_DATA 0x03
-
 // SPI-variabler
 volatile uint8_t* buffer;
 volatile uint8_t buffer_size;
 volatile uint8_t current_byte;
-volatile uint8_t spi_status;
+volatile uint8_t spi_status; 
 
 volatile uint8_t control_mode_flag;
 volatile uint8_t current_command;
@@ -327,21 +324,19 @@ int main()
 	
 	/* TEST ---------------- */
 	control_parameters.left_kd = 0;
-	control_parameters.left_kp = 0;
+	control_parameters.left_kp = 5;
 	control_parameters.right_kd = 0;
-	control_parameters.right_kp = 0;
+	control_parameters.right_kp = 5;
 	
 	control_signals.left_direction = 1;
 	control_signals.right_direction = 1;
 	/* TEST --------------- */
-	
 	
     while (1)
     {
 		if (abort_flag)
 		{
 			memset((void*)&control_signals, 0, sizeof(control_signals));
-			memset((void*)&control_parameters, 0, sizeof(control_parameters));
 			memset((void*)&current_sensor_data, 0, sizeof(current_sensor_data));
 			memset((void*)&previous_sensor_data, 0, sizeof(previous_sensor_data));
 
