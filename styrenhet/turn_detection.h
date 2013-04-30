@@ -25,10 +25,13 @@
 #define THRESHOLD_CONTACT 80
 
 /* Avståndsvärde när man ska rotera */
-#define THRESHOLD_STOP 30
+#define THRESHOLD_STOP 34
+
+/* Avstånd då vi är på väg att köra in i ngt */
+#define THRESHOLD_ABORT 20
 
 /* Avståndsvärde när man ska rotera  om det är en återvändsgränd man mäter mot*/
-#define THRESHOLD_STOP_DEAD_END 110
+#define THRESHOLD_STOP_DEAD_END 114
 
 void detectTurn(volatile TurnStack* turn_stack);
 

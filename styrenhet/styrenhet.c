@@ -31,7 +31,7 @@
 volatile uint8_t* buffer;
 volatile uint8_t buffer_size;
 volatile uint8_t current_byte;
-volatile uint8_t spi_status; 
+volatile uint8_t spi_status;
 
 volatile uint8_t control_mode_flag;
 volatile uint8_t current_command;
@@ -45,7 +45,7 @@ volatile SensorData current_sensor_data;
 volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
-volatile TurnStack* turn_stack;
+volatile TurnStack turn_stack;
 
 void parseCommand(uint8_t cmd);
 
@@ -298,6 +298,8 @@ void commandToControlSignal(uint8_t cmd)
 
 int main()
 {
+	turn_stack = createTurnStack();
+	
 	memset((void*)&control_signals, 0, sizeof(control_signals));
 	memset((void*)&control_parameters, 0, sizeof(control_parameters));
 	memset((void*)&current_sensor_data, 0, sizeof(current_sensor_data));
@@ -324,17 +326,18 @@ int main()
 	
 	/* TEST ---------------- */
 	control_parameters.left_kd = 0;
-	control_parameters.left_kp = 5;
+	control_parameters.left_kp = 0;
 	control_parameters.right_kd = 0;
-	control_parameters.right_kp = 5;
+	control_parameters.right_kp = 0;
 	
 	control_signals.left_direction = 1;
 	control_signals.right_direction = 1;
+	
 	/* TEST --------------- */
 	
     while (1)
     {
-		if (abort_flag)
+		if (abort_flag) // Återställs när mode -> manual 
 		{
 			memset((void*)&control_signals, 0, sizeof(control_signals));
 			memset((void*)&current_sensor_data, 0, sizeof(current_sensor_data));
@@ -343,29 +346,41 @@ int main()
 			pwmWheels(control_signals);
 			continue;
 		}
-	
-		// Låt inte Joel köra för fort...
-		if (throttle > 100)
+		else if (current_sensor_data.distance1 < THRESHOLD_ABORT || current_sensor_data.distance2 < THRESHOLD_ABORT)
 		{
-			throttle = 100;
-		}			
-		
-		if (control_mode_flag == FLAG_MANUAL)
-		{
-			commandToControlSignal(current_command);
+			// Stanna roboten om vi är på väg in i något
+			commandToControlSignal(STEER_STOP);
+			pwmWheels(control_signals);
 		}
-		else if (control_mode_flag == FLAG_AUTO)
+		else
 		{
-			if (new_sensor_data == 1)
+			// Låt inte Joel köra för fort...
+			if (throttle > 100)
 			{
- 				sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-				new_sensor_data = 0;
-				
-				//detectTurn(turn_stack);
+				throttle = 100;
 			}
+			
+			if (control_mode_flag == FLAG_MANUAL)
+			{
+				commandToControlSignal(current_command);
+			}
+			else if (control_mode_flag == FLAG_AUTO)
+			{
+				if (new_sensor_data == 1)
+				{
+					//sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+					new_sensor_data = 0;
+					
+					// TEST
+					detectTurn(&turn_stack);
+					throttle = 50;
+					commandToControlSignal(STEER_STRAIGHT);
+				}
+			}
+			
+			pwmWheels(control_signals);
+			pwmClaw(control_signals);
 		}
 		
-		pwmWheels(control_signals);
-		pwmClaw(control_signals);
     }
 }

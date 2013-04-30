@@ -50,7 +50,7 @@ void freeTurnNode(TurnNode* node)
 /*
  *	Skapar och initialiserar en ny kö.
  */
-TurnStack createTurnStack()
+volatile TurnStack createTurnStack()
 {
 	TurnStack stack;
 
