@@ -41,6 +41,7 @@ volatile uint8_t current_command;
 volatile uint8_t throttle;
 volatile uint8_t new_sensor_data = 0;
 volatile uint8_t reciving_sensor_data = 0;
+volatile uint8_t abort_flag = 0;	
 
 volatile ControlSignals control_signals;
 volatile SensorData current_sensor_data;
@@ -48,8 +49,6 @@ volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
 volatile TurnStack* turn_stack;
-
-volatile uint8_t mah_2nd_const = 129;
 
 void parseCommand(uint8_t cmd);
 
@@ -217,6 +216,10 @@ void parseCommand(uint8_t cmd)
 			current_byte = 0;
 			spi_status = SPI_RECEIVING_DATA;
 			break;
+			
+		case ABORT:
+			abort_flag = 1;
+			break;
 
         default:
             SPDR = ERROR_UNKNOWN_SPI_COMMAND;
@@ -329,6 +332,12 @@ int main()
 	
     while (1)
     {
+		if (abort_flag)
+		{
+			commandToControlSignal(STEER_STOP);
+			pwmWheels(control_signals);
+			continue;
+		}
 	
 		// Låt inte Joel köra för fort...
 		if (throttle > 100)

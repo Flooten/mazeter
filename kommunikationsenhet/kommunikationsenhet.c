@@ -155,6 +155,11 @@ int main(void)
 			}
 			else
 			{
+				if (control_command == ABORT)
+				{
+					spiSendCommand(control_command, STYR_ENHET);
+				}
+				
 				if (start == 1)
 				{
 					if (spiSendData(SENSOR_DATA_ALL, STYR_ENHET, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
@@ -232,6 +237,10 @@ int main(void)
 				
 					case CLAW_CLOSE:
 						control_command = CLAW_CLOSE;
+						break;
+						
+					case ABORT:
+						control_command = ABORT;
 						break;
 					
 					case CALIBRATE_LINE_SENSOR:
