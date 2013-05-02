@@ -262,6 +262,6 @@ void driveStraight(uint8_t cm)
 	
 	startTimer();
 	
-	while(TCNT1 < timer_count)
+	while(TCNT1 < timer_count && !abort_flag)
 	{}
 }
