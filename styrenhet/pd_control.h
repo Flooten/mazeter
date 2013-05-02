@@ -3,7 +3,7 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Mattias Fransson
  *				  Herman Ekwall
- * DATUM:         2013-04-22
+ * DATUM:         2013-05-02
  *
  */
 
@@ -21,5 +21,6 @@
 void sensorDataToControlSignal(const SensorData* current, const SensorData* previous);
 void makeTurn(uint8_t turn);
 void handleTape(volatile TurnStack* turn_stack, uint8_t turn);
+void lineRegulator(int8_t current_deviation, int8_t previous_deviation);
 
 #endif /* PD_CONTROL_H_ */

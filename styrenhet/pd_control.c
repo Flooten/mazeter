@@ -3,7 +3,7 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Mattias Fransson
  *				  Herman Ekwall
- * DATUM:         2013-04-18
+ * DATUM:         2013-05-02
  *
  */
 
@@ -33,7 +33,6 @@ void resetTimer()
 	TCNT1 = 0x0000;
 	TIFR1 |= (1 << TOV1);
 }
-
 
 void sensorDataToControlSignal(const SensorData* current, const SensorData* previous)
 {
@@ -226,4 +225,32 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 			break;
 	}
 	resetTimer();
+}
+
+void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
+{
+	const int8_t speed = 80;
+	int8_t regulator_value = (float)control_parameters.line_kp / 10 * current_deviation + (float)control_parameters.line_kd / 10 * (current_deviation - previous_deviation);
+	
+	if (regulator_value > speed)
+	{
+		regulator_value = speed;
+	}
+	else if (regulator_value < -speed)
+	{
+		regulator_value = -speed;
+	}
+	
+	control_signals.right_value = speed - regulator_value;
+	control_signals.left_value = speed + regulator_value;
+	
+	if (control_signals.right_value > 100)
+		control_signals.right_value = 100;
+	
+	if (control_signals.left_value > 100)
+		control_signals.left_value = 100;
+	
+	// Kör frammåt
+	control_signals.left_direction = 1;
+	control_signals.right_direction = 1;
 }

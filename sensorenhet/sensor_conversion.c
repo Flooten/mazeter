@@ -348,8 +348,6 @@ void convertLineData(RawLineData* data)
 				line_detections = 0;
 				
 				compareLines(first_line_val, second_line_val);
-				
-
 			}
 			else
 			{

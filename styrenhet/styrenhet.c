@@ -2,9 +2,11 @@
  * FILNAMN:       styrenhet.c
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Fredrik Stenmark
- * DATUM:         2013-04-08
+ *                Herman Ekwall
+ *                Mattias Fransson
+ * DATUM:         2013-05-02
  *
- * BESKRIVNING:
+ * BESKRIVNING: Styrenhetens huvudloop.
  *
  */
 
@@ -20,25 +22,18 @@
 #include "control_parameters.h"
 #include "pd_control.h"
 
-/* TEST  ---------------- */
-#ifndef F_CPU
-#define F_CPU 8000000UL
-#endif
-#include <util/delay.h> 
-/* TEST ----------------- */
-
 // SPI-variabler
-volatile uint8_t* buffer;
-volatile uint8_t buffer_size;
-volatile uint8_t current_byte;
-volatile uint8_t spi_status;
+volatile uint8_t* buffer = NULL;
+volatile uint8_t buffer_size = 0;
+volatile uint8_t current_byte = 0;
+volatile uint8_t spi_status = SPI_READY;
 
-volatile uint8_t control_mode_flag;
+volatile uint8_t control_mode_flag = FLAG_MANUAL;
 volatile uint8_t current_command;
 volatile uint8_t throttle;
-volatile uint8_t new_sensor_data = 0;
-volatile uint8_t reciving_sensor_data = 0;
-volatile uint8_t abort_flag = 0;	
+volatile uint8_t new_sensor_data_flag = 0;
+volatile uint8_t reciving_sensor_data_flag = 0;
+volatile uint8_t abort_flag = 0;
 
 volatile ControlSignals control_signals;
 volatile SensorData current_sensor_data;
@@ -70,10 +65,10 @@ ISR(SPI_STC_vect)
             buffer_size = 0;
             current_byte = 0;
 			
-			if(reciving_sensor_data == 1)
+			if(reciving_sensor_data_flag == 1)
 			{
-				new_sensor_data = 1;
-				reciving_sensor_data = 0;
+				new_sensor_data_flag = 1;
+				reciving_sensor_data_flag = 0;
 			}
 			
         }
@@ -115,8 +110,8 @@ void parseCommand(uint8_t cmd)
             buffer_size = sizeof(current_sensor_data);
             current_byte = 0;
             spi_status = SPI_RECEIVING_DATA;
-			new_sensor_data = 0;
-			reciving_sensor_data = 1;
+			new_sensor_data_flag = 0;
+			reciving_sensor_data_flag = 1;
 			previous_sensor_data = current_sensor_data;
             break;
 
@@ -218,7 +213,7 @@ void parseCommand(uint8_t cmd)
 		case ABORT:
 			SPDR = ABORT;
 			abort_flag = 1;
-			new_sensor_data = 0;
+			new_sensor_data_flag = 0;
 			break;
 
         default:
@@ -296,24 +291,26 @@ void commandToControlSignal(uint8_t cmd)
 	}
 }
 
+void resetData()
+{
+	memset((void*)&control_signals, 0, sizeof(control_signals));
+	memset((void*)&current_sensor_data, 0, sizeof(current_sensor_data));
+	memset((void*)&previous_sensor_data, 0, sizeof(previous_sensor_data));
+	
+	control_signals.left_direction = 1;
+	control_signals.right_direction = 1;
+	
+	current_command = STEER_STOP;
+	throttle = 0;
+}
+
 int main()
 {
 	turn_stack = createTurnStack();
 	
-	memset((void*)&control_signals, 0, sizeof(control_signals));
 	memset((void*)&control_parameters, 0, sizeof(control_parameters));
-	memset((void*)&current_sensor_data, 0, sizeof(current_sensor_data));
-	memset((void*)&previous_sensor_data, 0, sizeof(previous_sensor_data));
 	
-    spi_status = SPI_READY;
-    buffer = NULL;
-    buffer_size = 0;
-    current_byte = 0;
-	new_sensor_data = 0; 
-	
-	current_command = STEER_STOP;
-	throttle = 0;
-	
+	resetData();
     pwmInit();
     spiSlaveInit();
     sei();
@@ -325,24 +322,13 @@ int main()
 	pwmClaw(control_signals);
 	
 	/* TEST ---------------- */
-	control_parameters.dist_kd = 0;
-	control_parameters.dist_kp = 0;
-	control_parameters.line_kp = 0;
-	control_parameters.line_kd = 0;
-	
-	control_signals.left_direction = 1;
-	control_signals.right_direction = 1;
-	
-	/* TEST --------------- */
+	/* END TEST ------------ */
 	
     while (1)
     {
 		if (abort_flag) // Återställs när mode -> manual 
 		{
-			memset((void*)&control_signals, 0, sizeof(control_signals));
-			memset((void*)&current_sensor_data, 0, sizeof(current_sensor_data));
-			memset((void*)&previous_sensor_data, 0, sizeof(previous_sensor_data));
-
+			resetData();
 			pwmWheels(control_signals);
 			continue;
 		}
@@ -366,21 +352,28 @@ int main()
 			}
 			else if (control_mode_flag == FLAG_AUTO)
 			{
-				if (new_sensor_data == 1)
+				if (new_sensor_data_flag == 1)
 				{
-					//sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-					new_sensor_data = 0;
+					if (current_sensor_data.line_type == LINE_GOAL)
+					{
+						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
+					}
+					else
+					{
+						sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+						
+						// TEST
+						detectTurn(&turn_stack);
+						throttle = 50;
+						commandToControlSignal(STEER_STRAIGHT);	
+					}
 					
-					// TEST
-					detectTurn(&turn_stack);
-					throttle = 50;
-					commandToControlSignal(STEER_STRAIGHT);
+					new_sensor_data_flag = 0;
 				}
 			}
 			
 			pwmWheels(control_signals);
 			pwmClaw(control_signals);
-		}
-		
+		}	
     }
 }
