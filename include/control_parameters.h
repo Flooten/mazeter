@@ -15,10 +15,8 @@
 
 typedef struct  
 {
-	uint16_t right_kp;
-	uint16_t right_kd;
-	uint16_t left_kp;
-	uint16_t left_kd;
+	uint16_t dist_kp;
+	uint16_t dist_kd;
 	uint16_t line_kp;
 	uint16_t line_kd;
 } ControlParameters;
