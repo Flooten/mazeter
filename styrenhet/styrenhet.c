@@ -34,6 +34,7 @@ volatile uint8_t throttle;
 volatile uint8_t new_sensor_data_flag = 0;
 volatile uint8_t reciving_sensor_data_flag = 0;
 volatile uint8_t abort_flag = 0;
+volatile uint8_t algo_mode_flag = ALGO_IN;
 
 volatile ControlSignals control_signals;
 volatile SensorData current_sensor_data;
@@ -321,10 +322,7 @@ int main()
 	pwmWheels(control_signals);
 	pwmClaw(control_signals);
 	
-	/* TEST ---------------- */
-	/* END TEST ------------ */
-	
-    while (1)
+    while (algo_mode_flag != ALGO_DONE)
     {
 		if (abort_flag) // Återställs när mode -> manual 
 		{
@@ -378,3 +376,38 @@ int main()
 		}	
     }
 }
+
+
+///////////////////////////// TA INTE BORT /////////////////////////////////
+// Detta är labyrint algoritmen
+
+/*
+else if (control_mode_flag == FLAG_AUTO)
+{
+	if (new_sensor_data_flag == 1)
+	{
+		handleTape(turn_stack, current_sensor_data.line_type);
+		
+		if (algo_mode_flag == ALGO_IN)
+		{
+			detectTurn(turn_stack);
+			sensorDataToControlSignal(current_sensor_data, previous_sensor_data);
+		}
+		else if (algo_mode_flag == ALGO_GOAL)
+		{
+			lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
+		}
+		else if (algo_mode_flag == ALGO_GOAL_REVERSE)
+		{
+			jamesBondTurn(turn_stack);
+		}
+		else if (algo_mode_flag ==	ALGO_OUT)
+		{
+			detectTurnOut(turn_stack);
+			sensorDataToControlSignal(current_sensor_data, previous_sensor_data);
+		}
+		
+		new_sensor_data_flag = 0;
+	}		
+		
+*/
