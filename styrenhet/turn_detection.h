@@ -20,6 +20,8 @@
 #define RIGHT_TURN 2
 #define STRAIGHT 3
 
+#define DISTANCE_DETECT_TURN 45 
+
 /* Avståndsvärde då man inte längre har kontakt med väggen,
 	dvs sväng eller återvändsgränd upptäckt */
 #define THRESHOLD_CONTACT 80
@@ -33,7 +35,13 @@
 /* Avståndsvärde när man ska rotera  om det är en återvändsgränd man mäter mot*/
 #define THRESHOLD_STOP_DEAD_END 114
 
+
+/* Upptäcker svängar på väg in i labyrinten */
 void detectTurn(volatile TurnStack* turn_stack);
+
+/* Upptäcker svängar på väg ut ur labyrinten */
+void detectTurnOut(volatile TurnStack* turn_stack);
+
 
 
 

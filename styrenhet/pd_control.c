@@ -143,6 +143,8 @@ void makeTurn(uint8_t turn)
 			break;
 		
 		case STRAIGHT:
+			commandToControlSignal(STEER_STRAIGHT);
+			pwmWheels(control_signals);
 			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT) && !abort_flag)
 			{}
 			break;
@@ -167,15 +169,11 @@ void makeTurn(uint8_t turn)
 		}
 	}
 	
-	// TEST
-	commandToControlSignal(CLAW_CLOSE);
-	pwmClaw(control_signals);
 }
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 {
-	uint16_t timer_count = 100*F_CPU/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
-		
+	
 	switch(turn)
 	{
 		case LINE_GOAL:
@@ -191,28 +189,19 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 			break;
 			
 		case LINE_TURN_LEFT:
-			startTimer();
-		
-			while(TCNT1 < timer_count)
-			{}
+			driveStraight(DISTANCE_TAPE_TURN);
 			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 			makeTurn(LEFT_TURN);
 			break;
 			
 		case LINE_TURN_RIGHT:
-			startTimer();
-		
-			while(TCNT1 < timer_count)
-			{}	
+			driveStraight(DISTANCE_TAPE_TURN);
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
 			break;
 			
 		case LINE_STRAIGHT:
-			startTimer();
-		
-			while(TCNT1 < timer_count)
-			{}
+			driveStraight(DISTANCE_TAPE_TURN);
 			pushTurnStack(turn_stack, newTurnNode(STRAIGHT));
 			makeTurn(STRAIGHT);
 			break;
@@ -252,4 +241,25 @@ void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 	// Kör frammåt
 	control_signals.left_direction = 1;
 	control_signals.right_direction = 1;
+}
+
+void driveStraight(uint8_t cm)
+{
+	uint16_t timer_count = cm*2*F_CPU/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
+	
+	/* Kör rakt fram med den högsta av hjulparshastigheterna */
+	if (control_signals.right_value > control_signals.left_value)
+	{
+		control_signals.left_value = control_signals.right_value;
+	} 
+	else
+	{
+		control_signals.right_value = control_signals.left_value;
+	}
+	pwmWheels(control_signals);
+	
+	startTimer();
+	
+	while(TCNT1 < timer_count)
+	{}
 }
