@@ -21,8 +21,9 @@
 
 void sensorDataToControlSignal(const SensorData* current, const SensorData* previous);
 void makeTurn(uint8_t turn);
-void handleTape(volatile TurnStack* turn_stack, uint8_t turn);
+void handleTape(volatile TurnStack* turn_stack, uint8_t tape);
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation);
 void driveStraight(uint8_t cm);
+void jamesBondTurn(volatile TurnStack* turn_stack);
 
 #endif /* PD_CONTROL_H_ */

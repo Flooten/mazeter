@@ -168,16 +168,14 @@ void makeTurn(uint8_t turn)
 			return;
 		}
 	}
-	
 }
 
-void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
+void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 {
-	
-	switch(turn)
+	switch(tape)
 	{
 		case LINE_GOAL:
-			// algo mål
+			algo_mode_flag = ALGO_GOAL;
 			break;
 		
 		case LINE_GOAL_STOP:
@@ -186,33 +184,45 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 			pwmWheels(control_signals);
 			commandToControlSignal(CLAW_CLOSE);
 			pwmClaw(control_signals);
+			algo_mode_flag = ALGO_GOAL_REVERSE;
 			break;
 			
 		case LINE_TURN_LEFT:
+			if (algo_mode_flag == ALGO_OUT)
+				break;
 			driveStraight(DISTANCE_TAPE_TURN);
 			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 			makeTurn(LEFT_TURN);
 			break;
 			
 		case LINE_TURN_RIGHT:
+			if (algo_mode_flag == ALGO_OUT)
+				break;
 			driveStraight(DISTANCE_TAPE_TURN);
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
 			break;
 			
 		case LINE_STRAIGHT:
+			if (algo_mode_flag == ALGO_OUT)
+				break;
 			driveStraight(DISTANCE_TAPE_TURN);
 			pushTurnStack(turn_stack, newTurnNode(STRAIGHT));
 			makeTurn(STRAIGHT);
 			break;
 			
 		case LINE_START:
-			// linjen vi passerar när vi går in och ut ur labyrinten
+			if (algo_mode_flag == ALGO_OUT)
+			{
+				commandToControlSignal(STEER_STOP);
+				pwmWheels(control_signals);
+				algo_mode_flag = ALGO_DONE;
+			}
+			break;
 				
 		default:
 			break;
 	}
-	resetTimer();
 }
 
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
@@ -264,4 +274,23 @@ void driveStraight(uint8_t cm)
 	
 	while(TCNT1 < timer_count && !abort_flag)
 	{}
+}
+
+void jamesBondTurn(volatile TurnStack* turn_stack)
+{
+	// behöver pd regleras istället
+	commandToControlSignal(STEER_BACK);
+	pwmWheels(control_signals);
+	
+	while (current_sensor_data.distance7 > THRESHOLD_STOP && !abort_flag)
+	{}	
+		
+	uint8_t tmp = popTurnStack(turn_stack);
+	
+	if (tmp == LEFT_TURN)
+		makeTurn(RIGHT_TURN);
+	else if (tmp == RIGHT_TURN)
+		makeTurn(LEFT_TURN);
+		
+	algo_mode_flag = ALGO_OUT;
 }
