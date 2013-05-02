@@ -21,7 +21,6 @@
 #define F_CPU 8000000UL
 #endif
 
-
 void startTimer()
 {
 	TCCR1B = (1 << CS10) | (0 << CS11) | (1 << CS12); // Prescaler 1024, ändra i pd_control.c i handleTape om prescalern ändras
@@ -66,7 +65,7 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 			// Kör vänster mot mitten
 			regulator_value = 20;
 		}
-		else 
+		else if (current->distance3 <= 40 && current->distance4 <= 40)
 		{		
 			int16_t delta_front = current->distance3 - current->distance4;
 			int16_t delta_front_previous = previous->distance3 - previous->distance4;
@@ -116,12 +115,12 @@ void makeTurn(uint8_t turn)
 			if (angle_end >= 36000)
 			{
 				angle_end -= 36000;
-				while (current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start)
+				while ((current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start) && !abort_flag)
 				{}	
 			}
 			else
 			{
-				while (current_sensor_data.angle < angle_end)
+				while (current_sensor_data.angle < angle_end && !abort_flag)
 				{}
 			}
 			break;
@@ -133,18 +132,18 @@ void makeTurn(uint8_t turn)
 			if (angle_end >= 36000)
 			{
 				angle_end = 36000 - (DEGREES_90 - angle_start);
-				while (current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start)
+				while ((current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start) && !abort_flag)
 				{}		
 			}
 			else
 			{
-				while (current_sensor_data.angle > angle_end)
+				while (current_sensor_data.angle > angle_end && !abort_flag)
 				{}
 			}
 			break;
 		
 		case STRAIGHT:
-			while (current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT)
+			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT) && !abort_flag)
 			{}
 			break;
 		
@@ -157,7 +156,7 @@ void makeTurn(uint8_t turn)
 	
 	
 	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att PD-reglera på.
-	while (current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT)
+	while ((current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT) && !abort_flag)
 	{
 		// Stannar roboten om vi är på väg att köra in i något.
 		if (current_sensor_data.distance1 < THRESHOLD_ABORT || current_sensor_data.distance2 < THRESHOLD_ABORT)

@@ -22,6 +22,7 @@
 extern volatile uint8_t control_mode_flag;
 extern volatile uint8_t current_command;
 extern volatile uint8_t throttle;
+extern volatile uint8_t abort_flag;
 
 extern volatile ControlSignals control_signals;
 extern volatile SensorData current_sensor_data;
