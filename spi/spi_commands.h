@@ -61,10 +61,10 @@
 #define LINE_START 0x58
 
 #define CONTROL_PARAMETERS_ALL 0x60
-#define PARA_KP_RIGHT 0x61
-#define PARA_KD_RIGHT 0x62
-#define PARA_KP_LEFT 0x63
-#define PARA_KD_LEFT 0x64
+#define PARA_DIST_KP 0x61
+#define PARA_DIST_KD 0x62
+#define PARA_LINE_KP 0x63
+#define PARA_LINE_KD 0x64
 
 #define ABORT 0x99
 

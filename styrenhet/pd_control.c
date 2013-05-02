@@ -21,11 +21,6 @@
 #define F_CPU 8000000UL
 #endif
 
-typedef struct
-{
-	int8_t left_value;
-	int8_t right_value;
-} RegulatorSignals;
 
 void startTimer()
 {
@@ -39,54 +34,46 @@ void resetTimer()
 	TIFR1 |= (1 << TOV1);
 }
 
-RegulatorSignals regulatorSignalDeltaLeft(const int16_t* delta_left, const int16_t* delta_left_previous)
-{
-	RegulatorSignals ret;
-	ret.left_value = ((float)control_parameters.left_kp/10 * *delta_left + (float)control_parameters.left_kd/10 * (*delta_left - *delta_left_previous));
-	ret.right_value = -((float)control_parameters.right_kp/10 * *delta_left + (float)control_parameters.right_kd/10 * (*delta_left - *delta_left_previous));
-	return ret;
-}
-
-RegulatorSignals regulatorSignalDeltaRight(const int16_t* delta_right, const int16_t* delta_right_previous)
-{
-	RegulatorSignals ret;
-	ret.left_value = -(control_parameters.left_kp * *delta_right + control_parameters.left_kd * (*delta_right - *delta_right_previous));
-	ret.right_value = control_parameters.right_kp * *delta_right + control_parameters.right_kd * (*delta_right - *delta_right_previous);
-	return ret;
-}
-
-RegulatorSignals regulatorSignalDeltaFront(const int16_t* delta_front, const int16_t* delta_front_previous)
-{
-	RegulatorSignals ret;
-	ret.left_value = -((float)control_parameters.left_kp / 10 * (*delta_front) + (float)control_parameters.left_kd / 10 * (*delta_front - *delta_front_previous));
-	ret.right_value = (float)control_parameters.right_kp / 10 * *delta_front + (float)control_parameters.right_kd / 10 * (*delta_front - *delta_front_previous);
-	return ret;
-}
-
-RegulatorSignals regulatorSignalDeltaBack(const int16_t* delta_back, const int16_t* delta_back_previous)
-{
-	RegulatorSignals ret;
-	ret.left_value = control_parameters.left_kp * *delta_back + control_parameters.left_kd * (*delta_back - *delta_back_previous);
-	ret.right_value = -(control_parameters.right_kp * *delta_back + control_parameters.right_kd * (*delta_back - *delta_back_previous));
-	return ret;
-}
 
 void sensorDataToControlSignal(const SensorData* current, const SensorData* previous)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		//volatile RegulatorSignals regulator_signals;
+		int8_t regulator_value = 0;
 		
-		int16_t delta_front = current->distance3 - current->distance4;
-		int16_t delta_front_previous = previous->distance3 - previous->distance4;
-		
-		int8_t regulator_value = (float)control_parameters.left_kp / 10 * delta_front + (float)control_parameters.left_kd / 10 * (delta_front - delta_front_previous);
-		
-		//int16_t delta_left = current->distance3 - current->distance5;
-		//int16_t delta_left_previous = previous->distance3 - previous->distance5;
-
-		//regulator_signals = regulatorSignalDeltaLeft(&delta_left, &delta_left_previous);
-		//regulator_signals = regulatorSignalDeltaFront(&delta_front, &delta_front_previous);
+		if (current->distance3 >= 80 && current->distance6 != 255)
+		{
+			// Reglera på högersidan
+			int16_t delta_right = current->distance4 - current->distance6;
+			int16_t delta_right_previous = previous->distance4 - previous->distance6;
+			
+			regulator_value = -((float)control_parameters.dist_kp / 10 * delta_right + (float)control_parameters.dist_kd / 10 * (delta_right - delta_right_previous));
+		}
+		else if (current->distance4 >= 80 && current->distance5 != 255)
+		{
+			// Reglera på vänstersidan
+			int16_t delta_left = current->distance3 - current->distance5;
+			int16_t delta_left_previous = previous->distance3 - previous->distance5;
+			
+			regulator_value = (float)control_parameters.dist_kp / 10 * delta_left + (float)control_parameters.dist_kd / 10 * (delta_left - delta_left_previous);
+		}
+		else if (current->distance4 >= 45 && current->distance6 == 255)
+		{
+			// Kör höger mot mitten
+			regulator_value = -20;
+		}
+		else if (current->distance3 >= 45 && current->distance5 == 255)
+		{
+			// Kör vänster mot mitten
+			regulator_value = 20;
+		}
+		else 
+		{		
+			int16_t delta_front = current->distance3 - current->distance4;
+			int16_t delta_front_previous = previous->distance3 - previous->distance4;
+			
+			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
+		}		
 		
 		if (regulator_value > 100)
 		{
@@ -109,37 +96,8 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 			control_signals.left_value = 100 - regulator_value;
 		}
 		
-		if (control_signals.right_value > 100)
-		{
-			
-		}
-		
-		//if (regulator_signals.left_value + 80 < 0)
-		//{
-			//control_signals.left_value = 0;
-		//}
-		//else
-		//{
-			//control_signals.left_value = 80 + regulator_signals.left_value;
-			//if (control_signals.left_value > 100)
-			//{
-				//control_signals.left_value = 100;
-			//}
-		//}
-		//
-		//if (regulator_signals.right_value + 80 < 0)
-		//{
-			//control_signals.right_value = 0;
-		//}
-		//else
-		//{
-			//control_signals.right_value = 80 + regulator_signals.right_value;
-			//if (control_signals.right_value > 100)
-			//{
-				//control_signals.right_value = 100;
-			//}
-		//}
-		
+	
+		// Kör frammåt
 		control_signals.left_direction = 1;
 		control_signals.right_direction = 1;
 	}

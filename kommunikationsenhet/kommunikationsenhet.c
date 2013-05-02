@@ -147,7 +147,7 @@ int main(void)
 				
 				if (new_control_parameters)
 				{
-					if (spiSendData(CONTROL_PARAMETERS_ALL, STYR_ENHET, (const uint8_t*)&control_parameters.right_kp, sizeof(control_parameters)) != CONTROL_PARAMETERS_ALL)
+					if (spiSendData(CONTROL_PARAMETERS_ALL, STYR_ENHET, (const uint8_t*)&control_parameters.dist_kp, sizeof(control_parameters)) != CONTROL_PARAMETERS_ALL)
 					{
 						btSendString("Failed to send the control parameters to the control device.");
 					}
@@ -250,33 +250,31 @@ int main(void)
 						break;
 						
 					case CONTROL_PARAMETERS_ALL:
-						control_parameters.right_kp = tmp->data[0];
-						control_parameters.right_kd = tmp->data[1];
-						control_parameters.left_kp = tmp->data[2];
-						control_parameters.left_kd = tmp->data[3];
+						control_parameters.dist_kp = tmp->data[0];
+						control_parameters.dist_kd = tmp->data[1];
+						control_parameters.line_kp = tmp->data[2];
+						control_parameters.line_kd = tmp->data[3];
 						break;
 					
-					case PARA_KD_LEFT:
-						control_parameters.left_kd = tmp->data[0];
-						control_parameters.left_kd = control_parameters.left_kd; 
+					case PARA_DIST_KD:
+						control_parameters.dist_kd = tmp->data[0];
 						new_control_parameters = 1;
 						break;
 						
-					case PARA_KP_LEFT:
-						control_parameters.left_kp = tmp->data[0];
+					case PARA_DIST_KP:
+						control_parameters.dist_kp = tmp->data[0];
 						new_control_parameters = 1;
 						break;
 					
-					case PARA_KD_RIGHT:
-						control_parameters.right_kd = tmp->data[0];
+					case PARA_LINE_KD:
+						control_parameters.line_kd = tmp->data[0];
 						new_control_parameters = 1;
-						control_parameters.right_kd = control_parameters.right_kd; 
 						break;
-					
-					case PARA_KP_RIGHT:
-						control_parameters.right_kp = tmp->data[0];
+						
+					case PARA_LINE_KP:
+						control_parameters.line_kp = tmp->data[0];
 						new_control_parameters = 1;
-						break;	
+						break;
 						
 
 					default:

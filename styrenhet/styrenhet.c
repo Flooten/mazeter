@@ -209,7 +209,7 @@ void parseCommand(uint8_t cmd)
 			
 		case CONTROL_PARAMETERS_ALL:
 			SPDR = CONTROL_PARAMETERS_ALL;
-			buffer = (uint8_t*)&control_parameters.right_kp;
+			buffer = (uint8_t*)&control_parameters.dist_kp;
 			buffer_size = sizeof(control_parameters);
 			current_byte = 0;
 			spi_status = SPI_RECEIVING_DATA;
@@ -325,10 +325,10 @@ int main()
 	pwmClaw(control_signals);
 	
 	/* TEST ---------------- */
-	control_parameters.left_kd = 0;
-	control_parameters.left_kp = 0;
-	control_parameters.right_kd = 0;
-	control_parameters.right_kp = 0;
+	control_parameters.dist_kd = 0;
+	control_parameters.dist_kp = 0;
+	control_parameters.line_kp = 0;
+	control_parameters.line_kd = 0;
 	
 	control_signals.left_direction = 1;
 	control_signals.right_direction = 1;
