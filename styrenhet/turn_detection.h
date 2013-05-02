@@ -20,6 +20,8 @@
 #define RIGHT_TURN 2
 #define STRAIGHT 3
 
+#define DISTANCE_DETECT_TURN 45 
+
 /* Avståndsvärde då man inte längre har kontakt med väggen,
 	dvs sväng eller återvändsgränd upptäckt */
 #define THRESHOLD_CONTACT 80

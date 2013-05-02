@@ -89,6 +89,8 @@ void detectTurnOut(volatile TurnStack* turn_stack)
 {
 	if (current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT)
 	{
+		// Kör fram till mitten av svängen.
+		driveStraight(DISTANCE_DETECT_TURN);
 		makeTurn(popTurnStack(turn_stack));
 	}
 }
