@@ -356,13 +356,17 @@ int main()
 					//}
 					if (current_sensor_data.line_type == LINE_GOAL)
 					{
-						//lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
+						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
+					}
+					else if (current_sensor_data.line_type == LINE_GOAL_STOP)
+					{
+						commandToControlSignal(STEER_STOP);
 					}
 					else
 					{
-						//sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-						detectTurn(&turn_stack);
-						commandToControlSignal(STEER_STRAIGHT);
+						sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+						//detectTurn(&turn_stack);
+						//commandToControlSignal(STEER_STRAIGHT);
 					}
 					
 					new_sensor_data_flag = 0;

@@ -37,7 +37,7 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		int8_t regulator_value = 0;
+		static int8_t regulator_value = 0;
 		
 		if (current->distance3 >= 80 && current->distance6 != 255)
 		{
@@ -173,7 +173,6 @@ void makeTurn(uint8_t turn)
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 {
-	
 	switch(turn)
 	{
 		case LINE_GOAL:
@@ -217,7 +216,7 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t turn)
 
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 {
-	const int8_t speed = 80;
+	const int8_t speed = 60;
 	int8_t regulator_value = (float)control_parameters.line_kp / 10 * current_deviation + (float)control_parameters.line_kd / 10 * (current_deviation - previous_deviation);
 	
 	if (regulator_value > speed)
@@ -229,8 +228,8 @@ void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 		regulator_value = -speed;
 	}
 	
-	control_signals.right_value = speed - regulator_value;
-	control_signals.left_value = speed + regulator_value;
+	control_signals.right_value = speed + regulator_value;
+	control_signals.left_value = speed - regulator_value;
 	
 	if (control_signals.right_value > 100)
 		control_signals.right_value = 100;

@@ -172,7 +172,7 @@ int8_t calculateCenter(const uint8_t* data)
 	
 	// lägger ihop alla linjesensor sum_line_ och tyngdpunkten line_calc_
 	int i;
-	for(i=0;i<11;i++)
+	for(i=0; i<11; i++)
 	{
 		if(data[i] >= sensor_parameters.tape_threshold)
 		{
@@ -183,7 +183,7 @@ int8_t calculateCenter(const uint8_t* data)
 	}
 	
 	// gånger tio för att få med en decimal
-	int8_t center_ = (line_calc_ * 10)/sum_line_;
+	int8_t center_ = (line_calc_ * 10) / sum_line_;
 	
 	return center_;
 }
@@ -322,7 +322,7 @@ void convertLineData(RawLineData* data)
 		
 		case VERTICAL_LINE:
 		{
-			if (current_line == LINE_1)
+			if (current_line == LINE_1 || current_line == LINE_FOLLOWING)
 			{
 				goal_mode = 1;
 				current_line = LINE_FOLLOWING;
