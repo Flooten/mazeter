@@ -112,21 +112,16 @@ int main(void)
 	control_mode_flag = FLAG_MANUAL;
 	control_command = STEER_STOP;
 	throttle = 60;
-	
-	//! Ta bort, test
-	DDRA = 0xFF;
-	
+
     while(1)
     {
-
-		
 		if (timer_internal_ready)
 		{
 			// Läs sensordata
-			//if (spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
-			//{
-				////btSendString("Failed to fetch the sensor data from the sensor device.");
-			//}
+			if (spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
+			{
+				btSendString("Failed to fetch the sensor data from the sensor device.");
+			}
 			
 			spiSendData(control_mode_flag, STYR_ENHET, NULL, 0);
 			
@@ -170,7 +165,6 @@ int main(void)
 				}
 			}
 			
-			spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			timer_internal_ready = 0;
 		}		
