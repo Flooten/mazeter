@@ -245,6 +245,8 @@ void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 
 void driveStraight(uint8_t cm)
 {
+	resetTimer();
+	
 	uint16_t timer_count = cm*2*F_CPU/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
 	
 	/* Kör rakt fram med den högsta av hjulparshastigheterna */
@@ -260,6 +262,6 @@ void driveStraight(uint8_t cm)
 	
 	startTimer();
 	
-	while(TCNT1 < timer_count)
+	while(TCNT1 < timer_count && !abort_flag)
 	{}
 }
