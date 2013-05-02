@@ -187,6 +187,8 @@ void makeTurn(uint8_t turn)
 			break;
 		
 		case STRAIGHT:
+			commandToControlSignal(STEER_STRAIGHT);
+			pwmWheels(control_signals);
 			while (current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT)
 			{}
 			break;
@@ -211,9 +213,6 @@ void makeTurn(uint8_t turn)
 		}
 	}
 	
-	// TEST
-	commandToControlSignal(CLAW_CLOSE);
-	pwmClaw(control_signals);
 }
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t turn)

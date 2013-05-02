@@ -17,9 +17,9 @@
 #include "pd_control.h"
 #include "PWM.h"
 
+/* Upptäcker svängar på väg in i labyrinten */
 void detectTurn(volatile TurnStack* turn_stack)
-{
-	
+{	
 	if (current_sensor_data.distance3 > THRESHOLD_CONTACT)
 	{
 		// Vänster ej kontakt
@@ -80,5 +80,15 @@ void detectTurn(volatile TurnStack* turn_stack)
 			makeTurn(RIGHT_TURN);
 		}
 	}
-		
+}
+
+
+
+/* Upptäcker svängar (även rakt fram) på väg ut ur labyrinten */
+void detectTurnOut(volatile TurnStack* turn_stack)
+{
+	if (current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT)
+	{
+		makeTurn(popTurnStack(turn_stack));
+	}
 }

@@ -33,7 +33,13 @@
 /* Avståndsvärde när man ska rotera  om det är en återvändsgränd man mäter mot*/
 #define THRESHOLD_STOP_DEAD_END 114
 
+
+/* Upptäcker svängar på väg in i labyrinten */
 void detectTurn(volatile TurnStack* turn_stack);
+
+/* Upptäcker svängar på väg ut ur labyrinten */
+void detectTurnOut(volatile TurnStack* turn_stack);
+
 
 
 
