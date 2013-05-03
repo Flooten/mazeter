@@ -362,7 +362,7 @@ int main()
 					}
 					else
 					{
-						sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 						//detectTurn(&turn_stack);
 						//commandToControlSignal(STEER_STRAIGHT);
 					}

@@ -56,9 +56,8 @@
 #define LINE_STRAIGHT 0x53
 #define LINE_GOAL 0x54
 #define LINE_GOAL_STOP 0x55
-#define LINE_STOP 0x56
+#define LINE_START_STOP 0x56
 #define LINE_NONE 0x57
-#define LINE_START 0x58
 
 #define CONTROL_PARAMETERS_ALL 0x60
 #define PARA_DIST_KP 0x61

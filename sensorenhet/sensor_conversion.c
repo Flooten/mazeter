@@ -305,7 +305,7 @@ void convertLineData(RawLineData* data)
 			else if (current_line == SPACE_2)
 			{
 				// Tredje tejpen detekteras efter mellanrum
-				sensor_data.line_type = LINE_STOP;
+				sensor_data.line_type = LINE_START_STOP;
 				current_line = 0;
 				line_detections = 0;
 			}

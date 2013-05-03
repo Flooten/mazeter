@@ -425,7 +425,7 @@ int main()
 	
 	sensor_parameters.tape_threshold = 100;
 	sensor_parameters.horizontal_line_threshold = 4;
-	sensor_parameters.no_line_detection_threshold = 100;
+	sensor_parameters.no_line_detection_threshold = 50;
 	sensor_parameters.line_diff_threshold = 4;
 	sensor_parameters.horizontal_to_vertical_threshold = 30;
 
@@ -435,16 +435,6 @@ int main()
 	
 	spiSlaveInit();
 	sei();
-	
-	/* endast för test */
-	//sensor_data.distance1 = 0xFF;
-	//sensor_data.distance2 = 0xFF;
-	//sensor_data.distance3 = 0xFF;
-	//sensor_data.distance4 = 0xFF;
-	//sensor_data.distance5 = 05;
-	//sensor_data.distance6 = 06;
-	//sensor_data.distance7 = 0xFF;
-	//sensor_data.angle = 0x6400;
 	startADC();
 	
 	while (1)
