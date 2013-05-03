@@ -41,6 +41,8 @@ volatile SensorData current_sensor_data;
 volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
+volatile const char* str = "Hello, world!";
+
 volatile TurnStack turn_stack;
 
 void parseCommand(uint8_t cmd);
@@ -215,6 +217,13 @@ void parseCommand(uint8_t cmd)
 			SPDR = ABORT;
 			abort_flag = 1;
 			new_sensor_data_flag = 0;
+			break;
+
+		case 0x95:
+			SPDR = strlen((const char*)str);
+			buffer = (uint8_t*)str;
+			buffer_size = strlen((const char*)str);
+			current_byte = 0;
 			break;
 
         default:

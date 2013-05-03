@@ -113,6 +113,8 @@ int main(void)
 	control_command = STEER_STOP;
 	throttle = 60;
 
+	char* temp_string = NULL;
+
     while(1)
     {
 		if (timer_internal_ready)
@@ -166,6 +168,11 @@ int main(void)
 			}
 			
 			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));
+			
+			temp_string = spiReadString(0x95, STYR_ENHET);
+			if (temp_string == NULL)
+				temp_string = "ERROR!";
+			
 			timer_internal_ready = 0;
 		}		
 		
@@ -174,6 +181,7 @@ int main(void)
 			btSendData(CONTROL_SIGNALS, (const uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			btSendData(SENSOR_DATA_ALL, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			btSendData(control_mode_flag, NULL, 0);
+			btSendString(temp_string);
 			timer_external_ready = 0;
 		}
 		

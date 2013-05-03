@@ -30,5 +30,6 @@ uint8_t spiSendByte(uint8_t data);
 uint8_t spiSendCommand(uint8_t command, uint8_t to);
 uint8_t spiSendData(uint8_t command, uint8_t to, const uint8_t* buffer, uint8_t size);
 uint8_t spiReadData(uint8_t command, uint8_t from, uint8_t* buffer, uint8_t size);
+char* spiReadString(uint8_t command, uint8_t from);
 
 #endif /* SPI_H */
