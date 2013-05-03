@@ -148,7 +148,7 @@ void makeTurn(uint8_t turn)
 		case STRAIGHT:
 			commandToControlSignal(STEER_STRAIGHT);
 			pwmWheels(control_signals);
-			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT) && !abort_flag)
+			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
 			{}
 			break;
 		

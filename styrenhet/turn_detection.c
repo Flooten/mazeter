@@ -81,7 +81,7 @@ void detectTurn(volatile TurnStack* turn_stack)
 /* Upptäcker svängar (även rakt fram) på väg ut ur labyrinten */
 void detectTurnOut(volatile TurnStack* turn_stack)
 {
-	if (current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT)
+	if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
 	{
 		// Kör fram till mitten av svängen.
 		driveStraight(DISTANCE_DETECT_TURN);
