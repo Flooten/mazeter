@@ -24,16 +24,20 @@
 
 /* Avståndsvärde då man inte längre har kontakt med väggen,
 	dvs sväng eller återvändsgränd upptäckt */
-#define THRESHOLD_CONTACT 80
+#define THRESHOLD_CONTACT 85
+
+/* Avståndsvärde då man inte längre har kontakt med väggen,
+	dvs sväng eller återvändsgränd upptäckt */
+#define THRESHOLD_CONTACT_SIDE 60
 
 /* Avståndsvärde när man ska rotera */
-#define THRESHOLD_STOP 40
+#define THRESHOLD_STOP 36
 
 /* Avstånd då vi är på väg att köra in i ngt */
 #define THRESHOLD_ABORT 25
 
 /* Avståndsvärde när man ska rotera  om det är en återvändsgränd man mäter mot*/
-#define THRESHOLD_STOP_DEAD_END 114
+#define THRESHOLD_STOP_DEAD_END 110
 
 
 /* Upptäcker svängar på väg in i labyrinten */

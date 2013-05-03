@@ -105,6 +105,9 @@ void makeTurn(uint8_t turn)
 {
 	uint16_t angle_end = current_sensor_data.angle;
 	uint16_t angle_start = angle_end;
+	
+	commandToControlSignal(CLAW_CLOSE);
+	pwmClaw(control_signals);
 		
 	switch(turn)
 	{
@@ -158,8 +161,11 @@ void makeTurn(uint8_t turn)
 	
 	
 	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att PD-reglera på.
-	while ((current_sensor_data.distance3 > THRESHOLD_CONTACT || current_sensor_data.distance4 > THRESHOLD_CONTACT) && !abort_flag)
+	while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
 	{
+		commandToControlSignal(STEER_STRAIGHT);
+		pwmWheels(control_signals);
+		
 		// Stannar roboten om vi är på väg att köra in i något.
 		if (current_sensor_data.distance1 < THRESHOLD_ABORT || current_sensor_data.distance2 < THRESHOLD_ABORT)
 		{
@@ -168,6 +174,9 @@ void makeTurn(uint8_t turn)
 			return;
 		}
 	}
+	commandToControlSignal(CLAW_OPEN);
+	pwmClaw(control_signals);
+	
 }
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
