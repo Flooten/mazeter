@@ -10,6 +10,7 @@
 #include "spi.h"
 
 #include <avr/io.h>
+#include <stdio.h>
 
 void spiMasterInit()
 {
@@ -91,4 +92,25 @@ uint8_t spiReadData(uint8_t command, uint8_t from, uint8_t* buffer, uint8_t size
 	}
 	
 	return response;
+}
+
+char* spiReadString(uint8_t command, uint8_t from)
+{
+	char* buffer = NULL;
+	uint8_t size = spiSendCommand(command, from);
+	
+	buffer = (char*)malloc(size);
+	
+	if (buffer == NULL)
+		return buffer;
+	
+	uint8_t i;
+	for (i = 0; i < size; ++i)
+	{
+		spiSelectSlave(from);
+		buffer[i] = spiSendByte(0);
+		spiSelectSlave(0);
+	}
+		
+	return buffer;
 }

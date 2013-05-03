@@ -30,7 +30,7 @@
       </OverrideVtorValue>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1316</port>
+        <port>1104</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
@@ -38,7 +38,7 @@
         <InterfaceProperties>
           <JtagDbgClock>250000</JtagDbgClock>
           <JtagProgClock>1000000</JtagProgClock>
-          <IspClock>250000</IspClock>
+          <IspClock>150000</IspClock>
           <JtagInChain>true</JtagInChain>
           <JtagEnableExtResetOnStartSession>false</JtagEnableExtResetOnStartSession>
           <JtagDevicesBefore>1</JtagDevicesBefore>

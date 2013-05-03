@@ -19,7 +19,7 @@
 #include "spi_commands.h"
 #include "turn_detection.h"
 
-void sensorDataToControlSignal(const SensorData* current, const SensorData* previous);
+void straightRegulator(const SensorData* current, const SensorData* previous);
 void makeTurn(uint8_t turn);
 void handleTape(volatile TurnStack* turn_stack, uint8_t tape);
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation);

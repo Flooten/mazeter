@@ -33,7 +33,7 @@ void resetTimer()
 	TIFR1 |= (1 << TOV1);
 }
 
-void sensorDataToControlSignal(const SensorData* current, const SensorData* previous)
+void straightRegulator(const SensorData* current, const SensorData* previous)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
@@ -65,13 +65,13 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 			// Kör vänster mot mitten
 			regulator_value = 20;
 		}
-		else if (current->distance3 <= 40 && current->distance4 <= 40)
-		{		
+		else if (current->distance3 <= 42 && current->distance4 <= 42)
+		{	
 			int16_t delta_front = current->distance3 - current->distance4;
 			int16_t delta_front_previous = previous->distance3 - previous->distance4;
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
-		}		
+		}
 		
 		if (regulator_value > 100)
 		{
@@ -94,10 +94,9 @@ void sensorDataToControlSignal(const SensorData* current, const SensorData* prev
 			control_signals.left_value = 100 - regulator_value;
 		}
 		
-	
 		// Kör frammåt
-		control_signals.left_direction = 1;
-		control_signals.right_direction = 1;
+		//control_signals.left_direction = 1;
+		//control_signals.right_direction = 1;
 	}
 }
 
@@ -220,7 +219,7 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 			makeTurn(STRAIGHT);
 			break;
 			
-		case LINE_START:
+		case LINE_START_STOP:
 			if (algo_mode_flag == ALGO_OUT)
 			{
 				commandToControlSignal(STEER_STOP);

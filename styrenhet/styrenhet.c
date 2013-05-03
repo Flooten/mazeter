@@ -41,6 +41,8 @@ volatile SensorData current_sensor_data;
 volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
+volatile const char* str = "Hello, world!";
+
 volatile TurnStack turn_stack;
 
 void parseCommand(uint8_t cmd);
@@ -217,6 +219,13 @@ void parseCommand(uint8_t cmd)
 			new_sensor_data_flag = 0;
 			break;
 
+		case 0x95:
+			SPDR = strlen((const char*)str);
+			buffer = (uint8_t*)str;
+			buffer_size = strlen((const char*)str);
+			current_byte = 0;
+			break;
+
         default:
             SPDR = ERROR_UNKNOWN_SPI_COMMAND;
 			buffer_size = 0;
@@ -322,7 +331,7 @@ int main()
 	pwmWheels(control_signals);
 	pwmClaw(control_signals);
 	
-    while (algo_mode_flag != ALGO_DONE)
+    while (1)
     {
 		if (abort_flag) // Återställs när mode -> manual 
 		{
@@ -356,22 +365,20 @@ int main()
 						//commandToControlSignal(STEER_STOP);
 						//pwmWheels(control_signals);
 					//}
-					//if (current_sensor_data.line_type == LINE_GOAL)
-					//{
-						//lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
-					//}
-					//else if (current_sensor_data.line_type == LINE_GOAL_STOP)
-					//{
-						//commandToControlSignal(STEER_STOP);
-					//}
-					//else
-					//{
-						////sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+					if (current_sensor_data.line_type == LINE_GOAL)
+					{
+						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
+					}
+					else if (current_sensor_data.line_type == LINE_GOAL_STOP)
+					{
+						commandToControlSignal(STEER_STOP);
+					}
+					else
+					{
+						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 						//detectTurn(&turn_stack);
 						//commandToControlSignal(STEER_STRAIGHT);
-						//commandToControlSignal(CLAW_OPEN);
-						//pwmClaw(control_signals);
-					//}
+					}
 					
 					new_sensor_data_flag = 0;
 				}
@@ -382,7 +389,6 @@ int main()
 		}	
     }
 }
-
 
 ///////////////////////////// TA INTE BORT /////////////////////////////////
 // Detta är labyrint algoritmen
