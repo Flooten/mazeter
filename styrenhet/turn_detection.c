@@ -39,7 +39,7 @@ void detectTurn(volatile TurnStack* turn_stack)
 				makeTurn(LEFT_TURN);
 			}
 		}	
-		else if (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 > THRESHOLD_STOP_DEAD_END) &&
+		else if (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 >= THRESHOLD_STOP_DEAD_END) &&
 				 ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
 		{
 			// Fall 2
@@ -61,7 +61,7 @@ void detectTurn(volatile TurnStack* turn_stack)
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
 		}
-		else if (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 > THRESHOLD_STOP_DEAD_END) &&
+		else if (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 >= THRESHOLD_STOP_DEAD_END) &&
 				 ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
 		{
 			// Fall 6
