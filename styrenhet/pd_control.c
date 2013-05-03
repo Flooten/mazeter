@@ -71,7 +71,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			int16_t delta_front_previous = previous->distance3 - previous->distance4;
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
-		}		
+		}
 		
 		if (regulator_value > 100)
 		{
@@ -94,10 +94,9 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			control_signals.left_value = 100 - regulator_value;
 		}
 		
-	
 		// Kör frammåt
-		control_signals.left_direction = 1;
-		control_signals.right_direction = 1;
+		//control_signals.left_direction = 1;
+		//control_signals.right_direction = 1;
 	}
 }
 

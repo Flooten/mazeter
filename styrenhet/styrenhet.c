@@ -322,7 +322,7 @@ int main()
 	pwmWheels(control_signals);
 	pwmClaw(control_signals);
 	
-    while (algo_mode_flag != ALGO_DONE)
+    while (1)
     {
 		if (abort_flag) // Återställs när mode -> manual 
 		{
@@ -376,7 +376,6 @@ int main()
 		}	
     }
 }
-
 
 ///////////////////////////// TA INTE BORT /////////////////////////////////
 // Detta är labyrint algoritmen
