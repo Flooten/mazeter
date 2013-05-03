@@ -355,16 +355,13 @@ int main()
 			{
 				if (new_sensor_data_flag == 1)
 				{
-					detectTurn(&turn_stack);
-					commandToControlSignal(STEER_STRAIGHT);
-					commandToControlSignal(CLAW_OPEN);
-					pwmClaw(control_signals);
-					//if (current_sensor_data.distance1 < THRESHOLD_ABORT || current_sensor_data.distance2 < THRESHOLD_ABORT)
-					//{
-						//// Stanna roboten om vi är på väg in i något
-						//commandToControlSignal(STEER_STOP);
-						//pwmWheels(control_signals);
-					//}
+					if (current_sensor_data.distance1 < THRESHOLD_ABORT || current_sensor_data.distance2 < THRESHOLD_ABORT)
+					{
+						// Stanna roboten om vi är på väg in i något
+						commandToControlSignal(STEER_STOP);
+						pwmWheels(control_signals);
+					}
+					
 					if (current_sensor_data.line_type == LINE_GOAL)
 					{
 						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
@@ -377,7 +374,6 @@ int main()
 					{
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 						//detectTurn(&turn_stack);
-						//commandToControlSignal(STEER_STRAIGHT);
 					}
 					
 					new_sensor_data_flag = 0;
