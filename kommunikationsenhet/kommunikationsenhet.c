@@ -5,7 +5,7 @@
  *				  Joel Davidsson
  *				  Marcus Eriksson
  * 				  Mattias Fransson
- * DATUM:         2013-04-08
+ * DATUM:         2013-05-06
  *
  * BESKRIVNING:   Innehåller kommunikationsenhetens funktionalitet.
  *          
@@ -97,6 +97,8 @@ int main(void)
 	control_command = STEER_STOP;
 	throttle = 62;
 	
+	uint8_t turn_stack_top = 0;
+	
 	//! Ta bort, test
 	DDRA = 0xFF;
 	
@@ -144,6 +146,7 @@ int main(void)
 			btSendData(CONTROL_SIGNALS, (const uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			btSendData(SENSOR_DATA_ALL, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			btSendData(control_mode_flag, NULL, 0);
+			btSendData(TURN_STACK_TOP, &turn_stack_top, 1);
 			timer_external_ready = 0;
 		}
 		

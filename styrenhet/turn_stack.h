@@ -35,6 +35,7 @@ TurnStack createTurnStack();
 void freeTurnStack(volatile TurnStack* stack);
 void pushTurnStack(volatile TurnStack* stack, TurnNode* node);
 uint8_t popTurnStack(volatile TurnStack* stack);
+uint8_t topTurnStack(const TurnStack* stack);
 uint8_t empty(const volatile TurnStack* stack);
 
 #endif /* TURN_STACK_H_ */

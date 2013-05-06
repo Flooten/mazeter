@@ -110,6 +110,17 @@ uint8_t popTurnStack(volatile TurnStack* stack)
 }
 
 /*
+ *	Returnerar det första elementet.
+ */
+uint8_t topTurnStack(const TurnStack* stack)
+{
+	if (empty(stack) == 1)
+		return 0xEE;
+		
+	return stack->first->turn;
+}
+
+/*
  *	Kontrollerar om kön är tom.
  */
 uint8_t empty(const volatile TurnStack* stack)

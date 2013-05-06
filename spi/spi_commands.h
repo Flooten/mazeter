@@ -65,6 +65,8 @@
 #define PARA_KP_LEFT 0x63
 #define PARA_KD_LEFT 0x64
 
+#define TURN_STACK_TOP 0x71
+
 #define ERROR_SPI 0xE0
 #define ERROR_UNKNOWN_SPI_COMMAND 0xE1
 #define ERROR_FATAL 0xEE
