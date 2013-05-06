@@ -37,8 +37,6 @@ uint8_t new_control_parameters = 0;
 volatile uint8_t throttle;
 volatile uint8_t start;
 
-
-
 // Funktioner som initierar kommunikationsenheten
 void ioInit()
 {
