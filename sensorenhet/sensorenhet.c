@@ -24,6 +24,19 @@
 volatile uint8_t number_of_adc = 7;
 volatile uint8_t current_adc = 0;
 
+
+uint8_t min(uint8_t x, uint8_t y)
+{
+	if (x < y)
+	{
+		return x;
+	}
+	else
+	{
+		return y;
+	}
+}
+
 void ioInit()
 {
 	DDRD = 0xFF; // Sätter upp så att muxarna kan styras.
@@ -108,7 +121,12 @@ void readGyroTemp()
 
 void accumulateData(RawData* raw_data, uint8_t number_of_accumulations)
 {
+	
 	raw_data->value = raw_data->accumulator / number_of_accumulations;
+	
+	raw_data->value = min(raw_data->prev_value, raw_data->value);
+	raw_data->prev_value = raw_data->value;
+	
 	raw_data->accumulator = 0;
 	raw_data->is_converted = 0;
 }
