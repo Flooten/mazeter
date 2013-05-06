@@ -229,7 +229,7 @@ void parseCommand(uint8_t cmd)
 			
 		case TURN_STACK_TOP:
 			SPDR = TURN_STACK_TOP;
-			//turn_stack_top = topTurnStack((const TurnStack*)turn_stack);
+			turn_stack_top = topTurnStack((const TurnStack*)&turn_stack);
 			buffer = (uint8_t*)&turn_stack_top;
 			buffer_size = 1;
 			current_byte = 0;
@@ -371,6 +371,35 @@ int main()
 			{
 				if (new_sensor_data_flag == 1)
 				{
+					handleTape(&turn_stack, current_sensor_data.line_type);
+					
+					if (algo_mode_flag == ALGO_IN)
+					{
+						detectTurn(&turn_stack);
+						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+					}
+					else if (algo_mode_flag == ALGO_GOAL)
+					{
+						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
+					}
+					else if (algo_mode_flag == ALGO_GOAL_REVERSE)
+					{
+						jamesBondTurn(&turn_stack);
+					}
+					else if (algo_mode_flag ==	ALGO_OUT)
+					{
+						detectTurnOut(&turn_stack);
+						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+					}
+					
+					new_sensor_data_flag = 0;
+				}
+			}				
+			/*
+			else if (control_mode_flag == FLAG_AUTO)
+			{
+				if (new_sensor_data_flag == 1)
+				{
 					if (current_sensor_data.distance1 < THRESHOLD_ABORT || current_sensor_data.distance2 < THRESHOLD_ABORT)
 					{
 						// Stanna roboten om vi är på väg in i något
@@ -391,10 +420,10 @@ int main()
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 						//detectTurn(&turn_stack);
 					}
-					
 					new_sensor_data_flag = 0;
 				}
 			}
+			*/
 			
 			pwmWheels(control_signals);
 			pwmClaw(control_signals);

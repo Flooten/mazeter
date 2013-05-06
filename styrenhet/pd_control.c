@@ -23,15 +23,23 @@
 
 void startTimer()
 {
-	TCCR1B = (1 << CS10) | (0 << CS11) | (1 << CS12); // Prescaler 1024, ändra i pd_control.c i handleTape om prescalern ändras
+	TCCR3B = (1 << CS10) | (0 << CS11) | (1 << CS12); // Prescaler 1024, ändra i pd_control.c i handleTape om prescalern ändras
 }
+
+void stopTimer()
+{
+	TCCR3B = 0x00;
+}
+
 
 void resetTimer()
 {
-	TCCR1B = 0x00;
-	TCNT1 = 0x0000;
-	TIFR1 |= (1 << TOV1);
+	TCCR3B = 0x00;
+	TCNT3 = 0x0000;
+	TIFR3 |= (1 << TOV3);
 }
+
+
 
 void straightRegulator(const SensorData* current, const SensorData* previous)
 {
@@ -265,7 +273,9 @@ void driveStraight(uint8_t cm)
 {
 	resetTimer();
 	
-	uint16_t timer_count = cm*2*F_CPU/(1024*(control_signals.left_value + control_signals.right_value)); // Prescaler 1024
+	uint32_t tmp = (uint32_t)cm*2*F_CPU/(1024 * ((uint32_t)control_signals.left_value + (uint32_t)control_signals.right_value)); // Prescaler 1024
+	
+	uint16_t timer_count = (uint16_t)tmp; 
 	
 	/* Kör rakt fram med den högsta av hjulparshastigheterna */
 	if (control_signals.right_value > control_signals.left_value)
@@ -280,7 +290,7 @@ void driveStraight(uint8_t cm)
 	
 	startTimer();
 	
-	while(TCNT1 < timer_count && !abort_flag)
+	while((TCNT3 < timer_count) && !abort_flag)
 	{}
 }
 
