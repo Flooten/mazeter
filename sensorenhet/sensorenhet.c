@@ -423,7 +423,7 @@ int main()
 	buffer_size = 0;
 	current_byte = 0;
 	
-	sensor_parameters.tape_threshold = 100;
+	sensor_parameters.tape_threshold = 160;
 	sensor_parameters.horizontal_line_threshold = 4;
 	sensor_parameters.no_line_detection_threshold = 50;
 	sensor_parameters.line_diff_threshold = 4;
