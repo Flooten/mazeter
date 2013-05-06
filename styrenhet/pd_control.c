@@ -68,7 +68,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			int16_t delta = current->distance5 - current->distance4;
 			int16_t delta_previous = previous->distance5 - previous->distance4;
 			
-			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
+			regulator_value = -(float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 		}
 		else if (current->distance3 >= 45 && current->distance5 == 255)
 		{
@@ -78,7 +78,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			int16_t delta = current->distance3 - current->distance6;
 			int16_t delta_previous = previous->distance3 - previous->distance6;
 			
-			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
+			regulator_value = -(float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 		}
 		else if (current->distance3 <= 42 && current->distance4 <= 42)
 		{	
