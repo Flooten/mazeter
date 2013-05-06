@@ -67,24 +67,25 @@ ISR (USART0_RX_vect)
 	btReadData();
 }
 
-ISR (INT0_vect)
+ISR(INT0_vect)
 {
 	if (((1 << PIND2) & PIND) == 0x04)
 		control_mode_flag = FLAG_AUTO;
 	else
-		{
-			control_mode_flag = FLAG_MANUAL;
-			start = 0;
-			control_command = STEER_STOP;
-		}
+	{
+		control_mode_flag = FLAG_MANUAL;
+		start = 0;
+		control_command = STEER_STOP;
+	}
 }
 
-ISR (INT1_vect)
+ISR(INT1_vect)
 {
 	if (control_mode_flag == FLAG_AUTO)
+	{
 		start = 1;
-
-
+		btSendByte(RUN_START);
+	}		
 }
 
 ISR(TIMER1_COMPA_vect)

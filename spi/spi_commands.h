@@ -69,6 +69,7 @@
 
 #define TURN_STACK_TOP 0x71
 #define ALGO_STATE 0x72
+#define RUN_START 0x73
 
 #define ERROR_SPI 0xE0
 #define ERROR_UNKNOWN_SPI_COMMAND 0xE1
