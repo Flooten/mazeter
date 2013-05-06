@@ -18,6 +18,7 @@ typedef struct
 {
 	uint8_t sensor_type;
 	uint8_t prev_value;
+	uint8_t current_value;
 	uint8_t value;
 	uint16_t accumulator;
 	uint8_t is_converted;

@@ -122,9 +122,10 @@ void readGyroTemp()
 void accumulateData(RawData* raw_data, uint8_t number_of_accumulations)
 {
 //	raw_data->prev_value = raw_data->value;
-	raw_data->value = raw_data->accumulator / number_of_accumulations;
+	raw_data->current_value = raw_data->accumulator / number_of_accumulations;
 	
-//	raw_data->value = min(raw_data->prev_value, raw_data->value);
+	raw_data->value = min(raw_data->prev_value, raw_data->current_value);
+	raw_data->prev_value = raw_data->current_value;
 	
 	
 	raw_data->accumulator = 0;
