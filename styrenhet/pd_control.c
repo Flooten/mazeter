@@ -31,15 +31,12 @@ void stopTimer()
 	TCCR3B = 0x00;
 }
 
-
 void resetTimer()
 {
 	TCCR3B = 0x00;
 	TCNT3 = 0x0000;
 	TIFR3 |= (1 << TOV3);
 }
-
-
 
 void straightRegulator(const SensorData* current, const SensorData* previous)
 {
@@ -66,12 +63,22 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 		else if (current->distance4 >= 45 && current->distance6 == 255)
 		{
 			// Kör höger mot mitten
-			regulator_value = -20;
+			//regulator_value = -20;
+			
+			int16_t delta = current->distance5 - current->distance4;
+			int16_t delta_previous = previous->distance5 - previous->distance4;
+			
+			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
 		}
 		else if (current->distance3 >= 45 && current->distance5 == 255)
 		{
 			// Kör vänster mot mitten
-			regulator_value = 20;
+			//regulator_value = 20;
+			
+			int16_t delta = current->distance3 - current->distance6;
+			int16_t delta_previous = previous->distance3 - previous->distance6;
+			
+			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
 		}
 		else if (current->distance3 <= 42 && current->distance4 <= 42)
 		{	
