@@ -53,17 +53,19 @@
 // Lägg dessa i sin egna header?
 #define LINE_TURN_LEFT 0x51
 #define LINE_TURN_RIGHT 0x52
-#define LINE_STRIGHT 0x53
+#define LINE_STRAIGHT 0x53
 #define LINE_GOAL 0x54
 #define LINE_GOAL_STOP 0x55
-#define LINE_STOP 0x56
+#define LINE_START_STOP 0x56
 #define LINE_NONE 0x57
 
 #define CONTROL_PARAMETERS_ALL 0x60
-#define PARA_KP_RIGHT 0x61
-#define PARA_KD_RIGHT 0x62
-#define PARA_KP_LEFT 0x63
-#define PARA_KD_LEFT 0x64
+#define PARA_DIST_KP 0x61
+#define PARA_DIST_KD 0x62
+#define PARA_LINE_KP 0x63
+#define PARA_LINE_KD 0x64
+
+#define ABORT 0x99
 
 #define TURN_STACK_TOP 0x71
 

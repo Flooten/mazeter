@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include "sensor_conversion.h"
 #include "look_up.h"
+#include "line_calibration.h"
 
 volatile uint8_t conversion_status;
 uint8_t line_detections = 0;
@@ -48,8 +49,6 @@ void initGYRO()
 void convertAllData()
 {
 	convertRawDataGyro((RawDataGyro*)&gyro_sample1);
-	//sensor_data.angle = 11;
-	/* punktberäkning av linjesensor, kanske bara göra det i linjeföljande läge?  */
 	
 	convertRawData((RawData*)&distance1);
 	convertRawData((RawData*)&distance2);
@@ -59,6 +58,10 @@ void convertAllData()
 	convertRawData((RawData*)&distance5);
 	convertRawData((RawData*)&distance6);
 	convertRawData((RawData*)&distance7);
+	
+	convertLineData((RawLineData*)&line_sensor);
+	
+	
 }
 
 void convertRawData(RawData* data)
@@ -99,13 +102,12 @@ void convertRawData(RawData* data)
 	}
 }
 
-void convertRawDataGyro(RawDataGyro* data)
+void convertRawDataGyro(volatile RawDataGyro* data)
 {	
 	//* --- FIR filter, uint16_t angle ---------- */
 	if (!data->is_converted)
 	{
 		uint8_t i;
-		long int time_in_micros = ((long)data->time + 4) / 8; /* tid i mikrosekunder */
 	
 		for (i = 0; i < NR_OF_GYRO_SAMPLES-1; i++)
 		{
@@ -115,29 +117,30 @@ void convertRawDataGyro(RawDataGyro* data)
 		if (data->value >= GYRO_REF_LEVEL)
 		{
 			/* positiv ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 + 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (data->time * ((long)data->value - gyro_temp.value) * 3 + 5170 + GYRO_COMP) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 		else
 		{
 			/* negativ ändring */
-			gyro_samples[NR_OF_GYRO_SAMPLES -1] = (time_in_micros * ((long)data->value - GYRO_REF_LEVEL) * 3 - 5170) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
+			gyro_samples[NR_OF_GYRO_SAMPLES - 1] = (data->time * ((long)data->value - gyro_temp.value) * 3 - 5170 - GYRO_COMP) / 10340 ; /* ger antal hundradelsgrader matematiskt avrundat */
 		}
 	
+		/* FIR-filtrering */
 		for (i=0; i < NR_OF_GYRO_SAMPLES ; i++)
 		{
 			long int tmp;
-			tmp = 3 * (long int)filter_coeff[i] * (long int)gyro_samples[NR_OF_GYRO_SAMPLES - 1 - i];
+			tmp = 1 * (long int)filter_coeff[i] * (long int)gyro_samples[NR_OF_GYRO_SAMPLES - 1 - i];
 			
 			if ( tmp >= 0)
 			{
-				tmp += 25000;
+				tmp += 5000;
 			}
 			else
 			{
-				tmp -= 25000;
+				tmp -= 5000;
 			}
 							
-			gyro_filtered += tmp * 1 / 50000; /* original tmp / 10000, infogat normeringsfaktor 3/5 */
+			gyro_filtered += tmp * 1 / 10000; /* original tmp / 10000, infogat normeringsfaktor 3/5 */
 		}
 		
 		sensor_data.angle += gyro_filtered;
@@ -169,7 +172,7 @@ int8_t calculateCenter(const uint8_t* data)
 	
 	// lägger ihop alla linjesensor sum_line_ och tyngdpunkten line_calc_
 	int i;
-	for(i=0;i<11;i++)
+	for(i=0; i<11; i++)
 	{
 		if(data[i] >= sensor_parameters.tape_threshold)
 		{
@@ -180,7 +183,7 @@ int8_t calculateCenter(const uint8_t* data)
 	}
 	
 	// gånger tio för att få med en decimal
-	int8_t center_ = (line_calc_ * 10)/sum_line_;
+	int8_t center_ = (line_calc_ * 10) / sum_line_;
 	
 	return center_;
 }
@@ -255,7 +258,7 @@ void compareLines(uint8_t first, uint8_t second)
 	//! Helt godtyckligt
 	if (diff < sensor_parameters.line_diff_threshold)
 	{
-		sensor_data.line_type = LINE_STRIGHT;
+		sensor_data.line_type = LINE_STRAIGHT;
 	}
 	else if (first > second)
 	{
@@ -302,7 +305,7 @@ void convertLineData(RawLineData* data)
 			else if (current_line == SPACE_2)
 			{
 				// Tredje tejpen detekteras efter mellanrum
-				sensor_data.line_type = LINE_STOP;
+				sensor_data.line_type = LINE_START_STOP;
 				current_line = 0;
 				line_detections = 0;
 			}
@@ -319,7 +322,7 @@ void convertLineData(RawLineData* data)
 		
 		case VERTICAL_LINE:
 		{
-			if (current_line == LINE_1)
+			if (current_line == LINE_1 || current_line == LINE_FOLLOWING)
 			{
 				goal_mode = 1;
 				current_line = LINE_FOLLOWING;
@@ -344,9 +347,7 @@ void convertLineData(RawLineData* data)
 				current_line = SPACE_2;
 				line_detections = 0;
 				
-				sensor_data.line_type = first_line_val;
-				sensor_data.line_deviation = second_line_val;
-				//compareLines(first_line_val, second_line_val);
+				compareLines(first_line_val, second_line_val);
 			}
 			else
 			{

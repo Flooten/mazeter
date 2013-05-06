@@ -26,7 +26,7 @@ void timerInit()
 	//OCR3A = 24999; // Sätter vad den ska räkna till. 24999 -> skicka data 5 ggr/sekund
 	OCR3A = 0x1E78; // 1 avbr / sekundend @ 1024 prescaler
 
-	TCCR1B |= ((1 << CS10) | (1 << CS11)); // Sätter prescaler till 64 bit för timer 1
-	//TCCR3B |= ((1 << CS30) | (1 << CS31)); // Sätter prescaler till 64 bit för timer 3
-	TCCR3B |= ((1 << CS30) | (1 << CS32)); // Sätter prescaler till 1024 bit för timer 3
+	TCCR1B |= ((1 << CS10) | (1 << CS11)); // Sätter prescaler till 64 för timer 1
+	//TCCR3B |= ((1 << CS30) | (1 << CS31)); // Sätter prescaler till 64 för timer 3
+	TCCR3B |= ((1 << CS30) | (1 << CS32)); // Sätter prescaler till 1024 för timer 3
 }

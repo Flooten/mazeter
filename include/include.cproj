@@ -70,6 +70,9 @@
     <Compile Include="sensor_data.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="sensor_parameters.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

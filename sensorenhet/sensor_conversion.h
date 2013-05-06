@@ -34,6 +34,9 @@
 
 #define NR_OF_GYRO_SAMPLES 10
 #define GYRO_REF_LEVEL 127
+/* Kompensering för att gyrot driver:
+  hundradelsgrader/sample * 10340 = GYRO_COMP  */
+#define GYRO_COMP -5000
 
 #define CONVERSION_ERROR 1;
 
@@ -58,10 +61,7 @@ volatile int filter_coeff[10];
 void initGYRO();
 void convertAllData();
 void convertRawData(RawData* data);
-
-void convertDistanceLong(RawData* data);
-void convertDistanceShort(RawData* data);
-void convertRawDataGyro(RawDataGyro* data);
+void convertRawDataGyro(volatile RawDataGyro* data);
 
 int8_t calculateCenter(const uint8_t* data);
 // calcute_center ger ett värde mellan -5 och 5

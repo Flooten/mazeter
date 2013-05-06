@@ -2,9 +2,11 @@
  * FILNAMN:       styrenhet.c
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Fredrik Stenmark
- * DATUM:         2013-04-08
+ *                Herman Ekwall
+ *                Mattias Fransson
+ * DATUM:         2013-05-02
  *
- * BESKRIVNING:
+ * BESKRIVNING: Styrenhetens huvudloop.
  *
  */
 
@@ -20,27 +22,28 @@
 #include "control_parameters.h"
 #include "pd_control.h"
 
-#define SPI_RECEIVING_SENSOR_DATA 0x03
-
 // SPI-variabler
-volatile uint8_t* buffer;
-volatile uint8_t buffer_size;
-volatile uint8_t current_byte;
-volatile uint8_t spi_status;
+volatile uint8_t* buffer = NULL;
+volatile uint8_t buffer_size = 0;
+volatile uint8_t current_byte = 0;
+volatile uint8_t spi_status = SPI_READY;
 
-volatile uint8_t control_mode_flag;
+volatile uint8_t control_mode_flag = FLAG_MANUAL;
 volatile uint8_t current_command;
 volatile uint8_t throttle;
-volatile uint8_t new_sensor_data = 0;
+volatile uint8_t new_sensor_data_flag = 0;
+volatile uint8_t reciving_sensor_data_flag = 0;
+volatile uint8_t abort_flag = 0;
+volatile uint8_t algo_mode_flag = ALGO_IN;
 
 volatile ControlSignals control_signals;
 volatile SensorData current_sensor_data;
 volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
-volatile TurnStack turn_stack;
+volatile const char* str = "Hello, world!";
 
-volatile uint8_t mah_2nd_const = 129;
+volatile TurnStack turn_stack;
 
 void parseCommand(uint8_t cmd);
 
@@ -64,6 +67,13 @@ ISR(SPI_STC_vect)
             buffer = NULL;
             buffer_size = 0;
             current_byte = 0;
+			
+			if(reciving_sensor_data_flag == 1)
+			{
+				new_sensor_data_flag = 1;
+				reciving_sensor_data_flag = 0;
+			}
+			
         }
     }
     else
@@ -103,7 +113,8 @@ void parseCommand(uint8_t cmd)
             buffer_size = sizeof(current_sensor_data);
             current_byte = 0;
             spi_status = SPI_RECEIVING_DATA;
-			new_sensor_data = 0;
+			new_sensor_data_flag = 0;
+			reciving_sensor_data_flag = 1;
 			previous_sensor_data = current_sensor_data;
             break;
 
@@ -128,6 +139,7 @@ void parseCommand(uint8_t cmd)
 			
 		case FLAG_MANUAL:
 			control_mode_flag = FLAG_MANUAL;
+			abort_flag = 0;
 			break;
 
 		case STEER_STRAIGHT:
@@ -195,16 +207,22 @@ void parseCommand(uint8_t cmd)
 			
 		case CONTROL_PARAMETERS_ALL:
 			SPDR = CONTROL_PARAMETERS_ALL;
-			buffer = &control_parameters.right_kp;
+			buffer = (uint8_t*)&control_parameters.dist_kp;
 			buffer_size = sizeof(control_parameters);
 			current_byte = 0;
 			spi_status = SPI_RECEIVING_DATA;
 			break;
 			
-		case 0x96:
-			SPDR = 0x96;
-			buffer = &mah_2nd_const;
-			buffer_size = 1;
+		case ABORT:
+			SPDR = ABORT;
+			abort_flag = 1;
+			new_sensor_data_flag = 0;
+			break;
+
+		case 0x95:
+			SPDR = strlen((const char*)str);
+			buffer = (uint8_t*)str;
+			buffer_size = strlen((const char*)str);
 			current_byte = 0;
 			break;
 
@@ -283,23 +301,26 @@ void commandToControlSignal(uint8_t cmd)
 	}
 }
 
-
-
-int main()
+void resetData()
 {
 	memset((void*)&control_signals, 0, sizeof(control_signals));
-	memset((void*)&control_parameters, 0, sizeof(control_parameters));
 	memset((void*)&current_sensor_data, 0, sizeof(current_sensor_data));
 	memset((void*)&previous_sensor_data, 0, sizeof(previous_sensor_data));
 	
-    spi_status = SPI_READY;
-    buffer = NULL;
-    buffer_size = 0;
-    current_byte = 0;
+	control_signals.left_direction = 1;
+	control_signals.right_direction = 1;
 	
 	current_command = STEER_STOP;
 	throttle = 0;
+}
+
+int main()
+{
+	turn_stack = createTurnStack();
 	
+	memset((void*)&control_parameters, 0, sizeof(control_parameters));
+	
+	resetData();
     pwmInit();
     spiSlaveInit();
     sei();
@@ -312,26 +333,89 @@ int main()
 	
     while (1)
     {
-		// Låt inte Joel köra för fort...
-		if (throttle > 100)
+		if (abort_flag) // Återställs när mode -> manual 
 		{
-			throttle = 100;
-		}			
-		
-		if (control_mode_flag == FLAG_MANUAL)
-		{
-			commandToControlSignal(current_command);
+			resetData();
+			pwmWheels(control_signals);
+			continue;
 		}
-		else if (control_mode_flag == FLAG_AUTO)
+		else
 		{
-			if (new_sensor_data == 1)
+			// Låt inte Joel köra för fort...
+			if (throttle > 100)
 			{
-				sensorDataToControlSignal((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-				new_sensor_data = 0;
+				throttle = 100;
 			}
-		}
-		
-		pwmWheels(control_signals);
-		pwmClaw(control_signals);
+			
+			if (control_mode_flag == FLAG_MANUAL)
+			{
+				commandToControlSignal(current_command);
+			}
+			else if (control_mode_flag == FLAG_AUTO)
+			{
+				if (new_sensor_data_flag == 1)
+				{
+					if (current_sensor_data.distance1 < THRESHOLD_ABORT || current_sensor_data.distance2 < THRESHOLD_ABORT)
+					{
+						// Stanna roboten om vi är på väg in i något
+						commandToControlSignal(STEER_STOP);
+						pwmWheels(control_signals);
+					}
+					
+					if (current_sensor_data.line_type == LINE_GOAL)
+					{
+						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
+					}
+					else if (current_sensor_data.line_type == LINE_GOAL_STOP)
+					{
+						commandToControlSignal(STEER_STOP);
+					}
+					else
+					{
+						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+						//detectTurn(&turn_stack);
+					}
+					
+					new_sensor_data_flag = 0;
+				}
+			}
+			
+			pwmWheels(control_signals);
+			pwmClaw(control_signals);
+		}	
     }
 }
+
+///////////////////////////// TA INTE BORT /////////////////////////////////
+// Detta är labyrint algoritmen
+
+/*
+else if (control_mode_flag == FLAG_AUTO)
+{
+	if (new_sensor_data_flag == 1)
+	{
+		handleTape(turn_stack, current_sensor_data.line_type);
+		
+		if (algo_mode_flag == ALGO_IN)
+		{
+			detectTurn(turn_stack);
+			sensorDataToControlSignal(current_sensor_data, previous_sensor_data);
+		}
+		else if (algo_mode_flag == ALGO_GOAL)
+		{
+			lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
+		}
+		else if (algo_mode_flag == ALGO_GOAL_REVERSE)
+		{
+			jamesBondTurn(turn_stack);
+		}
+		else if (algo_mode_flag ==	ALGO_OUT)
+		{
+			detectTurnOut(turn_stack);
+			sensorDataToControlSignal(current_sensor_data, previous_sensor_data);
+		}
+		
+		new_sensor_data_flag = 0;
+	}		
+		
+*/

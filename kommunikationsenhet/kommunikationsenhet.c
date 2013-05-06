@@ -19,13 +19,25 @@
 #include "timer.h"
 #include "sensor_data.h"
 #include "controlsignals.h"
+#include "sensor_parameters.h"
+#include "control_parameters.h"
+
+#define DELTA_T 2 // i ms 
 
 volatile uint8_t control_mode_flag;
 volatile uint8_t control_command;
+volatile uint8_t sensor_command;
 volatile SensorData sensor_data;
 volatile ControlSignals control_signals;
+volatile SensorParameters sensor_parameters;
+volatile ControlParameters control_parameters;
+
+uint8_t new_control_parameters = 0;
+
 volatile uint8_t throttle;
 volatile uint8_t start;
+
+
 
 // Funktioner som initierar kommunikationsenheten
 void ioInit()
@@ -63,12 +75,16 @@ ISR (INT0_vect)
 		{
 			control_mode_flag = FLAG_MANUAL;
 			start = 0;
+			control_command = STEER_STOP;
 		}
 }
 
 ISR (INT1_vect)
 {
-	start = 1;
+	if (control_mode_flag == FLAG_AUTO)
+		start = 1;
+
+
 }
 
 ISR(TIMER1_COMPA_vect)
@@ -104,15 +120,13 @@ int main(void)
 	
     while(1)
     {
-		PORTA = sizeof(sensor_data);
-		
 		if (timer_internal_ready)
 		{
 			// Läs sensordata
-			//if (spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
-			//{
-				////btSendString("Failed to fetch the sensor data from the sensor device.");
-			//}
+			if (spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
+			{
+				btSendString("Failed to fetch the sensor data from the sensor device.");
+			}
 			
 			spiSendData(control_mode_flag, STYR_ENHET, NULL, 0);
 			
@@ -124,9 +138,29 @@ int main(void)
 				{
 					btSendString("Failed to send control commands to the control device.");
 				}
+				
+				if(sensor_command != 0)
+				{
+					spiSendCommand(sensor_command, SENSOR_ENHET);
+					sensor_command = 0;
+				}
+				
+				if (new_control_parameters)
+				{
+					if (spiSendData(CONTROL_PARAMETERS_ALL, STYR_ENHET, (const uint8_t*)&control_parameters.dist_kp, sizeof(control_parameters)) != CONTROL_PARAMETERS_ALL)
+					{
+						btSendString("Failed to send the control parameters to the control device.");
+					}
+					new_control_parameters = 0;
+				}				
 			}
 			else
 			{
+				if (control_command == ABORT)
+				{
+					spiSendCommand(control_command, STYR_ENHET);
+				}
+				
 				if (start == 1)
 				{
 					if (spiSendData(SENSOR_DATA_ALL, STYR_ENHET, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
@@ -136,7 +170,6 @@ int main(void)
 				}
 			}
 			
-			spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			timer_internal_ready = 0;
 		}		
@@ -149,8 +182,7 @@ int main(void)
 			btSendData(TURN_STACK_TOP, &turn_stack_top, 1);
 			timer_external_ready = 0;
 		}
-		
-		//cli();
+
 		ATOMIC_BLOCK(ATOMIC_FORCEON)
 		{
 			while (empty((const Queue*)&rx_queue) == 0)
@@ -206,6 +238,43 @@ int main(void)
 					case CLAW_CLOSE:
 						control_command = CLAW_CLOSE;
 						break;
+						
+					case ABORT:
+						control_command = ABORT;
+						start = 0;
+						break;
+					
+					case CALIBRATE_LINE_SENSOR:
+						sensor_command = CALIBRATE_LINE_SENSOR;
+						break;
+						
+					case CONTROL_PARAMETERS_ALL:
+						control_parameters.dist_kp = tmp->data[0];
+						control_parameters.dist_kd = tmp->data[1];
+						control_parameters.line_kp = tmp->data[2];
+						control_parameters.line_kd = tmp->data[3];
+						break;
+					
+					case PARA_DIST_KD:
+						control_parameters.dist_kd = tmp->data[0];
+						new_control_parameters = 1;
+						break;
+						
+					case PARA_DIST_KP:
+						control_parameters.dist_kp = tmp->data[0];
+						new_control_parameters = 1;
+						break;
+					
+					case PARA_LINE_KD:
+						control_parameters.line_kd = tmp->data[0];
+						new_control_parameters = 1;
+						break;
+						
+					case PARA_LINE_KP:
+						control_parameters.line_kp = tmp->data[0];
+						new_control_parameters = 1;
+						break;
+						
 
 					default:
 						btSendString("Unknown command");
@@ -216,7 +285,6 @@ int main(void)
 				pop((Queue*)&rx_queue);
 			}
 		} // END ATOMIC_BLOCK
-		//sei();
 	}
 	
 	return 0;
