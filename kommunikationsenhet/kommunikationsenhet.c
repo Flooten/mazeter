@@ -114,6 +114,7 @@ int main(void)
 	throttle = 62;
 	
 	uint8_t turn_stack_top = 0;
+	uint8_t algo_state = 0;
 	
 	//! Ta bort, test
 	DDRA = 0xFF;
@@ -176,10 +177,17 @@ int main(void)
 		
 		if (timer_external_ready)
 		{	
+			if (control_mode_flag == FLAG_AUTO)
+			{
+				spiReadData(TURN_STACK_TOP, STYR_ENHET, &turn_stack_top, 1);
+				spiReadData(ALGO_STATE, STYR_ENHET, &algo_state, 1);
+				btSendData(TURN_STACK_TOP, &turn_stack_top, 1);
+				btSendData(ALGO_STATE, &algo_state, 1);
+			}
+			
 			btSendData(CONTROL_SIGNALS, (const uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			btSendData(SENSOR_DATA_ALL, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
 			btSendData(control_mode_flag, NULL, 0);
-			btSendData(TURN_STACK_TOP, &turn_stack_top, 1);
 			timer_external_ready = 0;
 		}
 

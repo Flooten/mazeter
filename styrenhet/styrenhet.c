@@ -35,6 +35,7 @@ volatile uint8_t new_sensor_data_flag = 0;
 volatile uint8_t reciving_sensor_data_flag = 0;
 volatile uint8_t abort_flag = 0;
 volatile uint8_t algo_mode_flag = ALGO_IN;
+volatile uint8_t turn_stack_top = 0x11;
 
 volatile ControlSignals control_signals;
 volatile SensorData current_sensor_data;
@@ -223,6 +224,21 @@ void parseCommand(uint8_t cmd)
 			SPDR = strlen((const char*)str);
 			buffer = (uint8_t*)str;
 			buffer_size = strlen((const char*)str);
+			current_byte = 0;
+			break;
+			
+		case TURN_STACK_TOP:
+			SPDR = TURN_STACK_TOP;
+			//turn_stack_top = topTurnStack((const TurnStack*)turn_stack);
+			buffer = (uint8_t*)&turn_stack_top;
+			buffer_size = 1;
+			current_byte = 0;
+			break;
+			
+		case ALGO_STATE:
+			SPDR = ALGO_STATE;
+			buffer = (uint8_t*)&algo_mode_flag;
+			buffer_size = 1;
 			current_byte = 0;
 			break;
 
