@@ -82,7 +82,7 @@ ISR(INT1_vect)
 	if (control_mode_flag == FLAG_AUTO)
 	{
 		start = 1;
-		btSendByte(RUN_START);
+		btSendData(RUN_START, NULL, 0);
 	}		
 }
 
