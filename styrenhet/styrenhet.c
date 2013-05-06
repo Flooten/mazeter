@@ -371,10 +371,9 @@ int main()
 			{
 				if (new_sensor_data_flag == 1)
 				{
-					handleTape(&turn_stack, current_sensor_data.line_type);
-					
 					if (algo_mode_flag == ALGO_IN)
 					{
+						handleTape(&turn_stack, current_sensor_data.line_type);
 						detectTurn(&turn_stack);
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 					}

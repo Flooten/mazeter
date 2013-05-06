@@ -10,7 +10,7 @@
 #ifndef PD_CONTROL_H_
 #define PD_CONTROL_H_
 
-#define DEGREES_90 8000
+#define DEGREES_90 6000
 #define DISTANCE_TAPE_TURN 43
 
 #include "pd_control.h"

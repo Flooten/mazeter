@@ -79,6 +79,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			int16_t delta_previous = previous->distance3 - previous->distance6;
 			
 			regulator_value = -(float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
+
 		}
 		else if (current->distance3 <= 42 && current->distance4 <= 42)
 		{	
@@ -189,6 +190,11 @@ void makeTurn(uint8_t turn)
 		}
 	}
 	commandToControlSignal(CLAW_OPEN);
+	pwmClaw(control_signals);
+	
+	driveStraight(10);
+	
+	commandToControlSignal(CLAW_CLOSE);
 	pwmClaw(control_signals);
 	
 }
