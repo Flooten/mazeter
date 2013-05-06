@@ -31,7 +31,7 @@
 #define THRESHOLD_CONTACT_SIDE 60
 
 /* Avståndsvärde när man ska rotera */
-#define THRESHOLD_STOP 36
+#define THRESHOLD_STOP 50
 
 /* Avstånd då vi är på väg att köra in i ngt */
 #define THRESHOLD_ABORT 25

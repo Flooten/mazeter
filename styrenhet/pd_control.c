@@ -184,6 +184,11 @@ void makeTurn(uint8_t turn)
 	commandToControlSignal(CLAW_OPEN);
 	pwmClaw(control_signals);
 	
+	driveStraight(10);
+	
+	commandToControlSignal(CLAW_CLOSE);
+	pwmClaw(control_signals);
+	
 }
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
