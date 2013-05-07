@@ -104,17 +104,17 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 		{
 			// Sväng åt höger
 			control_signals.right_value = speed + regulator_value;
-			control_signals.left_value = speed;
+			
+			if ((control_signals.left_value = speed - regulator_value) > 100)
+				control_signals.left_value = 100;
 		}
 		else
 		{
-			control_signals.right_value = speed;
+			if ((control_signals.right_value = speed + regulator_value) > 100)
+				control_signals.right_value = 100;
+			
 			control_signals.left_value = speed - regulator_value;
 		}
-		
-		// Kör frammåt
-		//control_signals.left_direction = 1;
-		//control_signals.right_direction = 1;
 	}
 }
 
