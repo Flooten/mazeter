@@ -120,7 +120,11 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 
 void makeTurn(uint8_t turn)
 {
-	uint16_t angle_end = current_sensor_data.angle;
+	uint16_t angle_end;
+	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	{
+		angle_end = current_sensor_data.angle;	
+	}
 	uint16_t angle_start = angle_end;
 	
 	commandToControlSignal(CLAW_CLOSE);
@@ -135,13 +139,31 @@ void makeTurn(uint8_t turn)
 			if (angle_end >= 36000)
 			{
 				angle_end -= 36000;
-				while ((current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start) && !abort_flag)
-				{}	
+				
+				uint16_t angle_copy;
+				do 
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while ((angle_copy < angle_end || angle_copy >= angle_start) && !abort_flag);
+				
+				//while ((current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start) && !abort_flag)
+				//{}
 			}
 			else
 			{
-				while (current_sensor_data.angle < angle_end && !abort_flag)
-				{}
+				uint16_t angle_copy;
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while (angle_copy < angle_end && !abort_flag);
+				//while (current_sensor_data.angle < angle_end && !abort_flag)
+				//{}
 			}
 			break;
 		
@@ -152,13 +174,29 @@ void makeTurn(uint8_t turn)
 			if (angle_end >= 36000)
 			{
 				angle_end = 36000 - (DEGREES_90 - angle_start);
-				while ((current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start) && !abort_flag)
-				{}		
+				uint16_t angle_copy;
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while ((angle_copy > angle_end || angle_copy <= angle_start) && !abort_flag);
+				//while ((current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start) && !abort_flag)
+				//{}		
 			}
 			else
 			{
-				while (current_sensor_data.angle > angle_end && !abort_flag)
-				{}
+				uint16_t angle_copy;
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while (angle_copy > angle_end && !abort_flag);
+				//while (current_sensor_data.angle > angle_end && !abort_flag)
+				//{}
 			}
 			break;
 		
