@@ -44,7 +44,8 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		static int8_t regulator_value = 0;
+		//static int8_t regulator_value = 0;
+		int8_t regulator_value = 0;
 		
 		if (current->distance3 >= 80 && current->distance6 != 255)
 		{
@@ -62,7 +63,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta_left + (float)control_parameters.dist_kd / 10 * (delta_left - delta_left_previous);
 		}
-		else if (current->distance4 >= 40 && current->distance6 == 255)
+		else if (current->distance4 >= 43 && current->distance6 == 255)
 		{
 			// Kör höger mot mitten
 			//regulator_value = -20;
@@ -72,7 +73,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 		}
-		else if (current->distance3 >= 40 && current->distance5 == 255)
+		else if (current->distance3 >= 43 && current->distance5 == 255)
 		{
 			// Kör vänster mot mitten
 			//regulator_value = 20;
@@ -83,12 +84,16 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 
 		}
-		else //if (current->distance3 <= 42 && current->distance4 <= 42)
+		else if (current->distance3 <= 42 && current->distance4 <= 42)
 		{	
 			int16_t delta_front = current->distance3 - current->distance4;
 			int16_t delta_front_previous = previous->distance3 - previous->distance4;
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
+		}
+		else
+		{
+			regulator_value = 0;
 		}
 		
 		if (regulator_value > speed)
