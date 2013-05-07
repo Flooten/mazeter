@@ -44,7 +44,8 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		static int8_t regulator_value = 0;
+		//static int8_t regulator_value = 0;
+		int8_t regulator_value = 0;
 		
 		if (current->distance3 >= 80 && current->distance6 != 255)
 		{
@@ -62,7 +63,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta_left + (float)control_parameters.dist_kd / 10 * (delta_left - delta_left_previous);
 		}
-		else if (current->distance4 >= 40 && current->distance6 == 255)
+		else if (current->distance4 >= 43 && current->distance6 == 255)
 		{
 			// Kör höger mot mitten
 			//regulator_value = -20;
@@ -72,7 +73,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 		}
-		else if (current->distance3 >= 40 && current->distance5 == 255)
+		else if (current->distance3 >= 43 && current->distance5 == 255)
 		{
 			// Kör vänster mot mitten
 			//regulator_value = 20;
@@ -83,12 +84,16 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 
 		}
-		else //if (current->distance3 <= 42 && current->distance4 <= 42)
+		else if (current->distance3 <= 42 && current->distance4 <= 42)
 		{	
 			int16_t delta_front = current->distance3 - current->distance4;
 			int16_t delta_front_previous = previous->distance3 - previous->distance4;
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
+		}
+		else
+		{
+			regulator_value = 0;
 		}
 		
 		if (regulator_value > speed)
@@ -120,7 +125,11 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 
 void makeTurn(uint8_t turn)
 {
-	uint16_t angle_end = current_sensor_data.angle;
+	uint16_t angle_end;
+	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	{
+		angle_end = current_sensor_data.angle;	
+	}
 	uint16_t angle_start = angle_end;
 	
 	commandToControlSignal(CLAW_CLOSE);
@@ -135,13 +144,31 @@ void makeTurn(uint8_t turn)
 			if (angle_end >= 36000)
 			{
 				angle_end -= 36000;
-				while ((current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start) && !abort_flag)
-				{}	
+				
+				uint16_t angle_copy;
+				do 
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while ((angle_copy < angle_end || angle_copy >= angle_start) && !abort_flag);
+				
+				//while ((current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start) && !abort_flag)
+				//{}
 			}
 			else
 			{
-				while (current_sensor_data.angle < angle_end && !abort_flag)
-				{}
+				uint16_t angle_copy;
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while (angle_copy < angle_end && !abort_flag);
+				//while (current_sensor_data.angle < angle_end && !abort_flag)
+				//{}
 			}
 			break;
 		
@@ -152,13 +179,29 @@ void makeTurn(uint8_t turn)
 			if (angle_end >= 36000)
 			{
 				angle_end = 36000 - (DEGREES_90 - angle_start);
-				while ((current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start) && !abort_flag)
-				{}		
+				uint16_t angle_copy;
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while ((angle_copy > angle_end || angle_copy <= angle_start) && !abort_flag);
+				//while ((current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start) && !abort_flag)
+				//{}		
 			}
 			else
 			{
-				while (current_sensor_data.angle > angle_end && !abort_flag)
-				{}
+				uint16_t angle_copy;
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while (angle_copy > angle_end && !abort_flag);
+				//while (current_sensor_data.angle > angle_end && !abort_flag)
+				//{}
 			}
 			break;
 		
