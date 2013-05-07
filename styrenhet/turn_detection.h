@@ -37,8 +37,9 @@
 #define THRESHOLD_ABORT 25
 
 /* Avståndsvärde när man ska rotera  om det är en återvändsgränd man mäter mot*/
-#define THRESHOLD_STOP_DEAD_END 110
+#define THRESHOLD_STOP_DEAD_END 120
 
+uint8_t min(uint8_t x, uint8_t y);
 
 /* Upptäcker svängar på väg in i labyrinten */
 void detectTurn(volatile TurnStack* turn_stack);

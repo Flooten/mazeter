@@ -170,7 +170,7 @@ int main(void)
 				}
 			}
 			
-			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));
+			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));		
 			timer_internal_ready = 0;
 		}		
 		

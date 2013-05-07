@@ -40,6 +40,8 @@ void resetTimer()
 
 void straightRegulator(const SensorData* current, const SensorData* previous)
 {
+	uint8_t speed = throttle;
+	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
 		static int8_t regulator_value = 0;
@@ -60,7 +62,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta_left + (float)control_parameters.dist_kd / 10 * (delta_left - delta_left_previous);
 		}
-		else if (current->distance4 >= 45 && current->distance6 == 255)
+		else if (current->distance4 >= 40 && current->distance6 == 255)
 		{
 			// Kör höger mot mitten
 			//regulator_value = -20;
@@ -70,7 +72,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 		}
-		else if (current->distance3 >= 45 && current->distance5 == 255)
+		else if (current->distance3 >= 40 && current->distance5 == 255)
 		{
 			// Kör vänster mot mitten
 			//regulator_value = 20;
@@ -81,7 +83,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 
 		}
-		else if (current->distance3 <= 42 && current->distance4 <= 42)
+		else //if (current->distance3 <= 42 && current->distance4 <= 42)
 		{	
 			int16_t delta_front = current->distance3 - current->distance4;
 			int16_t delta_front_previous = previous->distance3 - previous->distance4;
@@ -89,25 +91,25 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
 		}
 		
-		if (regulator_value > 100)
+		if (regulator_value > speed)
 		{
-			regulator_value = 100;
+			regulator_value = speed;
 		}
-		else if (regulator_value < -100)
+		else if (regulator_value < -speed)
 		{
-			regulator_value = -100;
+			regulator_value = -speed;
 		}
 		
 		if (regulator_value < 0)
 		{
 			// Sväng åt höger
-			control_signals.right_value = 100 + regulator_value;
-			control_signals.left_value = 100;
+			control_signals.right_value = speed + regulator_value;
+			control_signals.left_value = speed;
 		}
 		else
 		{
-			control_signals.right_value = 100;
-			control_signals.left_value = 100 - regulator_value;
+			control_signals.right_value = speed;
+			control_signals.left_value = speed - regulator_value;
 		}
 		
 		// Kör frammåt
