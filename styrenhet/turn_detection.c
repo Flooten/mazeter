@@ -38,13 +38,13 @@ void detectTurn(volatile TurnStack* turn_stack)
 		if ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP)
 		{
 			// Fall 1, 3 eller 7
-			if (current_sensor_data.distance4 > current_sensor_data.distance3)
+			if (current_sensor_data.distance4 > current_sensor_data.distance3 + THRESHOLD_CONTACT_SIDE / 2)
 			{
 				// Fall 7
 				pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 				makeTurn(RIGHT_TURN);
 			}
-			else
+			else if (current_sensor_data.distance3 > current_sensor_data.distance4 + THRESHOLD_CONTACT_SIDE / 2)
 			{
 				// Fall 1 eller 3
 				pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
