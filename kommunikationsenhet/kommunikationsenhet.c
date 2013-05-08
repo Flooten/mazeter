@@ -98,6 +98,7 @@ ISR(TIMER3_COMPA_vect)
 
 int main(void)
 {
+	cli();
 	ioInit();
 	spiMasterInit();
 	btInit();
@@ -117,6 +118,8 @@ int main(void)
 	
 	//! Ta bort, test
 	DDRA = 0xFF;
+	
+	sei();
 	
     while(1)
     {

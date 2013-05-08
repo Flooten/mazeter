@@ -25,5 +25,6 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape);
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation);
 void driveStraight(uint8_t cm);
 void jamesBondTurn(volatile TurnStack* turn_stack);
+uint16_t TIM16_ReadTCNT3();
 
 #endif /* PD_CONTROL_H_ */
