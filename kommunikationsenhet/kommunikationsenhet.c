@@ -114,7 +114,7 @@ int main(void)
 	
 	uint8_t turn_stack_top = 0;
 	uint8_t algo_state = 0;
-	
+	uint8_t turn_done_flag = 0;
 	//! Ta bort, test
 	DDRA = 0xFF;
 	
@@ -168,6 +168,9 @@ int main(void)
 						btSendString("Failed to send the sensor data to the control device.");
 					}
 				}
+				
+				spiReadData(TURN_DONE, STYR_ENHET, &turn_done_flag, 1);
+				spiSendData(TURN_DONE, SENSOR_ENHET, &turn_done_flag, 1);
 			}
 			
 			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));		
