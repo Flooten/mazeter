@@ -237,7 +237,7 @@ void makeTurn(uint8_t turn)
 	commandToControlSignal(CLAW_OPEN);
 	pwmClaw(control_signals);
 	
-	driveStraight(40);
+	driveStraight(80);
 	
 	commandToControlSignal(CLAW_CLOSE);
 	pwmClaw(control_signals);
