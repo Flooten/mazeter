@@ -304,7 +304,7 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 {
-	const int8_t speed = 40;
+	const int8_t speed = 20;
 	int8_t regulator_value = (float)control_parameters.line_kp / 10 * current_deviation + (float)control_parameters.line_kd / 10 * (current_deviation - previous_deviation);
 	
 	if (regulator_value > speed)
@@ -361,9 +361,10 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 	commandToControlSignal(STEER_BACK);
 	pwmWheels(control_signals);
 	
-	while (current_sensor_data.distance7 > THRESHOLD_STOP && !abort_flag)
+	while (current_sensor_data.distance3 < THRESHOLD_CONTACT_SIDE && current_sensor_data.distance4 < THRESHOLD_CONTACT_SIDE && !abort_flag)
 	{}	
-		
+	
+	driveStraight(DISTANCE_DETECT_TURN);	
 	uint8_t tmp = popTurnStack(turn_stack);
 	
 	if (tmp == LEFT_TURN)

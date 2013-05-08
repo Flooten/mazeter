@@ -392,6 +392,7 @@ int main()
 					}
 					else if (algo_mode_flag == ALGO_GOAL)
 					{
+						handleTape(&turn_stack, current_sensor_data.line_type);
 						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
 					}
 					else if (algo_mode_flag == ALGO_GOAL_REVERSE)

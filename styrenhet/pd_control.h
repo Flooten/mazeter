@@ -12,6 +12,7 @@
 
 #define DEGREES_90 5000
 #define DISTANCE_TAPE_TURN 43
+#define DISTANCE_DETECT_TURN 40 
 
 #include "pd_control.h"
 #include "control_parameters.h"
