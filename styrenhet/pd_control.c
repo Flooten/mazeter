@@ -237,7 +237,7 @@ void makeTurn(uint8_t turn)
 	commandToControlSignal(CLAW_OPEN);
 	pwmClaw(control_signals);
 	
-	driveStraight(80);
+	driveStraight(30);
 	
 	commandToControlSignal(CLAW_CLOSE);
 	pwmClaw(control_signals);
@@ -250,6 +250,8 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 	switch(tape)
 	{
 		case LINE_GOAL:
+			commandToControlSignal(CLAW_OPEN);
+			pwmClaw(control_signals);
 			algo_mode_flag = ALGO_GOAL;
 			break;
 		
@@ -302,7 +304,7 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 {
-	const int8_t speed = 60;
+	const int8_t speed = 40;
 	int8_t regulator_value = (float)control_parameters.line_kp / 10 * current_deviation + (float)control_parameters.line_kd / 10 * (current_deviation - previous_deviation);
 	
 	if (regulator_value > speed)
