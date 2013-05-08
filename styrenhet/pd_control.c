@@ -359,9 +359,10 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 	commandToControlSignal(STEER_BACK);
 	pwmWheels(control_signals);
 	
-	while (current_sensor_data.distance7 > THRESHOLD_STOP && !abort_flag)
+	while (current_sensor_data.distance3 < THRESHOLD_CONTACT_SIDE && current_sensor_data.distance4 < THRESHOLD_CONTACT_SIDE && !abort_flag)
 	{}	
-		
+	
+	driveStraight(DISTANCE_DETECT_TURN);	
 	uint8_t tmp = popTurnStack(turn_stack);
 	
 	if (tmp == LEFT_TURN)
