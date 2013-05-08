@@ -344,6 +344,7 @@ void resetData()
 
 int main()
 {
+	cli();
 	turn_stack = createTurnStack();
 	
 	memset((void*)&control_parameters, 0, sizeof(control_parameters));

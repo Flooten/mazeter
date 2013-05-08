@@ -63,14 +63,20 @@ void stopTimer()
 uint16_t restartTimer()
 {
 	uint16_t tmp;
+	uint8_t sreg;
 	stopTimer();
 	
+	/* Save global interrupt flag */
+	sreg = SREG;
+	/* Disable interrupts */
+	cli();
+	/* Read TCNTn into i */
 	tmp = TCNT1;
-	
+	/* Restore global interrupt flag */
+	SREG = sreg;
 
 	TCNT1 = 0x0000;
 	TIFR1 |= (1 << TOV1); 
-
 	
 	startTimer();
 	return tmp;
@@ -445,6 +451,7 @@ void parseCommand(uint8_t cmd)
 
 int main()
 {
+	cli();
 	spi_status = SPI_READY;
 	buffer = NULL;
 	buffer_size = 0;

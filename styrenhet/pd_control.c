@@ -349,7 +349,7 @@ void driveStraight(uint8_t cm)
 	
 	startTimer();
 	
-	while((TCNT3 < timer_count) && !abort_flag)
+	while((TIM16_ReadTCNT3() < timer_count) && !abort_flag)
 	{}
 }
 
@@ -370,4 +370,19 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 		makeTurn(LEFT_TURN);
 		
 	algo_mode_flag = ALGO_OUT;
+}
+
+uint16_t TIM16_ReadTCNT3()
+{
+	unsigned char sreg;
+	uint16_t i;
+	/* Save global interrupt flag */
+	sreg = SREG;
+	/* Disable interrupts */
+	cli();
+	/* Read TCNTn into i */
+	i = TCNT3;
+	/* Restore global interrupt flag */
+	SREG = sreg;
+	return i;
 }
