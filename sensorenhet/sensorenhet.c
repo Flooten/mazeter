@@ -23,6 +23,7 @@
 
 volatile uint8_t number_of_adc = 7;
 volatile uint8_t current_adc = 0;
+volatile uint8_t turn_done_flag = 0;
 
 
 uint8_t min(uint8_t x, uint8_t y)
@@ -424,7 +425,15 @@ void parseCommand(uint8_t cmd)
 			SPDR = CALIBRATE_LINE_SENSOR;
 			calibrate_line_sensor = 1;
 			break;
-		
+			
+		case TURN_DONE:
+			SPDR = TURN_DONE;
+			buffer = (uint8_t*)&turn_done_flag;
+			buffer_size = 1;
+			current_byte = 0;
+			spi_status = SPI_RECEIVING_DATA;
+			break;
+			
 		default:
 			SPDR = ERROR_UNKNOWN_SPI_COMMAND;
 			buffer = NULL;
@@ -467,6 +476,12 @@ int main()
 			sensor_parameters.tape_threshold = sum / 2;
 			calibrate_line_sensor = 0;
 			sensor_data.line_type = sensor_parameters.tape_threshold;
+		}
+		
+		if (turn_done_flag == 1)
+		{
+			sensor_data.angle = 12000;
+			turn_done_flag = 0;
 		}
 		convertAllData();
 	}
