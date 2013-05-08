@@ -42,6 +42,9 @@ volatile SensorData current_sensor_data;
 volatile SensorData previous_sensor_data;
 volatile ControlParameters control_parameters;
 
+volatile uint8_t turn_done_flag = 0;
+volatile uint8_t turn_done_flag_copy;
+
 volatile const char* str = "Hello, world!";
 
 volatile TurnStack turn_stack;
@@ -241,7 +244,16 @@ void parseCommand(uint8_t cmd)
 			buffer_size = 1;
 			current_byte = 0;
 			break;
-
+			
+		case TURN_DONE:
+			SPDR = TURN_DONE;
+			turn_done_flag_copy = turn_done_flag;
+			turn_done_flag = 0;
+			buffer = (uint8_t*)&turn_done_flag_copy;
+			buffer_size = 1;
+			current_byte = 0;
+			break;
+			
         default:
             SPDR = ERROR_UNKNOWN_SPI_COMMAND;
 			buffer_size = 0;
@@ -376,7 +388,8 @@ int main()
 					{
 						handleTape(&turn_stack, current_sensor_data.line_type);
 						detectTurn(&turn_stack);
-						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+						commandToControlSignal(STEER_STRAIGHT);
+						//straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 					}
 					else if (algo_mode_flag == ALGO_GOAL)
 					{
