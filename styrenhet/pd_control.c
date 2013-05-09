@@ -49,19 +49,29 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 		
 		if (current->distance3 >= 80 && current->distance6 != 255)
 		{
-			// Reglera på högersidan
-			int16_t delta_right = current->distance4 - current->distance6;
-			int16_t delta_right_previous = previous->distance4 - previous->distance6;
+			int16_t delta = 30 - current->distance4;
+			int16_t delta_previous = 30 - previous->distance4;
 			
-			regulator_value = -((float)control_parameters.dist_kp / 10 * delta_right + (float)control_parameters.dist_kd / 10 * (delta_right - delta_right_previous));
+			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
+			
+			// Reglera på högersidan
+			//int16_t delta_right = current->distance4 - current->distance6;
+			//int16_t delta_right_previous = previous->distance4 - previous->distance6;
+			//
+			//regulator_value = -((float)control_parameters.dist_kp / 10 * delta_right + (float)control_parameters.dist_kd / 10 * (delta_right - delta_right_previous));
 		}
 		else if (current->distance4 >= 80 && current->distance5 != 255)
 		{
-			// Reglera på vänstersidan
-			int16_t delta_left = current->distance3 - current->distance5;
-			int16_t delta_left_previous = previous->distance3 - previous->distance5;
+			int16_t delta = current->distance3 - 30;
+			int16_t delta_previous = previous->distance3 - 30;
 			
-			regulator_value = (float)control_parameters.dist_kp / 10 * delta_left + (float)control_parameters.dist_kd / 10 * (delta_left - delta_left_previous);
+			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
+			
+			// Reglera på vänstersidan
+			//int16_t delta_left = current->distance3 - current->distance5;
+			//int16_t delta_left_previous = previous->distance3 - previous->distance5;
+			//
+			//regulator_value = (float)control_parameters.dist_kp / 10 * delta_left + (float)control_parameters.dist_kd / 10 * (delta_left - delta_left_previous);
 		}
 		else if (current->distance4 >= 43 && current->distance6 == 255)
 		{
