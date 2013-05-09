@@ -128,3 +128,10 @@ uint8_t empty(const volatile TurnStack* stack)
 	return (stack->first == NULL) ? 1 : 0;
 }
 
+void clear(volatile TurnStack* stack)
+{
+	while(!empty(stack))
+	{
+		popTurnStack(stack);
+	}
+}

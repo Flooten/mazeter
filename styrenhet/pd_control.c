@@ -131,9 +131,6 @@ void makeTurn(uint8_t turn)
 		angle_end = current_sensor_data.angle;	
 	}
 	uint16_t angle_start = angle_end;
-	
-	commandToControlSignal(CLAW_CLOSE);
-	pwmClaw(control_signals);
 		
 	switch(turn)
 	{
@@ -211,6 +208,42 @@ void makeTurn(uint8_t turn)
 			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
 			{}
 			break;
+			
+		case IEIGHTY_TURN:
+			angle_end += DEGREES_180;
+			commandToControlSignal(STEER_ROTATE_LEFT);
+			pwmWheels(control_signals);
+			if (angle_end >= 36000)
+			{
+				angle_end -= 36000;
+				
+				uint16_t angle_copy;
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while ((angle_copy < angle_end || angle_copy >= angle_start) && !abort_flag);
+				
+				//while ((current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start) && !abort_flag)
+				//{}
+			}
+			else
+			{
+				uint16_t angle_copy;
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while (angle_copy < angle_end && !abort_flag);
+				//while (current_sensor_data.angle < angle_end && !abort_flag)
+				//{}
+			}
+			break;
+			
 		
 		default:
 			break;
@@ -234,13 +267,7 @@ void makeTurn(uint8_t turn)
 			return;
 		}
 	}
-	commandToControlSignal(CLAW_OPEN);
-	pwmClaw(control_signals);
-	
 	driveStraight(30);
-	
-	commandToControlSignal(CLAW_CLOSE);
-	pwmClaw(control_signals);
 	
 	turn_done_flag = 1;
 }
@@ -362,7 +389,9 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 	pwmWheels(control_signals);
 	
 	while (current_sensor_data.distance3 < THRESHOLD_CONTACT_SIDE && current_sensor_data.distance4 < THRESHOLD_CONTACT_SIDE && !abort_flag)
-	{}	
+	{
+		straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+	}	
 	
 	driveStraight(DISTANCE_DETECT_TURN);	
 	uint8_t tmp = popTurnStack(turn_stack);
@@ -371,6 +400,8 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 		makeTurn(RIGHT_TURN);
 	else if (tmp == RIGHT_TURN)
 		makeTurn(LEFT_TURN);
+	else if (tmp == STRAIGHT)
+		makeTurn(IEIGHTY_TURN);	
 		
 	algo_mode_flag = ALGO_OUT;
 }
