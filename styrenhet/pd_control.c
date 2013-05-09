@@ -184,7 +184,9 @@ void makeTurn(uint8_t turn)
 			commandToControlSignal(STEER_STRAIGHT);
 			pwmWheels(control_signals);
 			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-			{}
+			{
+				straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+			}
 			break;
 		default:
 		break;			
@@ -208,7 +210,7 @@ void makeTurn(uint8_t turn)
 			return;
 		}
 	}
-	driveStraight(30);
+	driveStraight(40);
 	
 	turn_done_flag = 1;
 }
@@ -260,18 +262,18 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 			break;
 			
 		case LINE_START_STOP:
-			if (algo_mode_flag == ALGO_OUT)
-			{
-				driveStraight(DISTANCE_DETECT_TURN);
-				commandToControlSignal(STEER_STOP);
-				pwmWheels(control_signals);
-				algo_mode_flag = ALGO_DONE;
-			}
-			else if (algo_mode_flag == ALGO_START)
-			{
-				algo_mode_flag = ALGO_IN;
-				commandToControlSignal(CLAW_OPEN);
-			}
+			//if (algo_mode_flag == ALGO_OUT)
+			//{
+				//driveStraight(DISTANCE_DETECT_TURN);
+				//commandToControlSignal(STEER_STOP);
+				//pwmWheels(control_signals);
+				//algo_mode_flag = ALGO_DONE;
+			//}
+			//else if (algo_mode_flag == ALGO_START)
+			//{
+				//algo_mode_flag = ALGO_IN;
+				//commandToControlSignal(CLAW_OPEN);
+			//}
 			break;
 				
 		default:
@@ -309,6 +311,9 @@ void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 
 void driveStraight(uint8_t cm)
 {
+	commandToControlSignal(CLAW_CLOSE);
+	pwmClaw(control_signals);
+	
 	resetTimer();
 	
 	uint32_t tmp = (uint32_t)cm*2*F_CPU/(1024 * ((uint32_t)control_signals.left_value + (uint32_t)control_signals.right_value)); // Prescaler 1024
@@ -330,6 +335,10 @@ void driveStraight(uint8_t cm)
 	
 	while((TIM16_ReadTCNT3() < timer_count) && !abort_flag)
 	{}
+	
+	commandToControlSignal(CLAW_OPEN);
+	pwmClaw(control_signals);
+	
 }
 
 void jamesBondTurn(volatile TurnStack* turn_stack)

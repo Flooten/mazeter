@@ -141,10 +141,10 @@ void parseCommand(uint8_t cmd)
 		case FLAG_AUTO:
 			if (control_mode_flag == FLAG_MANUAL)
 			{
+				algo_mode_flag = ALGO_IN;
 				clear(&turn_stack);
 			}
 			control_mode_flag = FLAG_AUTO;
-			algo_mode_flag = ALGO_IN;
 			break;
 			
 		case FLAG_MANUAL:

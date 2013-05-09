@@ -58,10 +58,13 @@ void detectTurn(volatile TurnStack* turn_stack)
 			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 			makeTurn(LEFT_TURN);
 		}
-		else if (previous_sensor_data.distance3 > current_sensor_data.distance3 + 40)
+		//else if (previous_sensor_data.distance3 > current_sensor_data.distance3 + 40)
+		else
 		{
 			// Fall 4
 			pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
+			//makeTurn(STRAIGHT);
+			//driveStraight(30);
 		}
 	} 
 	else if (current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
@@ -80,15 +83,16 @@ void detectTurn(volatile TurnStack* turn_stack)
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
 		}
-		else if (previous_sensor_data.distance4 > current_sensor_data.distance4 + 40)
+		//else if (previous_sensor_data.distance4 > current_sensor_data.distance4 + THRESHOLD_CONTACT_SIDE - 10)
+		else
 		{
 			// Fall 8
 			pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
+			//makeTurn(STRAIGHT);
+			//driveStraight(30);
 		}
 	}
 }
-
-
 
 /* Upptäcker svängar (även rakt fram) på väg ut ur labyrinten */
 void detectTurnOut(volatile TurnStack* turn_stack)
