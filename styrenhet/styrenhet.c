@@ -142,9 +142,9 @@ void parseCommand(uint8_t cmd)
 			if (control_mode_flag == FLAG_MANUAL)
 			{
 				clear(&turn_stack);
+				algo_mode_flag = ALGO_IN;
 			}
 			control_mode_flag = FLAG_AUTO;
-			algo_mode_flag = ALGO_IN;
 			break;
 			
 		case FLAG_MANUAL:
@@ -399,7 +399,7 @@ int main()
 			{
 				if (new_sensor_data_flag == 1)
 				{
-					handleTape(&turn_stack, current_sensor_data.line_type);
+					//handleTape(&turn_stack, current_sensor_data.line_type);
 					if (algo_mode_flag == ALGO_IN)
 					{
 						detectTurn(&turn_stack);

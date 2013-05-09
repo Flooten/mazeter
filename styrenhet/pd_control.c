@@ -215,8 +215,6 @@ void makeTurn(uint8_t turn)
 		case STRAIGHT:
 			commandToControlSignal(STEER_STRAIGHT);
 			pwmWheels(control_signals);
-			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-			{}
 			break;
 			
 		case IEIGHTY_TURN:
@@ -266,8 +264,7 @@ void makeTurn(uint8_t turn)
 	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att PD-reglera på.
 	while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
 	{
-		commandToControlSignal(STEER_STRAIGHT);
-		pwmWheels(control_signals);
+		straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 		
 		// Stannar roboten om vi är på väg att köra in i något.
 		if (current_sensor_data.distance1 < THRESHOLD_ABORT || current_sensor_data.distance2 < THRESHOLD_ABORT)
@@ -277,7 +274,7 @@ void makeTurn(uint8_t turn)
 			return;
 		}
 	}
-	driveStraight(30);
+	driveStraight(10);
 	
 	turn_done_flag = 1;
 }
@@ -379,14 +376,7 @@ void driveStraight(uint8_t cm)
 	uint16_t timer_count = (uint16_t)tmp; 
 	
 	/* Kör rakt fram med den högsta av hjulparshastigheterna */
-	if (control_signals.right_value > control_signals.left_value)
-	{
-		control_signals.left_value = control_signals.right_value;
-	} 
-	else
-	{
-		control_signals.right_value = control_signals.left_value;
-	}
+	commandToControlSignal(STEER_STRAIGHT);
 	pwmWheels(control_signals);
 	
 	startTimer();

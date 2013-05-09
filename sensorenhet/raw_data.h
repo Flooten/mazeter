@@ -21,6 +21,7 @@ typedef struct
 	uint8_t current_value;
 	uint8_t value;
 	uint16_t accumulator;
+	uint8_t arr[7];
 	uint8_t is_converted;
 } RawData;
 

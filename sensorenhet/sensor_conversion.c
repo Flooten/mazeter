@@ -88,6 +88,7 @@ void convertRawData(RawData* data)
 				
 			case DISTANCE_5:
 				sensor_data.distance5 = lookUpDistance(data->value, data->sensor_type);
+				sensor_data.distance5 += 2;
 				break;
 			case DISTANCE_6:
 				sensor_data.distance6 = lookUpDistance(data->value, data->sensor_type);

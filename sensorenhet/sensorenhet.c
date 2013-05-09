@@ -128,11 +128,14 @@ void readGyroTemp()
 
 void accumulateData(RawData* raw_data, uint8_t number_of_accumulations)
 {
-//	raw_data->prev_value = raw_data->value;
-	raw_data->value = raw_data->accumulator / number_of_accumulations;
-	
-	//raw_data->value = min(raw_data->prev_value, raw_data->current_value);
-	//raw_data->prev_value = raw_data->current_value;	
+	//raw_data->value = raw_data->accumulator / number_of_accumulations;
+	//
+	uint8_t i;
+	raw_data->value = raw_data->arr[0];
+	for (i = 1; i < number_of_adc; ++i)
+	{
+		raw_data->value = min(raw_data->value, raw_data->arr[i]);
+	}
 	
 	raw_data->accumulator = 0;
 	raw_data->is_converted = 0;
@@ -145,6 +148,7 @@ ISR(ADC_vect)
 		// --------------- Avståndssensorer ---------------
 		
 		case DISTANCE_1:
+			distance1.arr[current_adc] = ADCH;
 			distance1.accumulator += ADCH;
 			//distance1.is_converted = 0;
 			distance1.sensor_type = DISTANCE_1;
@@ -155,6 +159,7 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_2:
+			distance2.arr[current_adc] = ADCH;		
 			distance2.accumulator += ADCH;
 			//distance2.is_converted = 0;
 			distance2.sensor_type = DISTANCE_2;
@@ -165,6 +170,7 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_3:
+			distance3.arr[current_adc] = ADCH;
 			distance3.accumulator += ADCH;
 			//distance3.is_converted = 0;
 			distance3.sensor_type = DISTANCE_3;
@@ -175,6 +181,7 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_4:
+			distance4.arr[current_adc] = ADCH;
 			distance4.accumulator +=  ADCH;
 			//distance4.is_converted = 0;
 			distance4.sensor_type = DISTANCE_4;
@@ -186,6 +193,7 @@ ISR(ADC_vect)
 			break;
 		
 		case DISTANCE_5:
+			distance5.arr[current_adc] = ADCH;
 			distance5.accumulator +=  ADCH;
 			//distance5.is_converted = 0;
 			distance5.sensor_type = DISTANCE_5;
@@ -196,6 +204,7 @@ ISR(ADC_vect)
 			break;
 				
 		case DISTANCE_6:
+			distance6.arr[current_adc] = ADCH;
 			distance6.accumulator += ADCH;
 			//distance6.is_converted = 0;
 			distance6.sensor_type = DISTANCE_6;
@@ -206,6 +215,7 @@ ISR(ADC_vect)
 			break;
 				
 		case DISTANCE_7:
+			distance7.arr[current_adc] = ADCH;
 			distance7.accumulator += ADCH;
 			//distance7.is_converted = 0;
 			distance7.sensor_type = DISTANCE_7;
