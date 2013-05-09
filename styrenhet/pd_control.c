@@ -283,7 +283,7 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 			break;
 		
 		case LINE_GOAL_STOP:
-			if (algo_mode_flag == ALGO_GOAL)
+			if (algo_mode_flag != ALGO_GOAL_REVERSE)
 			{
 				// stanna och plocka upp muggen
 				commandToControlSignal(STEER_STOP);
@@ -291,7 +291,7 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 				commandToControlSignal(CLAW_CLOSE);
 				pwmClaw(control_signals);
 				algo_mode_flag = ALGO_GOAL_REVERSE;
-			}
+			}				
 			break;
 			
 		case LINE_TURN_LEFT:
@@ -404,8 +404,13 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 	else if (tmp == RIGHT_TURN)
 		makeTurn(LEFT_TURN);
 	else if (tmp == STRAIGHT)
-		return;	
-		
+	{
+		while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE - 5 || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE - 5) && !abort_flag)
+		{
+			straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+		}
+		return;
+	}
 	algo_mode_flag = ALGO_OUT;
 }
 
