@@ -65,6 +65,7 @@
 #define PARA_LINE_KP 0x63
 #define PARA_LINE_KD 0x64
 
+#define CHECK_STACK 0x70
 #define TURN_STACK_TOP 0x71
 #define ALGO_STATE 0x72
 #define RUN_START 0x73

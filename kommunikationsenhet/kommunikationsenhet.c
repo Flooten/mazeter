@@ -116,8 +116,6 @@ int main(void)
 	uint8_t turn_stack_top = 0;
 	uint8_t algo_state = 0;
 	uint8_t turn_done_flag = 0;
-	//! Ta bort, test
-	DDRA = 0xFF;
 	
 	sei();
 	
@@ -184,9 +182,16 @@ int main(void)
 		{	
 			if (control_mode_flag == FLAG_AUTO)
 			{
-				spiReadData(TURN_STACK_TOP, STYR_ENHET, &turn_stack_top, 1);
+				uint8_t new_node;
+				spiReadData(CHECK_STACK, STYR_ENHET, &new_node, 1);
+				
+				if (new_node == 1)
+				{
+					spiReadData(TURN_STACK_TOP, STYR_ENHET, &turn_stack_top, 1);
+					btSendData(TURN_STACK_TOP, &turn_stack_top, 1);
+				}
+				
 				spiReadData(ALGO_STATE, STYR_ENHET, &algo_state, 1);
-				btSendData(TURN_STACK_TOP, &turn_stack_top, 1);
 				btSendData(ALGO_STATE, &algo_state, 1);
 			}
 			

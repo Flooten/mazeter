@@ -24,6 +24,7 @@ typedef struct TurnNode
 typedef struct TurnStack
 {
 	TurnNode* first;
+	uint8_t new_node;
 } TurnStack;
 
 /* Node */

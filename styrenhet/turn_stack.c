@@ -55,6 +55,7 @@ volatile TurnStack createTurnStack()
 	TurnStack stack;
 
 	stack.first = NULL;
+	stack.new_node = 0;
 
 	return stack;
 }
@@ -82,6 +83,8 @@ void pushTurnStack(volatile TurnStack* stack, TurnNode* node)
 		node->next = stack->first;
 		stack->first = node;
 	}
+	
+	stack->new_node = 1;
 }
 
 /*
