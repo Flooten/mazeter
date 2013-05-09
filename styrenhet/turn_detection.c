@@ -32,6 +32,60 @@ uint8_t min(uint8_t x, uint8_t y)
 /* Upptäcker svängar på väg in i labyrinten */
 void detectTurn(volatile TurnStack* turn_stack)
 {	
+	//if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE)
+	//{
+		//// Vänster ej kontakt
+		//if ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP)
+		//{
+			//// Fall 1, 3 eller 7
+			//if (current_sensor_data.distance4 > current_sensor_data.distance3 + THRESHOLD_CONTACT_SIDE / 2)
+			//{
+				//// Fall 7
+				//pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
+				//makeTurn(RIGHT_TURN);
+			//}
+			//else if (current_sensor_data.distance3 > current_sensor_data.distance4 + THRESHOLD_CONTACT_SIDE / 2)
+			//{
+				//// Fall 1 eller 3
+				//pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
+				//makeTurn(LEFT_TURN);
+			//}
+		//}	
+		//else if (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 >= THRESHOLD_STOP_DEAD_END) &&
+				 //((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
+		//{
+			//// Fall 2
+			//pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
+			//makeTurn(LEFT_TURN);
+		//}
+		//else if (previous_sensor_data.distance3 > current_sensor_data.distance3 + 40)
+		//{
+			//// Fall 4
+			//pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
+		//}
+	//} 
+	//else if (current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
+	//{
+		//// Höger ej kontakt men vänster har
+		//if ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP)
+		//{
+			//// Fall 5
+			//pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
+			//makeTurn(RIGHT_TURN);
+		//}
+		//else if  (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 >= THRESHOLD_STOP_DEAD_END) &&
+				  //((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
+		//{
+			//// Fall 6
+			//pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
+			//makeTurn(RIGHT_TURN);
+		//}
+		//else if (previous_sensor_data.distance4 > current_sensor_data.distance4 + 40)
+		//{
+			//// Fall 8
+			//pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
+		//}
+	//}
 	if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE)
 	{
 		// Vänster ej kontakt
@@ -41,51 +95,45 @@ void detectTurn(volatile TurnStack* turn_stack)
 			if (current_sensor_data.distance4 > current_sensor_data.distance3 + THRESHOLD_CONTACT_SIDE / 2)
 			{
 				// Fall 7
-				pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 				makeTurn(RIGHT_TURN);
 			}
 			else if (current_sensor_data.distance3 > current_sensor_data.distance4 + THRESHOLD_CONTACT_SIDE / 2)
 			{
 				// Fall 1 eller 3
-				pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 				makeTurn(LEFT_TURN);
 			}
-		}	
+		}
 		else if (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 >= THRESHOLD_STOP_DEAD_END) &&
-				 ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
+		((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
 		{
 			// Fall 2
-			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 			makeTurn(LEFT_TURN);
 		}
-		else if (previous_sensor_data.distance3 > current_sensor_data.distance3 + 40)
+		else
 		{
-			// Fall 4
-			pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
+			// Fall 4, rakt fram
 		}
-	} 
+	}
 	else if (current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
 	{
 		// Höger ej kontakt men vänster har
 		if ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP)
 		{
 			// Fall 5
-			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
 		}
 		else if  (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 >= THRESHOLD_STOP_DEAD_END) &&
-				  ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
+		((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
 		{
 			// Fall 6
-			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
 		}
 		else if (previous_sensor_data.distance4 > current_sensor_data.distance4 + 40)
 		{
 			// Fall 8
-			pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
 		}
 	}
+
 }
 
 
@@ -93,10 +141,74 @@ void detectTurn(volatile TurnStack* turn_stack)
 /* Upptäcker svängar (även rakt fram) på väg ut ur labyrinten */
 void detectTurnOut(volatile TurnStack* turn_stack)
 {
-	if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
+	//if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
+	//{
+		//// Kör fram till mitten av svängen.
+		//driveStraight(DISTANCE_DETECT_TURN);
+		//makeTurn(popTurnStack(turn_stack));
+	//}
+	
+	if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE)
 	{
-		// Kör fram till mitten av svängen.
-		driveStraight(DISTANCE_DETECT_TURN);
-		makeTurn(popTurnStack(turn_stack));
+		// Vänster ej kontakt
+		if ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP)
+		{
+			// Fall 1, 3 eller 7
+			if (current_sensor_data.distance4 > current_sensor_data.distance3 + THRESHOLD_CONTACT_SIDE / 2)
+			{
+				// Fall 7
+				makeTurn(RIGHT_TURN);
+			}
+			else if (current_sensor_data.distance3 > current_sensor_data.distance4 + THRESHOLD_CONTACT_SIDE / 2)
+			{
+				// Fall 1 eller 3
+				makeTurn(LEFT_TURN);
+			}
+		}
+		else if (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 >= THRESHOLD_STOP_DEAD_END) &&
+		((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
+		{
+			// Fall 2
+			makeTurn(LEFT_TURN);
+		}
+		else if (current_sensor_data.distance3 > THRESHOLD_NO_CONTACT && 
+					((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 > THRESHOLD_NO_CONTACT ||
+					current_sensor_data.distance4 > THRESHOLD_NO_CONTACT))
+		{
+			// Tejpfall
+			driveStraight(DISTANCE_DETECT_TURN);
+			makeTurn(popTurnStack(turn_stack));
+		}
+		else
+		{
+			// Fall 4, Kör rakt fram			
+		}
 	}
+	else if (current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
+	{
+		// Höger ej kontakt men vänster har
+		if ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP)
+		{
+			// Fall 5
+			makeTurn(RIGHT_TURN);
+		}
+		else if  (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 >= THRESHOLD_STOP_DEAD_END) &&
+		((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
+		{
+			// Fall 6
+			makeTurn(RIGHT_TURN);
+		}
+		else if (current_sensor_data.distance4 > THRESHOLD_NO_CONTACT &&
+					((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 > THRESHOLD_NO_CONTACT ||
+					current_sensor_data.distance3 > THRESHOLD_NO_CONTACT))
+		{
+			// Tejpfall
+			driveStraight(DISTANCE_DETECT_TURN);
+			makeTurn(popTurnStack(turn_stack));
+		}
+		else
+		{
+			// Fall 8, kör rakt fram
+		}
+	}	
 }
