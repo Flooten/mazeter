@@ -135,18 +135,48 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 
 void makeTurn(uint8_t turn)
 {
+	uint16_t angle_start;
 	uint16_t angle_end;
 	uint16_t angle_copy;
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		angle_end = current_sensor_data.angle;	
+		angle_start = current_sensor_data.angle;	
+		angle_end = angle_start;
 	}
 		
 	switch(turn)
 	{
 		case LEFT_TURN:
 			angle_end += DEGREES_90;
+			commandToControlSignal(STEER_ROTATE_LEFT);
+			pwmWheels(control_signals);
+			
+			if (angle_end >= 36000)
+			{
+				angle_end -= 36000;
+				
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while ((angle_copy >= angle_start || angle_copy < angle_end)  && !abort_flag);
+			}
+			else
+			{
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while (angle_copy < angle_end  && !abort_flag);
+
+			}
+			
+			/*angle_end += DEGREES_90;
 			commandToControlSignal(STEER_ROTATE_LEFT);
 			pwmWheels(control_signals);
 			if (angle_end >= 36000)
@@ -160,10 +190,40 @@ void makeTurn(uint8_t turn)
 					angle_copy = current_sensor_data.angle;
 				}
 			} while (abs(angle_end - angle_copy) > DEGREES_DIFF  && !abort_flag);
-				
+				*/
+			
 			break;
 		
 		case RIGHT_TURN:
+			angle_end -= DEGREES_90;
+			commandToControlSignal(STEER_ROTATE_RIGHT);
+			pwmWheels(control_signals);
+			if (angle_end >= 36000)
+			{
+				angle_end = 36000 - (DEGREES_90 - angle_end);
+			
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while ((angle_copy <= angle_start + 500 || angle_copy > angle_end)  && !abort_flag);
+			} 
+			else
+			{
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while (angle_copy > angle_end  && !abort_flag);
+
+			}
+			
+						
+			/*
 			angle_end -= DEGREES_90;
 			commandToControlSignal(STEER_ROTATE_RIGHT);
 			pwmWheels(control_signals);
@@ -178,6 +238,7 @@ void makeTurn(uint8_t turn)
 					angle_copy = current_sensor_data.angle;
 				}
 			} while (abs(angle_end - angle_copy) > DEGREES_DIFF  && !abort_flag);
+			*/
 			break;
 		
 		case STRAIGHT:
@@ -186,6 +247,7 @@ void makeTurn(uint8_t turn)
 			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
 			{}
 			break;
+			
 		default:
 		break;			
 	}
