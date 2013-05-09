@@ -19,7 +19,6 @@
 #define LEFT_TURN 1
 #define RIGHT_TURN 2
 #define STRAIGHT 3
-#define IEIGHTY_TURN 4
 
 /* Avståndsvärde då man inte längre har kontakt med väggen,
 	dvs sväng eller återvändsgränd upptäckt */
