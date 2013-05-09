@@ -33,6 +33,9 @@
 /* Avståndsvärde när man ska rotera  om det är en återvändsgränd man mäter mot*/
 #define THRESHOLD_STOP_DEAD_END 130
 
+/* Avståndsvärde när vi inte kan detektera sväng */
+#define THRESHOLD_NO_CONTACT 160
+
 uint8_t min(uint8_t x, uint8_t y);
 uint8_t max(uint8_t x, uint8_t y);
 
