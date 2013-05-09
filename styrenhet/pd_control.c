@@ -331,7 +331,7 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 {
-	const int8_t speed = 20;
+	const int8_t speed = 40;
 	int8_t regulator_value = (float)control_parameters.line_kp / 10 * current_deviation + (float)control_parameters.line_kd / 10 * (current_deviation - previous_deviation);
 	
 	if (regulator_value > speed)
@@ -401,7 +401,7 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 	else if (tmp == RIGHT_TURN)
 		makeTurn(LEFT_TURN);
 	else if (tmp == STRAIGHT)
-		makeTurn(IEIGHTY_TURN);	
+		return;	
 		
 	algo_mode_flag = ALGO_OUT;
 }

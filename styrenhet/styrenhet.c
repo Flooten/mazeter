@@ -138,9 +138,12 @@ void parseCommand(uint8_t cmd)
 			break;
 			
 		case FLAG_AUTO:
+			if (control_mode_flag == FLAG_MANUAL)
+			{
+				clear(&turn_stack);
+			}
 			control_mode_flag = FLAG_AUTO;
 			algo_mode_flag = ALGO_IN;
-			clear(&turn_stack);
 			break;
 			
 		case FLAG_MANUAL:
@@ -394,6 +397,7 @@ int main()
 					}
 					else if (algo_mode_flag == ALGO_GOAL)
 					{
+						commandToControlSignal(CLAW_OPEN);
 						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
 					}
 					else if (algo_mode_flag == ALGO_GOAL_REVERSE)
