@@ -324,7 +324,6 @@ void driveStraight(uint8_t cm)
 
 void jamesBondTurn(volatile TurnStack* turn_stack)
 {
-	// behöver pd regleras istället
 	commandToControlSignal(STEER_BACK);
 	pwmWheels(control_signals);
 	
