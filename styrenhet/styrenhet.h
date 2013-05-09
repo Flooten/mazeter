@@ -32,11 +32,11 @@ extern volatile ControlParameters control_parameters;
 
 extern volatile uint8_t turn_done_flag;
 
-#define ALGO_IN 0
-#define ALGO_OUT 1
-#define ALGO_GOAL 2
-#define ALGO_GOAL_REVERSE 3
-#define ALGO_DONE 4
+#define ALGO_IN 1
+#define ALGO_OUT 2
+#define ALGO_GOAL 3
+#define ALGO_GOAL_REVERSE 4
+#define ALGO_DONE 5
 
 // Funktioner
 void parseCommand(uint8_t cmd);
