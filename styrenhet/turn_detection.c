@@ -51,20 +51,18 @@ void detectTurn(volatile TurnStack* turn_stack)
 				makeTurn(LEFT_TURN);
 			}
 		}	
-		else if ((previous_sensor_data.distance1 >= THRESHOLD_STOP_DEAD_END) &&
-				 (current_sensor_data.distance1 < THRESHOLD_STOP_DEAD_END))
-				//((min(previous_sensor_data.distance1, previous_sensor_data.distance2) >= THRESHOLD_STOP_DEAD_END) &&
-				 //(min(current_sensor_data.distance1, current_sensor_data.distance2) < THRESHOLD_STOP_DEAD_END))
+		else if (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 >= THRESHOLD_STOP_DEAD_END) &&
+				 ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
 		{
 			// Fall 2
 			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 			makeTurn(LEFT_TURN);
 		}
-		//else if (previous_sensor_data.distance3 > current_sensor_data.distance3 + 40)
-		//{
-			//// Fall 4
-			//pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
-		//}
+		else if (previous_sensor_data.distance3 > current_sensor_data.distance3 + 40)
+		{
+			// Fall 4
+			pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
+		}
 	} 
 	else if (current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
 	{
@@ -75,18 +73,18 @@ void detectTurn(volatile TurnStack* turn_stack)
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
 		}
-		else if ((previous_sensor_data.distance1 >= THRESHOLD_STOP_DEAD_END) &&
-				 (current_sensor_data.distance1 < THRESHOLD_STOP_DEAD_END))
+		else if  (((previous_sensor_data.distance1 + previous_sensor_data.distance2) / 2 >= THRESHOLD_STOP_DEAD_END) &&
+				  ((current_sensor_data.distance1 + current_sensor_data.distance2) / 2 < THRESHOLD_STOP_DEAD_END))
 		{
 			// Fall 6
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
 		}
-		//else if (previous_sensor_data.distance4 > current_sensor_data.distance4 + 40)
-		//{
-			//// Fall 8
-			//pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
-		//}
+		else if (previous_sensor_data.distance4 > current_sensor_data.distance4 + 40)
+		{
+			// Fall 8
+			pushTurnStack(turn_stack, newTurnNode(STRAIGHT)); // Pusha att åka rakt fram
+		}
 	}
 }
 

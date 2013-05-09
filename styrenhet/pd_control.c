@@ -283,12 +283,15 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 			break;
 		
 		case LINE_GOAL_STOP:
-			// stanna och plocka upp muggen
-			commandToControlSignal(STEER_STOP);
-			pwmWheels(control_signals);
-			commandToControlSignal(CLAW_CLOSE);
-			pwmClaw(control_signals);
-			algo_mode_flag = ALGO_GOAL_REVERSE;
+			if (algo_mode_flag == ALGO_GOAL)
+			{
+				// stanna och plocka upp muggen
+				commandToControlSignal(STEER_STOP);
+				pwmWheels(control_signals);
+				commandToControlSignal(CLAW_CLOSE);
+				pwmClaw(control_signals);
+				algo_mode_flag = ALGO_GOAL_REVERSE;
+			}
 			break;
 			
 		case LINE_TURN_LEFT:
