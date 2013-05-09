@@ -321,9 +321,15 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 		case LINE_START_STOP:
 			if (algo_mode_flag == ALGO_OUT)
 			{
+				driveStraight(DISTANCE_DETECT_TURN);
 				commandToControlSignal(STEER_STOP);
 				pwmWheels(control_signals);
 				algo_mode_flag = ALGO_DONE;
+			}
+			else if (algo_mode_flag == ALGO_START)
+			{
+				algo_mode_flag = ALGO_IN;
+				commandToControlSignal(CLAW_OPEN);
 			}
 			break;
 				
