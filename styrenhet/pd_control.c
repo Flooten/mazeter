@@ -52,7 +52,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			int16_t delta = 30 - current->distance4;
 			int16_t delta_previous = 30 - previous->distance4;
 			
-			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
+			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
 			
 			// Reglera på högersidan
 			//int16_t delta_right = current->distance4 - current->distance6;
@@ -65,7 +65,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			int16_t delta = current->distance3 - 30;
 			int16_t delta_previous = previous->distance3 - 30;
 			
-			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
+			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
 			
 			// Reglera på vänstersidan
 			//int16_t delta_left = current->distance3 - current->distance5;
