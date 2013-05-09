@@ -42,7 +42,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 {
 	uint8_t speed = throttle;
 	
-	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	//ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
 		//static int8_t regulator_value = 0;
 		int8_t regulator_value = 0;

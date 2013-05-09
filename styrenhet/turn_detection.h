@@ -25,7 +25,7 @@
 #define THRESHOLD_CONTACT_SIDE 80
 
 /* Avståndsvärde när man ska rotera */
-#define THRESHOLD_STOP 50
+#define THRESHOLD_STOP 60
 
 /* Avstånd då vi är på väg att köra in i ngt */
 #define THRESHOLD_ABORT 25
@@ -34,6 +34,7 @@
 #define THRESHOLD_STOP_DEAD_END 130
 
 uint8_t min(uint8_t x, uint8_t y);
+uint8_t max(uint8_t x, uint8_t y);
 
 /* Upptäcker svängar på väg in i labyrinten */
 void detectTurn(volatile TurnStack* turn_stack);

@@ -13,7 +13,7 @@
 #define DEGREES_90 5000
 #define DEGREES_DIFF 300
 #define DEGREES_180 14000
-#define DISTANCE_TAPE_TURN 43
+#define DISTANCE_TAPE_TURN 35
 #define DISTANCE_DETECT_TURN 40 
 
 #include "pd_control.h"

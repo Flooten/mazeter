@@ -14,6 +14,7 @@
 #include <string.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 #include "styrenhet.h"
 #include "spi.h"
 #include "PWM.h"
@@ -405,8 +406,8 @@ int main()
 						commandToControlSignal(STEER_STRAIGHT);
 					}
 					else if (algo_mode_flag == ALGO_IN)
-					{
-						detectTurn(&turn_stack);
+					{	
+						detectTurn(&turn_stack);	
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 					}
 					else if (algo_mode_flag == ALGO_GOAL)
