@@ -88,6 +88,7 @@ void convertRawData(RawData* data)
 				
 			case DISTANCE_5:
 				sensor_data.distance5 = lookUpDistance(data->value, data->sensor_type);
+				sensor_data.distance5 += 2;
 				break;
 			case DISTANCE_6:
 				sensor_data.distance6 = lookUpDistance(data->value, data->sensor_type);
@@ -348,6 +349,7 @@ void convertLineData(RawLineData* data)
 				line_detections = 0;
 				
 				compareLines(first_line_val, second_line_val);
+				sensor_data.line_deviation = first_line_val - second_line_val;
 			}
 			else
 			{

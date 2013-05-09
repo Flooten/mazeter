@@ -14,6 +14,7 @@
 #include <string.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 #include "styrenhet.h"
 #include "spi.h"
 #include "PWM.h"
@@ -141,10 +142,10 @@ void parseCommand(uint8_t cmd)
 		case FLAG_AUTO:
 			if (control_mode_flag == FLAG_MANUAL)
 			{
+				algo_mode_flag = ALGO_IN;
 				clear(&turn_stack);
 			}
 			control_mode_flag = FLAG_AUTO;
-			algo_mode_flag = ALGO_IN;
 			break;
 			
 		case FLAG_MANUAL:
@@ -400,9 +401,13 @@ int main()
 				if (new_sensor_data_flag == 1)
 				{
 					handleTape(&turn_stack, current_sensor_data.line_type);
-					if (algo_mode_flag == ALGO_IN)
+					if (algo_mode_flag == ALGO_START)
 					{
-						detectTurn(&turn_stack);
+						commandToControlSignal(STEER_STRAIGHT);
+					}
+					else if (algo_mode_flag == ALGO_IN)
+					{	
+						detectTurn(&turn_stack);	
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 					}
 					else if (algo_mode_flag == ALGO_GOAL)
@@ -412,7 +417,7 @@ int main()
 					}
 					else if (algo_mode_flag == ALGO_GOAL_REVERSE)
 					{
-						jamesBondTurn(&turn_stack);
+						detectTurnBack(&turn_stack);
 					}
 					else if (algo_mode_flag ==	ALGO_OUT)
 					{

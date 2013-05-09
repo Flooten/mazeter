@@ -42,7 +42,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 {
 	uint8_t speed = throttle;
 	
-	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	//ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
 		//static int8_t regulator_value = 0;
 		int8_t regulator_value = 0;
@@ -52,7 +52,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			int16_t delta = 30 - current->distance4;
 			int16_t delta_previous = 30 - previous->distance4;
 			
-			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
+			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
 			
 			// Reglera på högersidan
 			//int16_t delta_right = current->distance4 - current->distance6;
@@ -65,7 +65,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			int16_t delta = current->distance3 - 30;
 			int16_t delta_previous = previous->distance3 - 30;
 			
-			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
+			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
 			
 			// Reglera på vänstersidan
 			//int16_t delta_left = current->distance3 - current->distance5;
@@ -135,12 +135,15 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 
 void makeTurn(uint8_t turn)
 {
+	uint16_t angle_start;
 	uint16_t angle_end;
+	uint16_t angle_copy;
+	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		angle_end = current_sensor_data.angle;	
+		angle_start = current_sensor_data.angle;	
+		angle_end = angle_start;
 	}
-	uint16_t angle_start = angle_end;
 		
 	switch(turn)
 	{
@@ -148,35 +151,47 @@ void makeTurn(uint8_t turn)
 			angle_end += DEGREES_90;
 			commandToControlSignal(STEER_ROTATE_LEFT);
 			pwmWheels(control_signals);
+			
 			if (angle_end >= 36000)
 			{
 				angle_end -= 36000;
 				
-				uint16_t angle_copy;
-				do 
-				{
-					ATOMIC_BLOCK(ATOMIC_FORCEON)
-					{
-						angle_copy = current_sensor_data.angle;
-					}
-				} while ((angle_copy < angle_end || angle_copy >= angle_start) && !abort_flag);
-				
-				//while ((current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start) && !abort_flag)
-				//{}
-			}
-			else
-			{
-				uint16_t angle_copy;
 				do
 				{
 					ATOMIC_BLOCK(ATOMIC_FORCEON)
 					{
 						angle_copy = current_sensor_data.angle;
 					}
-				} while (angle_copy < angle_end && !abort_flag);
-				//while (current_sensor_data.angle < angle_end && !abort_flag)
-				//{}
+				} while ((angle_copy >= angle_start || angle_copy < angle_end)  && !abort_flag);
 			}
+			else
+			{
+				do
+				{
+					ATOMIC_BLOCK(ATOMIC_FORCEON)
+					{
+						angle_copy = current_sensor_data.angle;
+					}
+				} while (angle_copy < angle_end  && !abort_flag);
+
+			}
+			
+			/*angle_end += DEGREES_90;
+			commandToControlSignal(STEER_ROTATE_LEFT);
+			pwmWheels(control_signals);
+			if (angle_end >= 36000)
+			{
+				angle_end -= 36000;
+			}
+			do
+			{
+				ATOMIC_BLOCK(ATOMIC_FORCEON)
+				{
+					angle_copy = current_sensor_data.angle;
+				}
+			} while (abs(angle_end - angle_copy) > DEGREES_DIFF  && !abort_flag);
+				*/
+			
 			break;
 		
 		case RIGHT_TURN:
@@ -185,78 +200,58 @@ void makeTurn(uint8_t turn)
 			pwmWheels(control_signals);
 			if (angle_end >= 36000)
 			{
-				angle_end = 36000 - (DEGREES_90 - angle_start);
-				uint16_t angle_copy;
+				angle_end = 36000 - (DEGREES_90 - angle_end);
+			
 				do
 				{
 					ATOMIC_BLOCK(ATOMIC_FORCEON)
 					{
 						angle_copy = current_sensor_data.angle;
 					}
-				} while ((angle_copy > angle_end || angle_copy <= angle_start) && !abort_flag);
-				//while ((current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start) && !abort_flag)
-				//{}		
-			}
+				} while ((angle_copy <= angle_start + 500 || angle_copy > angle_end)  && !abort_flag);
+			} 
 			else
 			{
-				uint16_t angle_copy;
 				do
 				{
 					ATOMIC_BLOCK(ATOMIC_FORCEON)
 					{
 						angle_copy = current_sensor_data.angle;
 					}
-				} while (angle_copy > angle_end && !abort_flag);
-				//while (current_sensor_data.angle > angle_end && !abort_flag)
-				//{}
+				} while (angle_copy > angle_end  && !abort_flag);
+
 			}
+			
+						
+			/*
+			angle_end -= DEGREES_90;
+			commandToControlSignal(STEER_ROTATE_RIGHT);
+			pwmWheels(control_signals);
+			if (angle_end >= 36000)
+			{
+				angle_end = 36000 - (DEGREES_90 - angle_end);
+			}
+			do
+			{
+				ATOMIC_BLOCK(ATOMIC_FORCEON)
+				{
+					angle_copy = current_sensor_data.angle;
+				}
+			} while (abs(angle_end - angle_copy) > DEGREES_DIFF  && !abort_flag);
+			*/
 			break;
 		
 		case STRAIGHT:
 			commandToControlSignal(STEER_STRAIGHT);
 			pwmWheels(control_signals);
 			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-			{}
-			break;
-			
-		case IEIGHTY_TURN:
-			angle_end += DEGREES_180;
-			commandToControlSignal(STEER_ROTATE_LEFT);
-			pwmWheels(control_signals);
-			if (angle_end >= 36000)
 			{
-				angle_end -= 36000;
-				
-				uint16_t angle_copy;
-				do
-				{
-					ATOMIC_BLOCK(ATOMIC_FORCEON)
-					{
-						angle_copy = current_sensor_data.angle;
-					}
-				} while ((angle_copy < angle_end || angle_copy >= angle_start) && !abort_flag);
-				
-				//while ((current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start) && !abort_flag)
-				//{}
-			}
-			else
-			{
-				uint16_t angle_copy;
-				do
-				{
-					ATOMIC_BLOCK(ATOMIC_FORCEON)
-					{
-						angle_copy = current_sensor_data.angle;
-					}
-				} while (angle_copy < angle_end && !abort_flag);
-				//while (current_sensor_data.angle < angle_end && !abort_flag)
-				//{}
+				straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 			}
 			break;
 			
-		
 		default:
-			break;
+		break;			
 	}
 	
 	commandToControlSignal(STEER_STRAIGHT);
@@ -277,7 +272,7 @@ void makeTurn(uint8_t turn)
 			return;
 		}
 	}
-	driveStraight(30);
+	driveStraight(40);
 	
 	turn_done_flag = 1;
 }
@@ -293,7 +288,7 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 			break;
 		
 		case LINE_GOAL_STOP:
-			if (algo_mode_flag == ALGO_GOAL)
+			if (algo_mode_flag != ALGO_GOAL_REVERSE)
 			{
 				// stanna och plocka upp muggen
 				commandToControlSignal(STEER_STOP);
@@ -301,7 +296,7 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 				commandToControlSignal(CLAW_CLOSE);
 				pwmClaw(control_signals);
 				algo_mode_flag = ALGO_GOAL_REVERSE;
-			}
+			}				
 			break;
 			
 		case LINE_TURN_LEFT:
@@ -329,12 +324,18 @@ void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 			break;
 			
 		case LINE_START_STOP:
-			if (algo_mode_flag == ALGO_OUT)
-			{
-				commandToControlSignal(STEER_STOP);
-				pwmWheels(control_signals);
-				algo_mode_flag = ALGO_DONE;
-			}
+			//if (algo_mode_flag == ALGO_OUT)
+			//{
+				//driveStraight(DISTANCE_DETECT_TURN);
+				//commandToControlSignal(STEER_STOP);
+				//pwmWheels(control_signals);
+				//algo_mode_flag = ALGO_DONE;
+			//}
+			//else if (algo_mode_flag == ALGO_START)
+			//{
+				//algo_mode_flag = ALGO_IN;
+				//commandToControlSignal(CLAW_OPEN);
+			//}
 			break;
 				
 		default:
@@ -372,6 +373,9 @@ void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 
 void driveStraight(uint8_t cm)
 {
+	commandToControlSignal(CLAW_CLOSE);
+	pwmClaw(control_signals);
+	
 	resetTimer();
 	
 	uint32_t tmp = (uint32_t)cm*2*F_CPU/(1024 * ((uint32_t)control_signals.left_value + (uint32_t)control_signals.right_value)); // Prescaler 1024
@@ -393,11 +397,14 @@ void driveStraight(uint8_t cm)
 	
 	while((TIM16_ReadTCNT3() < timer_count) && !abort_flag)
 	{}
+	
+	commandToControlSignal(CLAW_OPEN);
+	pwmClaw(control_signals);
+	
 }
 
 void jamesBondTurn(volatile TurnStack* turn_stack)
 {
-	// behöver pd regleras istället
 	commandToControlSignal(STEER_BACK);
 	pwmWheels(control_signals);
 	
@@ -414,8 +421,13 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 	else if (tmp == RIGHT_TURN)
 		makeTurn(LEFT_TURN);
 	else if (tmp == STRAIGHT)
-		return;	
-		
+	{
+		while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE - 5 || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE - 5) && !abort_flag)
+		{
+			straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+		}
+		return;
+	}
 	algo_mode_flag = ALGO_OUT;
 }
 
