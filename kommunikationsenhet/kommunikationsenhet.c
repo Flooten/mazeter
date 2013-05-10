@@ -113,9 +113,9 @@ int main(void)
 	control_command = STEER_STOP;
 	throttle = 62;
 	
-	uint8_t turn_stack_top = 0;
-	uint8_t algo_state = 0;
-	uint8_t turn_done_flag = 0;
+	//uint8_t turn_stack_top = 0;
+	//uint8_t algo_state = 0;
+	//uint8_t turn_done_flag = 0;
 	
 	sei();
 	
@@ -170,8 +170,8 @@ int main(void)
 					}
 				}
 				
-				spiReadData(TURN_DONE, STYR_ENHET, &turn_done_flag, 1);
-				spiSendData(TURN_DONE, SENSOR_ENHET, &turn_done_flag, 1);
+				//spiReadData(TURN_DONE, STYR_ENHET, &turn_done_flag, 1);
+				//spiSendData(TURN_DONE, SENSOR_ENHET, &turn_done_flag, 1);
 			}
 			
 			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));		
@@ -180,20 +180,20 @@ int main(void)
 		
 		if (timer_external_ready)
 		{	
-			if (control_mode_flag == FLAG_AUTO)
-			{
-				uint8_t new_node;
-				spiReadData(CHECK_STACK, STYR_ENHET, &new_node, 1);
-				
-				if (new_node == 1)
-				{
-					spiReadData(TURN_STACK_TOP, STYR_ENHET, &turn_stack_top, 1);
-					btSendData(TURN_STACK_TOP, &turn_stack_top, 1);
-				}
-				
-				spiReadData(ALGO_STATE, STYR_ENHET, &algo_state, 1);
-				btSendData(ALGO_STATE, &algo_state, 1);
-			}
+			//if (control_mode_flag == FLAG_AUTO)
+			//{
+				//uint8_t new_node;
+				//spiReadData(CHECK_STACK, STYR_ENHET, &new_node, 1);
+				//
+				//if (new_node == 1)
+				//{
+					//spiReadData(TURN_STACK_TOP, STYR_ENHET, &turn_stack_top, 1);
+					//btSendData(TURN_STACK_TOP, &turn_stack_top, 1);
+				//}
+				//
+				//spiReadData(ALGO_STATE, STYR_ENHET, &algo_state, 1);
+				//btSendData(ALGO_STATE, &algo_state, 1);
+			//}
 			
 			btSendData(CONTROL_SIGNALS, (const uint8_t*)&control_signals.right_value, sizeof(control_signals));
 			btSendData(SENSOR_DATA_ALL, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data));

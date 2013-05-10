@@ -10,7 +10,7 @@
 #ifndef PD_CONTROL_H_
 #define PD_CONTROL_H_
 
-#define DEGREES_90 5000
+#define DEGREES_90 7000 // 5000 i 90% hastiget 
 #define DEGREES_180 14000
 #define DISTANCE_TAPE_TURN 43
 #define DISTANCE_DETECT_TURN 40 

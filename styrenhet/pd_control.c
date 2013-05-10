@@ -21,6 +21,9 @@
 #define F_CPU 8000000UL
 #endif
 
+// TEST
+#include <util/delay.h>
+
 void startTimer()
 {
 	TCCR3B = (1 << CS10) | (0 << CS11) | (1 << CS12); // Prescaler 1024, ändra i pd_control.c i handleTape om prescalern ändras
@@ -193,7 +196,7 @@ void makeTurn(uint8_t turn)
 					{
 						angle_copy = current_sensor_data.angle;
 					}
-				} while ((angle_copy > angle_end || angle_copy <= angle_start) && !abort_flag);
+				} while ((angle_copy > angle_end || angle_copy <= angle_start + 500) && !abort_flag);
 				//while ((current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start) && !abort_flag)
 				//{}		
 			}
@@ -257,22 +260,12 @@ void makeTurn(uint8_t turn)
 			break;
 	}
 	
-	commandToControlSignal(STEER_STRAIGHT);
-	pwmWheels(control_signals);
-	
-	
-	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att PD-reglera på.
+	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att upptäcka svängar på.
 	while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
 	{
-		straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-		
-		// Stannar roboten om vi är på väg att köra in i något.
-		if (current_sensor_data.distance1 < THRESHOLD_ABORT || current_sensor_data.distance2 < THRESHOLD_ABORT)
-		{
-			commandToControlSignal(STEER_STOP);
-			pwmWheels(control_signals);
-			return;
-		}
+		//straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+		commandToControlSignal(STEER_STRAIGHT);
+		pwmWheels(control_signals);
 	}
 	driveStraight(10);
 	
