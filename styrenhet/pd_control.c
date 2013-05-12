@@ -43,7 +43,7 @@ void resetTimer()
 
 void straightRegulator(const SensorData* current, const SensorData* previous)
 {
-	uint8_t speed = throttle;
+	uint8_t speed = 90; //throttle;
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
@@ -84,7 +84,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			int16_t delta = current->distance5 - current->distance4;
 			int16_t delta_previous = previous->distance5 - previous->distance4;
 			
-			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
+			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
 		}
 		else if (current->distance3 >= 43 && current->distance5 == 255)
 		{
@@ -94,7 +94,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			int16_t delta = current->distance3 - current->distance6;
 			int16_t delta_previous = previous->distance3 - previous->distance6;
 			
-			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
+			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
 
 		}
 		else if (current->distance3 <= 42 && current->distance4 <= 42)
@@ -209,7 +209,11 @@ void makeTurn(uint8_t turn)
 					{
 						angle_copy = current_sensor_data.angle;
 					}
-				} while (angle_copy > angle_end && !abort_flag);
+					
+					if (angle_start > 300 && (angle_copy >= 0 && angle_copy <= 45))
+						angle_copy = angle_start;
+					
+				} while ((angle_copy > angle_end) && !abort_flag);
 				//while (current_sensor_data.angle > angle_end && !abort_flag)
 				//{}
 			}
@@ -261,16 +265,134 @@ void makeTurn(uint8_t turn)
 	}
 	
 	// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att upptäcka svängar på.
-	while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-	{
-		//straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-		commandToControlSignal(STEER_STRAIGHT);
-		pwmWheels(control_signals);
-	}
-	driveStraight(10);
-	
-	turn_done_flag = 1;
+	//while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
+	//{
+		////straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+		//commandToControlSignal(STEER_STRAIGHT);
+		//pwmWheels(control_signals);
+	//}
+	driveStraight(40);
+	//
+	//turn_done_flag = 1;
 }
+
+//void makeTurn(uint8_t turn)
+//{
+	//uint16_t angle_start;
+	//uint16_t angle_end = 0;
+	//ATOMIC_BLOCK(ATOMIC_FORCEON)
+	//{
+		//angle_start = current_sensor_data.angle / 100;
+	//}
+	//int16_t angle_diff = 0;
+	//
+	//switch(turn)
+	//{
+		//case LEFT_TURN:
+		//angle_end += DEGREES_90;
+		//commandToControlSignal(STEER_ROTATE_LEFT);
+		//pwmWheels(control_signals);
+		//if (angle_end >= 36000)
+		//{
+			//angle_end -= 36000;
+			//
+			//uint16_t angle_copy;
+			//do
+			//{
+				//ATOMIC_BLOCK(ATOMIC_FORCEON)
+				//{
+					//angle_copy = current_sensor_data.angle;
+				//}
+			//} while ((angle_copy < angle_end || angle_copy >= angle_start) && !abort_flag);
+		//
+		//}
+		//else
+		//{
+			//uint16_t angle_copy;
+			//do
+			//{
+				//ATOMIC_BLOCK(ATOMIC_FORCEON)
+				//{
+					//angle_copy = current_sensor_data.angle;
+				//}
+			//} while (angle_copy < angle_end && !abort_flag);
+		//}
+		//break;
+//
+		//case RIGHT_TURN:
+			//commandToControlSignal(STEER_ROTATE_RIGHT);
+			//pwmWheels(control_signals);
+			//
+			//do 
+			//{
+				//uint16_t angle_copy;
+				//ATOMIC_BLOCK(ATOMIC_FORCEON)
+				//{
+					//angle_copy = current_sensor_data.angle / 100;
+				//}
+				//
+				//angle_diff = angle_start - angle_copy;
+				//
+			//} while (angle_diff < DEGREES_90 && !abort_flag);
+			//break;
+		//
+		//case STRAIGHT:
+			//commandToControlSignal(STEER_STRAIGHT);
+			//pwmWheels(control_signals);
+			//break;
+			//
+		//case IEIGHTY_TURN:
+			//angle_end += DEGREES_180;
+			//commandToControlSignal(STEER_ROTATE_LEFT);
+			//pwmWheels(control_signals);
+			//if (angle_end >= 36000)
+			//{
+				//angle_end -= 36000;
+				//
+				//uint16_t angle_copy;
+				//do
+				//{
+					//ATOMIC_BLOCK(ATOMIC_FORCEON)
+					//{
+						//angle_copy = current_sensor_data.angle;
+					//}
+				//} while ((angle_copy < angle_end || angle_copy >= angle_start) && !abort_flag);
+				//
+				////while ((current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start) && !abort_flag)
+				////{}
+			//}
+			//else
+			//{
+				//uint16_t angle_copy;
+				//do
+				//{
+					//ATOMIC_BLOCK(ATOMIC_FORCEON)
+					//{
+						//angle_copy = current_sensor_data.angle;
+					//}
+				//} while (angle_copy < angle_end && !abort_flag);
+				////while (current_sensor_data.angle < angle_end && !abort_flag)
+				////{}
+			//}
+			//break;
+			//
+		//
+		//default:
+			//break;
+	//}
+	//
+	//// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att upptäcka svängar på.
+	////while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
+	////{
+		////straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+		////commandToControlSignal(STEER_STRAIGHT);
+		////pwmWheels(control_signals);
+	////}
+	////driveStraight(10);
+	////
+	////turn_done_flag = 1;
+//}
+
 
 void handleTape(volatile TurnStack* turn_stack, uint8_t tape)
 {
@@ -364,8 +486,8 @@ void driveStraight(uint8_t cm)
 {
 	resetTimer();
 	
-	uint32_t tmp = (uint32_t)cm*2*F_CPU/(1024 * ((uint32_t)control_signals.left_value + (uint32_t)control_signals.right_value)); // Prescaler 1024
-	
+	//uint32_t tmp = (uint32_t)cm*2*F_CPU/(1024 * ((uint32_t)control_signals.left_value + (uint32_t)control_signals.right_value)); // Prescaler 1024
+	uint32_t tmp = (uint32_t)cm*F_CPU/(1024 * (uint32_t)throttle);
 	uint16_t timer_count = (uint16_t)tmp; 
 	
 	/* Kör rakt fram med den högsta av hjulparshastigheterna */

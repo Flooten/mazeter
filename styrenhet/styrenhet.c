@@ -32,7 +32,7 @@ volatile uint8_t control_mode_flag = FLAG_MANUAL;
 volatile uint8_t current_command;
 volatile uint8_t throttle;
 volatile uint8_t new_sensor_data_flag = 0;
-volatile uint8_t reciving_sensor_data_flag = 0;
+volatile uint8_t receiving_sensor_data_flag = 0;
 volatile uint8_t abort_flag = 0;
 volatile uint8_t algo_mode_flag = ALGO_IN;
 volatile uint8_t turn_stack_top;
@@ -73,10 +73,10 @@ ISR(SPI_STC_vect)
             buffer_size = 0;
             current_byte = 0;
 			
-			if(reciving_sensor_data_flag == 1)
+			if(receiving_sensor_data_flag == 1)
 			{
 				new_sensor_data_flag = 1;
-				reciving_sensor_data_flag = 0;
+				receiving_sensor_data_flag = 0;
 			}
 			
         }
@@ -119,7 +119,7 @@ void parseCommand(uint8_t cmd)
             current_byte = 0;
             spi_status = SPI_RECEIVING_DATA;
 			new_sensor_data_flag = 0;
-			reciving_sensor_data_flag = 1;
+			receiving_sensor_data_flag = 1;
 			previous_sensor_data = current_sensor_data;
             break;
 
@@ -401,10 +401,19 @@ int main()
 			{
 				if (new_sensor_data_flag == 1)
 				{
-					// TEST
-					commandToControlSignal(STEER_STRAIGHT);
-					pwmWheels(control_signals);
-					detectTurn(&turn_stack);
+					//if (current_sensor_data.distance1 < 50 || current_sensor_data.distance2 < 50)
+					//{
+						//commandToControlSignal(STEER_STOP);
+					//}
+					//else
+					{
+						//commandToControlSignal(STEER_STRAIGHT);
+						detectTurnTest();
+						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+						new_sensor_data_flag = 0;
+					}
+					
+					//detectTurn(&turn_stack);
 					
 					//handleTape(&turn_stack, current_sensor_data.line_type);
 					//if (algo_mode_flag == ALGO_IN)
@@ -421,7 +430,7 @@ int main()
 					//{
 						//jamesBondTurn(&turn_stack);
 					//}
-					//else if (algo_mode_flag ==	ALGO_OUT)
+					//else if (algo_mode_flag == ALGO_OUT)
 					//{
 						//detectTurnOut(&turn_stack);
 						//straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);

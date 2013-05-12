@@ -29,13 +29,44 @@ uint8_t min(uint8_t x, uint8_t y)
 	}
 }
 
+/* DETEECT TURN TEST */
+void detectTurnTest()
+{
+	if (current_sensor_data.distance1 < 50 || current_sensor_data.distance2 < 50)
+	{
+		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255)
+		{
+			makeTurn(RIGHT_TURN);
+			driveStraight(40);
+		}
+		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance5 == 255)
+		{
+			makeTurn(LEFT_TURN);
+			driveStraight(40);
+		}
+	}
+	else if (current_sensor_data.distance1 <= 120 || current_sensor_data.distance2 < 120)
+	{
+		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255)
+		{
+			makeTurn(RIGHT_TURN);
+			driveStraight(40);
+		}
+		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance5 == 255)
+		{
+			makeTurn(LEFT_TURN);
+			driveStraight(40);
+		}
+	}
+}
+
 /* Upptäcker svängar på väg in i labyrinten */
 void detectTurn(volatile TurnStack* turn_stack)
 {
 	if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE)
 	{
 		// Vänster ej kontakt
-		if (min(current_sensor_data.distance1, current_sensor_data.distance2)  < THRESHOLD_STOP)
+		if (min(current_sensor_data.distance1, current_sensor_data.distance2) < THRESHOLD_STOP)
 		{
 			// Fall 1, 3 eller 7
 			if (current_sensor_data.distance4 > current_sensor_data.distance3 + THRESHOLD_CONTACT_SIDE)
@@ -107,8 +138,6 @@ void detectTurn(volatile TurnStack* turn_stack)
 		return;
 	}
 }
-
-
 
 /* Upptäcker svängar (även rakt fram) på väg ut ur labyrinten */
 void detectTurnOut(volatile TurnStack* turn_stack)

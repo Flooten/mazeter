@@ -128,14 +128,14 @@ void readGyroTemp()
 
 void accumulateData(RawData* raw_data, uint8_t number_of_accumulations)
 {
-	//raw_data->value = raw_data->accumulator / number_of_accumulations;
-	//
-	uint8_t i;
-	raw_data->value = raw_data->arr[0];
-	for (i = 1; i < number_of_adc; ++i)
-	{
-		raw_data->value = min(raw_data->value, raw_data->arr[i]);
-	}
+	raw_data->value = raw_data->accumulator / number_of_accumulations;
+	
+	//uint8_t i;
+	//raw_data->value = raw_data->arr[0];
+	//for (i = 1; i < number_of_adc; ++i)
+	//{
+		//raw_data->value = min(raw_data->value, raw_data->arr[i]);
+	//}
 	
 	raw_data->accumulator = 0;
 	raw_data->is_converted = 0;
@@ -495,11 +495,11 @@ int main()
 			sensor_data.line_type = sensor_parameters.tape_threshold;
 		}
 		
-		if (turn_done_flag == 1)
-		{
-			sensor_data.angle = 12000;
-			turn_done_flag = 0;
-		}
+		//if (turn_done_flag == 1)
+		//{
+			//sensor_data.angle = 12000;
+			//turn_done_flag = 0;
+		//}
 		convertAllData();
 	}
 }

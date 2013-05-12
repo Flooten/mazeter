@@ -36,13 +36,13 @@
 
 uint8_t min(uint8_t x, uint8_t y);
 
+/* TEST*/
+void detectTurnTest();
+
 /* Upptäcker svängar på väg in i labyrinten */
 void detectTurn(volatile TurnStack* turn_stack);
 
 /* Upptäcker svängar på väg ut ur labyrinten */
 void detectTurnOut(volatile TurnStack* turn_stack);
-
-
-
 
 #endif /* TURN_DETECTION_H_ */

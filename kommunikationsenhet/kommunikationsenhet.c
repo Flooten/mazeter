@@ -68,7 +68,9 @@ ISR (USART0_RX_vect)
 ISR(INT0_vect)
 {
 	if (((1 << PIND2) & PIND) == 0x04)
+	{
 		control_mode_flag = FLAG_AUTO;
+	}		
 	else
 	{
 		control_mode_flag = FLAG_MANUAL;
@@ -162,13 +164,13 @@ int main(void)
 					spiSendCommand(control_command, STYR_ENHET);
 				}
 				
-				if (start == 1)
-				{
+				//if (start == 1)
+				//{
 					if (spiSendData(SENSOR_DATA_ALL, STYR_ENHET, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
 					{
 						btSendString("Failed to send the sensor data to the control device.");
 					}
-				}
+				//}
 				
 				//spiReadData(TURN_DONE, STYR_ENHET, &turn_done_flag, 1);
 				//spiSendData(TURN_DONE, SENSOR_ENHET, &turn_done_flag, 1);
