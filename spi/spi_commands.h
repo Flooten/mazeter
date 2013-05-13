@@ -70,6 +70,7 @@
 #define ALGO_STATE 0x72
 #define RUN_START 0x73
 #define TURN_DONE 0x74
+#define RESET_GYRO 0x75
 
 #define ABORT 0x99
 

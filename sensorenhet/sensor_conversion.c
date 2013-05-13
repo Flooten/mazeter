@@ -242,9 +242,14 @@ uint8_t getLineType(const uint8_t* data)
 			return NO_LINE;
 		}
 		
-		previous_val = VERTICAL_LINE;
-		count = 0;
-		return VERTICAL_LINE;
+		if (previous_val == HORIZONTAL_LINE || previous_val == VERTICAL_LINE)
+		{
+			previous_val = VERTICAL_LINE;
+			count = 0;
+			return VERTICAL_LINE;
+		}
+		
+		return NO_LINE;
 	}
 	else
 	{
@@ -326,6 +331,9 @@ void convertLineData(RawLineData* data)
 		{
 			if (current_line == LINE_1 || current_line == LINE_FOLLOWING)
 			{
+				if (current_line == LINE_1)
+					sensor_data.line_deviation = 0;
+				
 				goal_mode = 1;
 				current_line = LINE_FOLLOWING;
 				sensor_data.line_type = LINE_GOAL;

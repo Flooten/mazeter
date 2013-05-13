@@ -37,6 +37,8 @@ extern volatile uint8_t turn_done_flag;
 #define ALGO_GOAL 3
 #define ALGO_GOAL_REVERSE 4
 #define ALGO_DONE 5
+#define ALGO_START 6
+#define ALGO_FINISH 7
 
 // Funktioner
 void parseCommand(uint8_t cmd);

@@ -12,7 +12,7 @@
 
 #define DEGREES_90 5000 // 5000 i 90% hastiget 
 #define DEGREES_180 14000
-#define DISTANCE_TAPE_TURN 43
+#define DISTANCE_TAPE_TURN 35
 #define DISTANCE_DETECT_TURN 40 
 
 #include "pd_control.h"
@@ -23,7 +23,7 @@
 
 void straightRegulator(const SensorData* current, const SensorData* previous);
 void makeTurn(uint8_t turn);
-void handleTape(volatile TurnStack* turn_stack, uint8_t tape);
+void handleTape(TurnStack* turn_stack, uint8_t tape);
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation);
 void driveStraight(uint8_t cm);
 void jamesBondTurn(volatile TurnStack* turn_stack);

@@ -22,14 +22,14 @@
     <com_atmel_avrdbg_tool_jtagicemk3>
       <ToolType>com.atmel.avrdbg.tool.jtagicemk3</ToolType>
       <ToolName>JTAGICE3</ToolName>
-      <ToolNumber>J30200013355</ToolNumber>
+      <ToolNumber>J30200013098</ToolNumber>
       <KeepTimersRunning>true</KeepTimersRunning>
       <OverrideVtor>false</OverrideVtor>
       <OverrideVtorValue>
       </OverrideVtorValue>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1172</port>
+        <port>49231</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>

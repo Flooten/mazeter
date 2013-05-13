@@ -30,38 +30,38 @@ uint8_t min(uint8_t x, uint8_t y)
 }
 
 /* DETEECT TURN TEST */
-void detectTurnTest()
+void detectTurnTest(TurnStack* turn_stack)
 {
-	if (current_sensor_data.distance1 < 50 || current_sensor_data.distance2 < 50)
+	if ((current_sensor_data.distance1 < 50 || current_sensor_data.distance2 < 50) && 0)
 	{
-		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255)
+		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
 		{
 			makeTurn(RIGHT_TURN);
-			driveStraight(40);
 		}
-		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance5 == 255)
+		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance4 != 255 && current_sensor_data.distance5 == 255)
 		{
 			makeTurn(LEFT_TURN);
-			driveStraight(40);
 		}
 	}
-	else if (current_sensor_data.distance1 <= 120 || current_sensor_data.distance2 < 120)
+	else if (current_sensor_data.distance1 <= 120 || current_sensor_data.distance2 <= 120)
 	{
-		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255)
+		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
 		{
 			makeTurn(RIGHT_TURN);
-			driveStraight(40);
 		}
-		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance5 == 255)
+		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance4 != 255 && current_sensor_data.distance5 == 255)
 		{
 			makeTurn(LEFT_TURN);
-			driveStraight(40);
+		}
+		else if (algo_mode_flag == ALGO_OUT && current_sensor_data.distance3 == 255 && current_sensor_data.distance4 == 255)
+		{
+			makeTurn(popTurnStack(turn_stack));
 		}
 	}
 }
 
 /* Upptäcker svängar på väg in i labyrinten */
-void detectTurn(volatile TurnStack* turn_stack)
+void detectTurn(TurnStack* turn_stack)
 {
 	if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE)
 	{

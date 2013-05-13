@@ -401,19 +401,41 @@ int main()
 			{
 				if (new_sensor_data_flag == 1)
 				{
-					//if (current_sensor_data.distance1 < 50 || current_sensor_data.distance2 < 50)
-					//{
-						//commandToControlSignal(STEER_STOP);
-					//}
-					//else
+					if (algo_mode_flag == ALGO_START)
 					{
-						//commandToControlSignal(STEER_STRAIGHT);
-						detectTurnTest();
+						handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						commandToControlSignal(STEER_STRAIGHT);
+					}
+					else if (algo_mode_flag == ALGO_IN || algo_mode_flag == ALGO_OUT)
+					{
+						if (current_sensor_data.line_type == LINE_NONE)
+							detectTurnTest((TurnStack*)&turn_stack);
+						else
+							handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+							
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-						new_sensor_data_flag = 0;
+					}
+					else if (algo_mode_flag == ALGO_GOAL)
+					{
+						commandToControlSignal(CLAW_OPEN);
+						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
+						handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+					}
+					else if (algo_mode_flag == ALGO_GOAL_REVERSE)
+					{
+						jamesBondTurn(&turn_stack);
+					}
+					else if (algo_mode_flag == ALGO_FINISH)
+					{
+						driveStraight(40);
+						algo_mode_flag = ALGO_DONE;
+					}
+					else
+					{
+						commandToControlSignal(STEER_STOP);
 					}
 					
-					//detectTurn(&turn_stack);
+					new_sensor_data_flag = 0;
 					
 					//handleTape(&turn_stack, current_sensor_data.line_type);
 					//if (algo_mode_flag == ALGO_IN)

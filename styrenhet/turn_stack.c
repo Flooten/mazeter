@@ -72,7 +72,7 @@ void freeTurnStack(volatile TurnStack* stack)
 /*
  *	Pushar node på queue.
  */
-void pushTurnStack(volatile TurnStack* stack, TurnNode* node)
+void pushTurnStack(TurnStack* stack, TurnNode* node)
 {
 	if (empty(stack))
 	{

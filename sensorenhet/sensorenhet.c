@@ -24,7 +24,7 @@
 volatile uint8_t number_of_adc = 7;
 volatile uint8_t current_adc = 0;
 volatile uint8_t turn_done_flag = 0;
-
+volatile uint8_t reset_gyro;
 
 uint8_t min(uint8_t x, uint8_t y)
 {
@@ -450,6 +450,14 @@ void parseCommand(uint8_t cmd)
 			spi_status = SPI_RECEIVING_DATA;
 			break;
 			
+		case RESET_GYRO:
+			SPDR = RESET_GYRO;
+			buffer = (uint8_t*)&reset_gyro;
+			buffer_size = 1;
+			current_byte = 0;
+			spi_status = SPI_RECEIVING_DATA;
+			break;
+			
 		default:
 			SPDR = ERROR_UNKNOWN_SPI_COMMAND;
 			buffer = NULL;
@@ -469,7 +477,7 @@ int main()
 	
 	sensor_parameters.tape_threshold = 160;
 	sensor_parameters.horizontal_line_threshold = 4;
-	sensor_parameters.no_line_detection_threshold = 50;
+	sensor_parameters.no_line_detection_threshold = 25;
 	sensor_parameters.line_diff_threshold = 4;
 	sensor_parameters.horizontal_to_vertical_threshold = 30;
 
@@ -480,6 +488,8 @@ int main()
 	spiSlaveInit();
 	sei();
 	startADC();
+	
+	sensor_data.angle = 12000;
 	
 	while (1)
 	{
@@ -495,11 +505,11 @@ int main()
 			sensor_data.line_type = sensor_parameters.tape_threshold;
 		}
 		
-		//if (turn_done_flag == 1)
-		//{
-			//sensor_data.angle = 12000;
-			//turn_done_flag = 0;
-		//}
+		if (turn_done_flag == 1)
+		{
+			sensor_data.angle = 12000;
+			turn_done_flag = 0;
+		}
 		convertAllData();
 	}
 }
