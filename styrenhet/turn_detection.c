@@ -72,10 +72,16 @@ void detectTurnTest(TurnStack* turn_stack)
 			}
 			makeTurn(LEFT_TURN);
 		}
-		else if (algo_mode_flag == ALGO_OUT && current_sensor_data.distance3 == 255 && current_sensor_data.distance4 == 255)
+		else if (algo_mode_flag == ALGO_OUT)
 		{
-			// Detta stämer ej helt, missar fall, ska vara mer som i jamesbond
-			makeTurn(popTurnStack(turn_stack));
+			uint8_t max_distance = max(current_sensor_data.distance1, current_sensor_data.distance2);
+			
+			if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance4 == 255) ||
+			    (current_sensor_data.distance3 == 255 && max_distance == 255) ||
+			    (current_sensor_data.distance4 == 255 && max_distance == 255))
+			{
+				makeTurn(popTurnStack(turn_stack));
+			}
 		}
 	}
 }

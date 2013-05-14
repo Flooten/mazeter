@@ -141,7 +141,7 @@ void parseCommand(uint8_t cmd)
 			if (control_mode_flag == FLAG_MANUAL)
 			{
 				clear(&turn_stack);
-				algo_mode_flag = ALGO_GOAL_REVERSE;
+				algo_mode_flag = ALGO_IN;
 				control_signals.left_direction = 1;
 				control_signals.right_direction = 1;
 			}
@@ -358,6 +358,11 @@ void resetData()
 	throttle = 0;
 }
 
+uint8_t maxAwesome(uint8_t x, uint8_t y)
+{
+	return (x < y) ? y : x;
+}
+
 int main()
 {
 	cli();
@@ -412,6 +417,11 @@ int main()
 						//handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
 						
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+						
+						if (maxAwesome(current_sensor_data.distance1, current_sensor_data.distance2) <= 25)
+						{
+							algo_mode_flag = ALGO_GOAL_REVERSE;
+						}
 					}
 					else if (algo_mode_flag == ALGO_START)
 					{
