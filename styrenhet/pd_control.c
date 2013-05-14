@@ -43,11 +43,12 @@ void resetTimer()
 
 void straightRegulator(const SensorData* current, const SensorData* previous)
 {
+	// PD-reglering med avståndssensorerna
+
 	uint8_t speed = 90; //throttle;
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		//static int8_t regulator_value = 0;
 		int8_t regulator_value = 0;
 		
 		if (current->distance3 >= 80 && current->distance6 != 255)
