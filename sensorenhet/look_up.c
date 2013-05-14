@@ -13,6 +13,10 @@
 
 #define ELEM_CNT(x)  (sizeof(x) / sizeof(x[0]))
 
+
+
+// Look-up-tables för avståndsensorerna. Sparade i programminnet
+
 const uint8_t distance1_table[37][2] PROGMEM =
 {
 	//Fram vänster
@@ -115,7 +119,7 @@ uint8_t lookUp(uint8_t raw_value, uint8_t size, const uint8_t table[][2])
 	
 	while(raw_value < pgm_read_byte_near(&table[i][1]))
 	{
-		// Kollar att man inte går utanför tabellen!!! (vilket vi gjorde tidigare)
+		// Kollar att man inte går utanför tabellen!!!
 		if (i > size)
 		{
 			return 0xFF; // För stort

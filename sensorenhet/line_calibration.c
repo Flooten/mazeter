@@ -12,13 +12,14 @@
 
 #ifndef F_CPU
 #define F_CPU 8000000UL
-#endif
+#endif  
 #include <util/delay.h>
 
 volatile uint8_t calibrate_line_sensor = 0;
 
 uint8_t calibrateLineSensorTape(const RawLineData* sensor_data)
 {
+	// Returnerar det minsta värdet från dioderna
 	uint8_t min_tape_value = 0xFF;
 	uint8_t i;
 	for (i = 0; i < 11; ++i)
@@ -34,6 +35,7 @@ uint8_t calibrateLineSensorTape(const RawLineData* sensor_data)
 
 uint8_t calibrateLineSensorFloor(const RawLineData* sensor_data)
 {
+	// Returnerar det största värdet från dioderna
 	uint8_t max_floor_value = 0x00;
 	uint8_t i;
 	for (i = 0; i < 11; ++i)
@@ -54,4 +56,6 @@ void waitFiveSeconds()
 	{
 		_delay_ms(30);
 	}
+
+
 }

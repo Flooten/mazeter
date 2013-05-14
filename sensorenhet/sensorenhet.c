@@ -106,6 +106,7 @@ void restartADC()
 
 void readLine(uint8_t diod)
 {
+	// Väljer vilken diod som ska läsas i linjesensorn
 	if (diod <= 11 && diod >= 0)
 	{
 		PORTD = (diod << 4) | diod;
@@ -128,14 +129,8 @@ void readGyroTemp()
 
 void accumulateData(RawData* raw_data, uint8_t number_of_accumulations)
 {
+	// Beräknar medelvärdet av de 'number_of_accumulations' senaste mätningarna 
 	raw_data->value = raw_data->accumulator / number_of_accumulations;
-	
-	//uint8_t i;
-	//raw_data->value = raw_data->arr[0];
-	//for (i = 1; i < number_of_adc; ++i)
-	//{
-		//raw_data->value = min(raw_data->value, raw_data->arr[i]);
-	//}
 	
 	raw_data->accumulator = 0;
 	raw_data->is_converted = 0;
@@ -143,6 +138,11 @@ void accumulateData(RawData* raw_data, uint8_t number_of_accumulations)
 
 ISR(ADC_vect)
 {
+	// Går igenom alla sensorer och AD-omvandlar dessa. Ny omvandling startar direkt efter att en avslutats. 
+	// Se teknisk dokumentation för ordningen.
+	// Avståndssenorena omvandlas number_of_adc gånger, och sedan beräknas medelvärdet av dessa och läggs i distanceX.value
+
+
 	switch (current_sensor)
 	{
 		// --------------- Avståndssensorer ---------------
@@ -153,9 +153,9 @@ ISR(ADC_vect)
 			//distance1.is_converted = 0;
 			distance1.sensor_type = DISTANCE_1;
 		
-			current_sensor = DISTANCE_2;
+			current_sensor = DISTANCE_2; // Sätter nästa sensor att omvandla 
 			ADMUX = 0x23; // Ingång ADC1
-			ADCSRA |= (1 << ADSC);
+			ADCSRA |= (1 << ADSC); // Startar nästa omvandling
 			break;
 		
 		case DISTANCE_2:
@@ -364,8 +364,6 @@ ISR(ADC_vect)
 			break;
 		
 	}
-	
-	//ADCSRA |= (1 << ADSC); // Startar en ny AD-omvandling
 }
 
 ISR(SPI_STC_vect)
@@ -474,7 +472,9 @@ int main()
 	buffer = NULL;
 	buffer_size = 0;
 	current_byte = 0;
-	
+
+
+	// Tröskelvärden för linjesensorn. tape_threshold kan kalibreras via datorn
 	sensor_parameters.tape_threshold = 160;
 	sensor_parameters.horizontal_line_threshold = 4;
 	sensor_parameters.no_line_detection_threshold = 25;

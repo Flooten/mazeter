@@ -66,6 +66,7 @@ void convertAllData()
 
 void convertRawData(RawData* data)
 {
+	// Konvertering av avståndssensorerna
 	if (!data->is_converted)
 	{
 		switch (data->sensor_type)
@@ -169,10 +170,12 @@ void convertRawDataGyro(volatile RawDataGyro* data)
 
 int8_t calculateCenter(const uint8_t* data)
 {
+	// Beräknar offseten från mitt-tejpen
+
 	int line_calc_ = 0;
 	int sum_line_ = 0;
 	
-	// lägger ihop alla linjesensor sum_line_ och tyngdpunkten line_calc_
+	// Lägger ihop alla linjesensor sum_line_ och tyngdpunkten line_calc_
 	int i;
 	for(i=0; i<11; i++)
 	{
@@ -210,6 +213,8 @@ uint8_t calculateAverage(const uint8_t* data)
 
 uint8_t getLineType(const uint8_t* data)
 {
+	// Returnerar vilken linjetyp som linjesenorn ser; vertikal, horizontell eller ingen linje
+
 	static uint8_t previous_val = NO_LINE;
 	static uint8_t count = 0;
 	
@@ -218,6 +223,7 @@ uint8_t getLineType(const uint8_t* data)
 	uint8_t i;
 	for (i = 0; i < 11; ++i)
 	{
+		// Hur många av dioderna är över tejp?
 		if (data[i] > sensor_parameters.tape_threshold)
 		{
 			++num_detection;
@@ -231,6 +237,8 @@ uint8_t getLineType(const uint8_t* data)
 	}
 	else if (num_detection < sensor_parameters.horizontal_line_threshold)
 	{
+		// Om föregående tejp var horisontell krävs en nedkylningsperiod för dioderna, horizontal_to_vertical_threshold
+		// innan vertikal tejp kan detekteras
 		if (previous_val == HORIZONTAL_LINE && count < sensor_parameters.horizontal_to_vertical_threshold)
 		{
 			++count;
@@ -259,10 +267,12 @@ uint8_t getLineType(const uint8_t* data)
 }
 
 void compareLines(uint8_t first, uint8_t second)
-{
+{	
+
+	// Jämför antalet AD-omvandlingar som hinns med över den första respektive den andra tejpen.
+	// Är dessa ungefär lika antas det vara två tunna linjer, annars en tunn och en tjock.
 	uint8_t diff = abs(first - second);
-	
-	//! Helt godtyckligt
+
 	if (diff < sensor_parameters.line_diff_threshold)
 	{
 		sensor_data.line_type = LINE_STRAIGHT;
@@ -363,7 +373,8 @@ void convertLineData(RawLineData* data)
 			{
 				++no_line_detections;
 				
-				// Godtyckligt
+				// Om ingen tejp detekteras under 'no_line_detection_threshold' AD-omvandlingar
+				// sätts 'line_type' till ingen tejp
 				if (no_line_detections > sensor_parameters.no_line_detection_threshold)
 				{
 					no_line_detections = 0;
