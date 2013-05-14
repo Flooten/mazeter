@@ -505,10 +505,9 @@ int main()
 			sensor_data.line_type = sensor_parameters.tape_threshold;
 		}
 		
-		if (turn_done_flag == 1)
+		if (reset_gyro == 1)
 		{
 			sensor_data.angle = 12000;
-			turn_done_flag = 0;
 		}
 		convertAllData();
 	}

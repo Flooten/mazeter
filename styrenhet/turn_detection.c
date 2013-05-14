@@ -29,32 +29,52 @@ uint8_t min(uint8_t x, uint8_t y)
 	}
 }
 
+uint8_t max(uint8_t x, uint8_t y)
+{
+	if (x > y)
+	{
+		return x;
+	}
+	else
+	{
+		return y;
+	}
+}
 /* DETEECT TURN TEST */
 void detectTurnTest(TurnStack* turn_stack)
 {
-	if ((current_sensor_data.distance1 < 50 || current_sensor_data.distance2 < 50) && 0)
+	//if ((current_sensor_data.distance1 < 50 || current_sensor_data.distance2 < 50) && 0)
+	//{
+		//if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
+		//{
+			//makeTurn(RIGHT_TURN);
+		//}
+		//else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance4 != 255 && current_sensor_data.distance5 == 255)
+		//{
+			//makeTurn(LEFT_TURN);
+		//}
+	//}
+	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 130)
 	{
 		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
-		{
+		{ 
+			if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
+			{
+				driveStraight(10);
+			}
 			makeTurn(RIGHT_TURN);
 		}
 		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance4 != 255 && current_sensor_data.distance5 == 255)
 		{
-			makeTurn(LEFT_TURN);
-		}
-	}
-	else if (current_sensor_data.distance1 <= 120 || current_sensor_data.distance2 <= 120)
-	{
-		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
-		{
-			makeTurn(RIGHT_TURN);
-		}
-		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance4 != 255 && current_sensor_data.distance5 == 255)
-		{
+			if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
+			{
+				driveStraight(10);
+			}
 			makeTurn(LEFT_TURN);
 		}
 		else if (algo_mode_flag == ALGO_OUT && current_sensor_data.distance3 == 255 && current_sensor_data.distance4 == 255)
 		{
+			// Detta stämer ej helt, missar fall, ska vara mer som i jamesbond
 			makeTurn(popTurnStack(turn_stack));
 		}
 	}

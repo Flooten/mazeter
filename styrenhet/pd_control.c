@@ -141,6 +141,8 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 
 void makeTurn(uint8_t turn)
 {
+	reset_gyro = 0;
+	
 	uint16_t angle_end;
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
@@ -240,9 +242,10 @@ void makeTurn(uint8_t turn)
 		//pwmWheels(control_signals);
 	//}
 	
-	driveStraight(50);
+	driveStraight(60);
 	
 	turn_done_flag = 1;
+	reset_gyro = 1;
 }
 
 void handleTape(TurnStack* turn_stack, uint8_t tape)

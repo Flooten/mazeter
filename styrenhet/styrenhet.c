@@ -45,8 +45,7 @@ volatile ControlParameters control_parameters;
 
 volatile uint8_t turn_done_flag = 0;
 volatile uint8_t turn_done_flag_copy;
-
-volatile const char* str = "Hello, world!";
+volatile uint8_t reset_gyro = 1;
 
 volatile TurnStack turn_stack;
 
@@ -142,7 +141,7 @@ void parseCommand(uint8_t cmd)
 			if (control_mode_flag == FLAG_MANUAL)
 			{
 				clear(&turn_stack);
-				algo_mode_flag = ALGO_IN;
+				algo_mode_flag = ALGO_GOAL_REVERSE;
 				control_signals.left_direction = 1;
 				control_signals.right_direction = 1;
 			}
@@ -230,13 +229,6 @@ void parseCommand(uint8_t cmd)
 			abort_flag = 1;
 			new_sensor_data_flag = 0;
 			break;
-
-		case 0x95:
-			SPDR = strlen((const char*)str);
-			buffer = (uint8_t*)str;
-			buffer_size = strlen((const char*)str);
-			current_byte = 0;
-			break;
 			
 		case CHECK_STACK:
 			SPDR = CHECK_STACK;
@@ -267,6 +259,13 @@ void parseCommand(uint8_t cmd)
 			turn_done_flag_copy = turn_done_flag;
 			turn_done_flag = 0;
 			buffer = (uint8_t*)&turn_done_flag_copy;
+			buffer_size = 1;
+			current_byte = 0;
+			break;
+			
+		case RESET_GYRO:
+			SPDR = RESET_GYRO;
+			buffer = (uint8_t*)&reset_gyro;
 			buffer_size = 1;
 			current_byte = 0;
 			break;
@@ -399,27 +398,31 @@ int main()
 			}
 			else if (control_mode_flag == FLAG_AUTO)
 			{
+				reset_gyro = 1;
+				
 				if (new_sensor_data_flag == 1)
 				{
-					if (algo_mode_flag == ALGO_START)
+					if (algo_mode_flag == ALGO_IN || algo_mode_flag == ALGO_OUT)
 					{
-						handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
-						commandToControlSignal(STEER_STRAIGHT);
-					}
-					else if (algo_mode_flag == ALGO_IN || algo_mode_flag == ALGO_OUT)
-					{
-						if (current_sensor_data.line_type == LINE_NONE)
-							detectTurnTest((TurnStack*)&turn_stack);
-						else
-							handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
-							
+						detectTurnTest((TurnStack*)&turn_stack); // TEST
+						
+						//if (current_sensor_data.line_type == LINE_NONE)
+						//detectTurnTest((TurnStack*)&turn_stack);
+						//else
+						//handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+					}
+					else if (algo_mode_flag == ALGO_START)
+					{
+						//handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						commandToControlSignal(STEER_STRAIGHT);
 					}
 					else if (algo_mode_flag == ALGO_GOAL)
 					{
 						commandToControlSignal(CLAW_OPEN);
 						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
-						handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						//handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
 					}
 					else if (algo_mode_flag == ALGO_GOAL_REVERSE)
 					{

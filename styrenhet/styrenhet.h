@@ -31,6 +31,7 @@ extern volatile SensorData previous_sensor_data;
 extern volatile ControlParameters control_parameters;
 
 extern volatile uint8_t turn_done_flag;
+extern volatile uint8_t reset_gyro;
 
 #define ALGO_IN 1
 #define ALGO_OUT 2
