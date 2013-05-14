@@ -18,8 +18,8 @@ void pwmInit()
 	DDRD = (1 << DDD4) | (1 << DDD5) | (1 << DDD6); // PWM till motorer och klo
 		
 	// Kontrollregister till hjulen
-	TCCR1A = (1 << COM1A1) | (1 << COM1B1) | (1 << WGM11); // Väljer mode 14 i 14-5
-	TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11); // Ställer in klockan och mode 14 och delar klockan 8
+	TCCR1A = (1 << COM1A1) | (1 << COM1B1) | (1 << WGM11); // Väljer mode 14 i tabell 14-5
+	TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11); // Ställer in klockan och mode 14 och delar klockan med 8
 	
 	// Periodtiden 0x4E1F = 19999 klockpulser dvs. 20 ms
 	ICR1 = 0x4E1F; 

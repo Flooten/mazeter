@@ -54,9 +54,6 @@ volatile long int gyro_total_time;
 volatile long int gyro_samples[10];
 volatile int filter_coeff[10];
 
-/* conversion_status */
-
-/* ------ Variabler slut ------- */
 
 void initGYRO();
 void convertAllData();
