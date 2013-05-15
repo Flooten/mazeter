@@ -409,30 +409,26 @@ int main()
 				{
 					if (algo_mode_flag == ALGO_IN || algo_mode_flag == ALGO_OUT)
 					{
-						detectTurnTest((TurnStack*)&turn_stack); // TEST
+						//detectTurnTest((TurnStack*)&turn_stack); // TEST
 						
-						//if (current_sensor_data.line_type == LINE_NONE)
-						//detectTurnTest((TurnStack*)&turn_stack);
-						//else
-						//handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						if (current_sensor_data.line_type == LINE_NONE)
+						detectTurnTest((TurnStack*)&turn_stack);
+						else
+						handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
 						
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-						
-						if (maxAwesome(current_sensor_data.distance1, current_sensor_data.distance2) <= 25)
-						{
-							algo_mode_flag = ALGO_GOAL_REVERSE;
-						}
+	
 					}
 					else if (algo_mode_flag == ALGO_START)
 					{
-						//handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
 						commandToControlSignal(STEER_STRAIGHT);
 					}
 					else if (algo_mode_flag == ALGO_GOAL)
 					{
 						commandToControlSignal(CLAW_OPEN);
 						lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
-						//handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
 					}
 					else if (algo_mode_flag == ALGO_GOAL_REVERSE)
 					{

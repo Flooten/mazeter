@@ -72,16 +72,17 @@ void detectTurnTest(TurnStack* turn_stack)
 			}
 			makeTurn(LEFT_TURN);
 		}
-		else if (algo_mode_flag == ALGO_OUT)
+	}		
+	else if (algo_mode_flag == ALGO_OUT)
+	{
+		uint8_t max_distance = max(current_sensor_data.distance1, current_sensor_data.distance2);
+		
+		if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance4 == 255) ||
+		(current_sensor_data.distance3 == 255 && max_distance == 255) ||
+		(current_sensor_data.distance4 == 255 && max_distance == 255))
 		{
-			uint8_t max_distance = max(current_sensor_data.distance1, current_sensor_data.distance2);
-			
-			if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance4 == 255) ||
-			    (current_sensor_data.distance3 == 255 && max_distance == 255) ||
-			    (current_sensor_data.distance4 == 255 && max_distance == 255))
-			{
-				makeTurn(popTurnStack(turn_stack));
-			}
+			driveStraight(10);
+			makeTurn(popTurnStack(turn_stack));
 		}
 	}
 }

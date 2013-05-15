@@ -252,6 +252,7 @@ ISR(ADC_vect)
 		
 		case LINE_SENSOR_1:
 			line_sensor.value[1] = ADCH;
+			line_sensor.value[0] = line_sensor.value[1];
 			current_sensor = LINE_SENSOR_6;
 			ADMUX = 0x27; // Ingång ADC7
 			readLine(LINE_SENSOR_6);

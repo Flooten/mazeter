@@ -82,20 +82,32 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			// Kör höger mot mitten
 			//regulator_value = -20;
 			
-			int16_t delta = current->distance5 - current->distance4;
-			int16_t delta_previous = previous->distance5 - previous->distance4;
+			//int16_t delta = current->distance5 - current->distance4;
+			//int16_t delta_previous = previous->distance5 - previous->distance4;
+			//
+			//regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
+			
+			int16_t delta = current->distance3 - 30;
+			int16_t delta_previous = previous->distance3 - 30;
 			
 			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
+			
 		}
 		else if (current->distance3 >= 43 && current->distance5 == 255)
 		{
 			// Kör vänster mot mitten
 			//regulator_value = 20;
 			
-			int16_t delta = current->distance3 - current->distance6;
-			int16_t delta_previous = previous->distance3 - previous->distance6;
+			//int16_t delta = current->distance3 - current->distance6;
+			//int16_t delta_previous = previous->distance3 - previous->distance6;
+			//
+			//regulator_value = (float)control_parameters.dist_kp / 5 * delta + (float)control_parameters.dist_kd / 5 * (delta - delta_previous);
 			
-			regulator_value = (float)control_parameters.dist_kp / 5 * delta + (float)control_parameters.dist_kd / 5 * (delta - delta_previous);
+			int16_t delta = 30 - current->distance4;
+			int16_t delta_previous = 30 - previous->distance4;
+			
+			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
+
 
 		}
 		else if (current->distance3 <= 42 && current->distance4 <= 42)
@@ -229,7 +241,7 @@ void makeTurn(uint8_t turn)
 		case STRAIGHT:
 			commandToControlSignal(STEER_STRAIGHT);
 			pwmWheels(control_signals);
-			break;
+			driveStraight(60);
 			
 		default:
 			break;
@@ -293,7 +305,8 @@ void handleTape(TurnStack* turn_stack, uint8_t tape)
 				break;
 			//driveStraight(DISTANCE_TAPE_TURN);
 			//makeTurn(STRAIGHT);
-			driveStraight(80);
+			driveStraight(90);
+
 			pushTurnStack(turn_stack, newTurnNode(STRAIGHT));
 			break;
 			
