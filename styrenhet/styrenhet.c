@@ -407,7 +407,7 @@ int main()
 				
 				if (new_sensor_data_flag == 1)
 				{
-					if (algo_mode_flag == ALGO_IN || algo_mode_flag == ALGO_OUT)
+					if (algo_mode_flag == ALGO_IN)// || algo_mode_flag == ALGO_OUT)
 					{
 						//detectTurnTest((TurnStack*)&turn_stack); // TEST
 						
@@ -417,7 +417,12 @@ int main()
 							handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
 						
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-	
+					}
+					else if (algo_mode_flag == ALGO_OUT)
+					{
+						handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						detectTurnOut(&turn_stack);
+						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 					}
 					else if (algo_mode_flag == ALGO_START)
 					{

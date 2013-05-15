@@ -62,6 +62,7 @@ void detectTurnTest(TurnStack* turn_stack)
 			{
 				driveStraight(10);
 			}
+			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
 		}
 		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance4 != 255 && current_sensor_data.distance5 == 255)
@@ -70,6 +71,7 @@ void detectTurnTest(TurnStack* turn_stack)
 			{
 				driveStraight(10);
 			}
+			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 			makeTurn(LEFT_TURN);
 		}
 	}		
@@ -168,12 +170,14 @@ void detectTurn(TurnStack* turn_stack)
 }
 
 /* Upptäcker svängar (även rakt fram) på väg ut ur labyrinten */
-//void detectTurnOut(volatile TurnStack* turn_stack)
-//{
-	//if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
-	//{
-		//// Kör fram till mitten av svängen.
-		//driveStraight(DISTANCE_DETECT_TURN);
-		//makeTurn(popTurnStack(turn_stack));
-	//}
-//}
+void detectTurnOut(volatile TurnStack* turn_stack)
+{
+	if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance5 == 255) ||
+	    (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255) ||
+		(max(current_sensor_data.distance1, current_sensor_data.distance2) <= 60))
+	{
+		// Kör fram till mitten av svängen.
+		driveStraight(10);
+		makeTurn(popTurnStack(turn_stack));
+	}
+}
