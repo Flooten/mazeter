@@ -141,7 +141,7 @@ void parseCommand(uint8_t cmd)
 			if (control_mode_flag == FLAG_MANUAL)
 			{
 				clear(&turn_stack);
-				algo_mode_flag = ALGO_IN;
+				algo_mode_flag = ALGO_START;
 				control_signals.left_direction = 1;
 				control_signals.right_direction = 1;
 			}
@@ -294,13 +294,13 @@ void commandToControlSignal(uint8_t cmd)
 		
 		case STEER_STRAIGHT_LEFT:
 			control_signals.right_value = throttle;
-			control_signals.left_value = throttle / 2;
+			control_signals.left_value = throttle / 3;
 			control_signals.right_direction = 1;
 			control_signals.left_direction = 1;
 			break;
 		
 		case STEER_STRAIGHT_RIGHT:
-			control_signals.right_value = throttle /2;
+			control_signals.right_value = throttle / 3;
 			control_signals.left_value = throttle;
 			control_signals.right_direction = 1;
 			control_signals.left_direction = 1;
@@ -412,9 +412,9 @@ int main()
 						//detectTurnTest((TurnStack*)&turn_stack); // TEST
 						
 						if (current_sensor_data.line_type == LINE_NONE)
-						detectTurnTest((TurnStack*)&turn_stack);
+							detectTurnTest((TurnStack*)&turn_stack);
 						else
-						handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+							handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
 						
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 	

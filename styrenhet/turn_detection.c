@@ -77,9 +77,10 @@ void detectTurnTest(TurnStack* turn_stack)
 	{
 		uint8_t max_distance = max(current_sensor_data.distance1, current_sensor_data.distance2);
 		
-		if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance4 == 255) ||
-		(current_sensor_data.distance3 == 255 && max_distance == 255) ||
-		(current_sensor_data.distance4 == 255 && max_distance == 255))
+		if (((current_sensor_data.distance3 == 255 && previous_sensor_data.distance3 == 255) &&
+			 (current_sensor_data.distance4 == 255 && previous_sensor_data.distance4 == 255)) ||
+			((current_sensor_data.distance3 == 255 && previous_sensor_data.distance3 == 255) && max_distance == 255) ||
+			((current_sensor_data.distance4 == 255 && previous_sensor_data.distance4 == 255) && max_distance == 255))
 		{
 			driveStraight(10);
 			makeTurn(popTurnStack(turn_stack));
@@ -167,12 +168,12 @@ void detectTurn(TurnStack* turn_stack)
 }
 
 /* Upptäcker svängar (även rakt fram) på väg ut ur labyrinten */
-void detectTurnOut(volatile TurnStack* turn_stack)
-{
-	if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
-	{
-		// Kör fram till mitten av svängen.
-		driveStraight(DISTANCE_DETECT_TURN);
-		makeTurn(popTurnStack(turn_stack));
-	}
-}
+//void detectTurnOut(volatile TurnStack* turn_stack)
+//{
+	//if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE)
+	//{
+		//// Kör fram till mitten av svängen.
+		//driveStraight(DISTANCE_DETECT_TURN);
+		//makeTurn(popTurnStack(turn_stack));
+	//}
+//}

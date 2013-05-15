@@ -15,6 +15,7 @@
 #include "PWM.h"
 #include "controlsignals.h"
 #include <util/atomic.h>
+#include <string.h>
 #include <stdint.h>
 
 #ifndef F_CPU
@@ -82,15 +83,15 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			// Kör höger mot mitten
 			//regulator_value = -20;
 			
-			//int16_t delta = current->distance5 - current->distance4;
-			//int16_t delta_previous = previous->distance5 - previous->distance4;
-			//
-			//regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
-			
-			int16_t delta = current->distance3 - 30;
-			int16_t delta_previous = previous->distance3 - 30;
+			int16_t delta = current->distance5 - current->distance4;
+			int16_t delta_previous = previous->distance5 - previous->distance4;
 			
 			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
+			//
+			//int16_t delta = current->distance3 - 30;
+			//int16_t delta_previous = previous->distance3 - 30;
+			//
+			//regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
 			
 		}
 		else if (current->distance3 >= 43 && current->distance5 == 255)
@@ -98,15 +99,15 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			// Kör vänster mot mitten
 			//regulator_value = 20;
 			
-			//int16_t delta = current->distance3 - current->distance6;
-			//int16_t delta_previous = previous->distance3 - previous->distance6;
+			int16_t delta = current->distance3 - current->distance6;
+			int16_t delta_previous = previous->distance3 - previous->distance6;
+			
+			regulator_value = (float)control_parameters.dist_kp / 5 * delta + (float)control_parameters.dist_kd / 5 * (delta - delta_previous);
+			
+			//int16_t delta = 30 - current->distance4;
+			//int16_t delta_previous = 30 - previous->distance4;
 			//
-			//regulator_value = (float)control_parameters.dist_kp / 5 * delta + (float)control_parameters.dist_kd / 5 * (delta - delta_previous);
-			
-			int16_t delta = 30 - current->distance4;
-			int16_t delta_previous = 30 - previous->distance4;
-			
-			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
+			//regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
 
 
 		}
@@ -242,22 +243,25 @@ void makeTurn(uint8_t turn)
 			commandToControlSignal(STEER_STRAIGHT);
 			pwmWheels(control_signals);
 			driveStraight(60);
+			break;
 			
 		default:
+			return;
 			break;
 	}
 	
+	//commandToControlSignal(STEER_STRAIGHT);
+	//pwmWheels(control_signals);
+	
 	//// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att upptäcka svängar på.
-	//while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) &&
-		//!(current_sensor_data.distance5 < 255 || current_sensor_data.distance6 < 255)
-		 //&& !abort_flag)
-	//{
-		//commandToControlSignal(STEER_STRAIGHT);
-		//pwmWheels(control_signals);
-	//}
+	//while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
+	//{}
 	
-	driveStraight(60);
+	driveStraight(50);
 	
+	//memset((void*)&current_sensor_data.distance1, 0, sizeof(current_sensor_data));
+	//memset((void*)&previous_sensor_data.distance1, 0, sizeof(current_sensor_data));
+
 	turn_done_flag = 1;
 	reset_gyro = 1;
 }
@@ -341,6 +345,15 @@ void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 		regulator_value = -speed;
 	}
 	
+	if (current_deviation >= 40)
+	{
+		regulator_value = 20;
+	}
+	else if (current_deviation <= -40)
+	{
+		regulator_value = -20;
+	}
+	
 	control_signals.right_value = speed + regulator_value;
 	control_signals.left_value = speed - regulator_value;
 	
@@ -373,6 +386,24 @@ void driveStraight(uint8_t cm)
 	{}
 }
 
+void driveStraightBack(uint8_t cm)
+{
+	resetTimer();
+	
+	//uint32_t tmp = (uint32_t)cm*2*F_CPU/(1024 * ((uint32_t)control_signals.left_value + (uint32_t)control_signals.right_value)); // Prescaler 1024
+	uint32_t tmp = (uint32_t)cm*F_CPU/(1024 * (uint32_t)throttle);
+	uint16_t timer_count = (uint16_t)tmp;
+	
+	/* Kör rakt fram med den högsta av hjulparshastigheterna */
+	commandToControlSignal(STEER_BACK);
+	pwmWheels(control_signals);
+	
+	startTimer();
+	
+	while((TIM16_ReadTCNT3() < timer_count) && !abort_flag)
+{}
+}
+
 void jamesBondTurn(volatile TurnStack* turn_stack)
 {
 	// behöver pd regleras istället
@@ -387,25 +418,38 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 		
 		uint8_t tmp = popTurnStack(turn_stack);
 		
-		if (tmp == LEFT_TURN)
-			makeTurn(RIGHT_TURN);
-		else if (tmp == RIGHT_TURN)
-			makeTurn(LEFT_TURN);
-		else if (tmp == STRAIGHT)
-			return;
+		//if (tmp == LEFT_TURN)
+			//makeTurn(RIGHT_TURN);
+		//else if (tmp == RIGHT_TURN)
+			//makeTurn(LEFT_TURN);
+		//else if (tmp == STRAIGHT)
+			//return;
 			
+		makeTurn(tmp);
+		
+		commandToControlSignal(STEER_STOP);
+		pwmWheels(control_signals);
+		while (!abort_flag)
+		{
+			
+		}
+		
 		algo_mode_flag = ALGO_OUT;
 	}
 	else if (current_sensor_data.distance7 <= 130)
 	{
 		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
 		{
+			driveStraightBack(10);
 			makeTurn(RIGHT_TURN);
+			driveStraight(20);
 			algo_mode_flag = ALGO_OUT;
 		}
 		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance4 != 255 && current_sensor_data.distance5 == 255)
 		{
+			driveStraightBack(10);
 			makeTurn(LEFT_TURN);
+			driveStraight(20);
 			algo_mode_flag = ALGO_OUT;
 		}
 	}
