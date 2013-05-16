@@ -6,7 +6,6 @@
  *
  * DATUM:         2013-05-17
  *
- * BESKRIVNING: Funktioner för att kalibrera linjesensorns tröskelvärden för korrekt detektering av tejp
  */
 
 #include "line_calibration.h"

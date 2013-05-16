@@ -8,16 +8,13 @@
  *
  * DATUM:         2013-05-17
  *
- * BESKRIVNING:   Implementation av de look-up-tables som används för att omvandla
- *				  spänningen från avståndssensorerna till avstånd i centimeter.
- *
  */
 
 #include "look_up.h"
 #include "sensor_names.h"
 #include <avr/pgmspace.h> 
 
-// funktion som räknar ut tabellens rader.
+// Funktion som räknar ut antal rader.
 #define ELEM_CNT(x)  (sizeof(x) / sizeof(x[0]))
 
 // Look-up-tables för avståndsensorerna. Sparade i programminnet

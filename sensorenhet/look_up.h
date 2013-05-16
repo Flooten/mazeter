@@ -5,7 +5,8 @@
  *				  Herman Ekwall
  * DATUM:         2013-05-17
  *
- * BESKRIVNING:   I denna headerfil finns tabellerna för sensorerna.
+ * BESKRIVNING:   Implementation av de look-up-tables som används för att omvandla
+ *                spänningen från avståndssensorerna till avstånd i centimeter.
  *
  */
 
