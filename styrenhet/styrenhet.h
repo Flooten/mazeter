@@ -3,7 +3,7 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Mattias Fransson
  *				  Herman Ekwall
- * DATUM:         2013-04-18
+ * DATUM:         2013-05-16
  *
  * BESKRIVNING: 
  *
@@ -19,6 +19,7 @@
 #include "turn_detection.h"
 #include "turn_stack.h"
 
+// Globaler som sätts och skickas i spi-avbrottet.
 extern volatile uint8_t control_mode_flag;
 extern volatile uint8_t current_command;
 extern volatile uint8_t throttle;
@@ -33,6 +34,7 @@ extern volatile ControlParameters control_parameters;
 extern volatile uint8_t turn_done_flag;
 extern volatile uint8_t reset_gyro;
 
+// Olika lägen för labyrintalgoritmen.
 #define ALGO_IN 1
 #define ALGO_OUT 2
 #define ALGO_GOAL 3
