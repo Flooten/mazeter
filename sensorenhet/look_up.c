@@ -1,11 +1,15 @@
 ﻿/*
- * FILNAMN:       look_up.h
+ * FILNAMN:       look_up.c
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Mattias Fransson
  *				  Herman Ekwall
- * DATUM:         2013-04-18
+ *				  Joel Davidsson
+ *				  Fredrik Stenmark
  *
- * BESKRIVNING:   
+ * DATUM:         2013-05-17
+ *
+ * BESKRIVNING:   Implementation av de look-up-tables som används för att omvandla
+ *				  spänningen från avståndssensorerna till avstånd i centimeter.
  *
  */
 
