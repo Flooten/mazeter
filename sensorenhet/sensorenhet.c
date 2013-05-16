@@ -5,9 +5,9 @@
  *                Herman Ekwall
  *                Mattias Fransson
  *                
- * DATUM:         2013-04-26
+ * DATUM:         2013-05-17
  *
- * BESKRIVNING:
+ * BESKRIVNING: Sensorenhetens huvudprogramflöde återfinns här.
  *
  */
 
@@ -150,7 +150,6 @@ ISR(ADC_vect)
 		case DISTANCE_1:
 			distance1.arr[current_adc] = ADCH;
 			distance1.accumulator += ADCH;
-			//distance1.is_converted = 0;
 			distance1.sensor_type = DISTANCE_1;
 		
 			current_sensor = DISTANCE_2; // Sätter nästa sensor att omvandla 
@@ -161,7 +160,6 @@ ISR(ADC_vect)
 		case DISTANCE_2:
 			distance2.arr[current_adc] = ADCH;		
 			distance2.accumulator += ADCH;
-			//distance2.is_converted = 0;
 			distance2.sensor_type = DISTANCE_2;
 		
 			current_sensor = DISTANCE_3;
@@ -172,7 +170,6 @@ ISR(ADC_vect)
 		case DISTANCE_3:
 			distance3.arr[current_adc] = ADCH;
 			distance3.accumulator += ADCH;
-			//distance3.is_converted = 0;
 			distance3.sensor_type = DISTANCE_3;
 		
 			current_sensor = DISTANCE_4;
@@ -183,7 +180,6 @@ ISR(ADC_vect)
 		case DISTANCE_4:
 			distance4.arr[current_adc] = ADCH;
 			distance4.accumulator +=  ADCH;
-			//distance4.is_converted = 0;
 			distance4.sensor_type = DISTANCE_4;
 
 			current_sensor = DISTANCE_5;
@@ -195,7 +191,6 @@ ISR(ADC_vect)
 		case DISTANCE_5:
 			distance5.arr[current_adc] = ADCH;
 			distance5.accumulator +=  ADCH;
-			//distance5.is_converted = 0;
 			distance5.sensor_type = DISTANCE_5;
 				
 			current_sensor = DISTANCE_6;
@@ -206,7 +201,6 @@ ISR(ADC_vect)
 		case DISTANCE_6:
 			distance6.arr[current_adc] = ADCH;
 			distance6.accumulator += ADCH;
-			//distance6.is_converted = 0;
 			distance6.sensor_type = DISTANCE_6;
 				
 			current_sensor = DISTANCE_7;
@@ -217,7 +211,6 @@ ISR(ADC_vect)
 		case DISTANCE_7:
 			distance7.arr[current_adc] = ADCH;
 			distance7.accumulator += ADCH;
-			//distance7.is_converted = 0;
 			distance7.sensor_type = DISTANCE_7;
 				
 			current_sensor = GYRO_SAMPLE_1;
@@ -309,10 +302,6 @@ ISR(ADC_vect)
 		
 		case LINE_SENSOR_8:
 			line_sensor.value[8] = ADCH;
-			//line_sensor.is_converted = 0;
-			//current_sensor = DISTANCE_1;
-			//ADMUX = 0x20; // Ingång ADC0
-			//readLine(0xFF); // Avaktiverar muxarna
 			current_sensor = LINE_SENSOR_4;
 			ADMUX = 0x27;
 			readLine(LINE_SENSOR_4);
@@ -326,9 +315,6 @@ ISR(ADC_vect)
 			ADMUX = 0x22; // Ingång ADC0
 			readLine(0xFF); // Avaktiverar muxarna
 			ADCSRA |= (1 << ADSC);
-			//current_sensor = LINE_SENSOR_1;
-			//ADMUX = 0x27; // Ingång ADC7
-			//readLine(LINE_SENSOR_1);
 			break;
 		
 		case LINE_SENSOR_10:

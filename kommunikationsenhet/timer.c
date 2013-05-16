@@ -4,16 +4,18 @@
  * PROGRAMMERARE: Fredrik Stenmark
  * DATUM:         2013-04-08
  *
- * BESKRIVNING:   
+ * BESKRIVNING: I denna fil initieras kommunikationsenhetens två timrar  
  *          
  */
 
 #include <avr/io.h>
 #include "timer.h"
 
+// Variabler
 volatile uint8_t timer_internal_ready;
 volatile uint8_t timer_external_ready;
 
+// Funktion
 void timerInit()
 {
 	TCCR1B |= (1 << WGM12);

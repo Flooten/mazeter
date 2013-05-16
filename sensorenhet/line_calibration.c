@@ -4,12 +4,14 @@
  * PROGRAMMERARE: Herman Ekwall
  *                Mattias Fransson
  *
- * DATUM:         2013-04-17
+ * DATUM:         2013-05-17
  *
+ * BESKRIVNING: Funktioner för att kalibrera linjesensorns tröskelvärden för korrekt detektering av tejp
  */
 
 #include "line_calibration.h"
 
+// Klockhastighet på 8 MHz
 #ifndef F_CPU
 #define F_CPU 8000000UL
 #endif  

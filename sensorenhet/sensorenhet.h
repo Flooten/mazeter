@@ -1,11 +1,13 @@
 ﻿/*
  * FILNAMN:       sensorenheten.h
  * PROJEKT:       Mazeter
- * PROGRAMMERARE: Martin Andersson
+ * PROGRAMMERARE: Fredrik Stenmark
+ *                Herman Ekwall
+ *                Mattias Fransson
+ *           
+ * DATUM:         2013-05-17
  *
- * DATUM:         2013-04-xx
- *
- * BESKRIVNING:
+ * BESKRIVNING: Sensorenhetens huvudprogramflöde återfinns i c-filen.
  *
  */
 

@@ -4,10 +4,9 @@
  * PROGRAMMERARE: Herman Ekwall
  *                Mattias Fransson
  *
- * DATUM:         2013-04-17
+ * DATUM:         2013-05-17
  *
- * BESKRIVNING:
- *
+ * BESKRIVNING: Funktioner för att kalibrera linjesensorns tröskelvärden för korrekt detektering av tejp
  */
 
 #ifndef LINE_CALIBRATION_H

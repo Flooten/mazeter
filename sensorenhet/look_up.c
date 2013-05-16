@@ -1,9 +1,15 @@
 ﻿/*
- * FILNAMN:       look_up.h
+ * FILNAMN:       look_up.c
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Mattias Fransson
  *				  Herman Ekwall
- * DATUM:         2013-04-18
+ *				  Joel Davidsson
+ *				  Fredrik Stenmark
+ *
+ * DATUM:         2013-05-17
+ *
+ * BESKRIVNING:   Implementation av de look-up-tables som används för att omvandla
+ *				  spänningen från avståndssensorerna till avstånd i centimeter.
  *
  */
 
@@ -11,12 +17,10 @@
 #include "sensor_names.h"
 #include <avr/pgmspace.h> 
 
+// funktion som räknar ut tabellens rader.
 #define ELEM_CNT(x)  (sizeof(x) / sizeof(x[0]))
 
-
-
 // Look-up-tables för avståndsensorerna. Sparade i programminnet
-
 const uint8_t distance1_table[37][2] PROGMEM =
 {
 	//Fram vänster
@@ -24,7 +28,6 @@ const uint8_t distance1_table[37][2] PROGMEM =
 {26,109},{27,106},{28,103},{29,101},{30,98},{31,96},{32,94},{33,91},{34,89},{35,87},{37,83},{40,77},
 {45,69},{50,61},{55,56},{60,52},{65,48},{70,44},{75,41},{80,40},{90,36},{100,32},{110,29},{120,27},{130,24},{140,22}
 };
-
 const uint8_t distance2_table[37][2] PROGMEM =
 {
 	//Fram höger
@@ -105,21 +108,20 @@ uint8_t lookUpDistance(uint8_t raw_value, uint8_t sensor)
 	return 0;
 }
 
-
 uint8_t lookUp(uint8_t raw_value, uint8_t size, const uint8_t table[][2])
 {
 	volatile uint8_t i= 0;
 	
-	// Täcker bara om vi får ett värde som är på toppen av spänningskurvan, 
-	// vi vet inte om vi är 2 cm från väggen eller 45 cm, se till att aldrig hamna i ett sådant läge
+	// Täcker fallet om roboten är för nära
 	if (raw_value > pgm_read_byte_near(&table[0][1]))
 	{
 		return 0x00; // För nära
 	}
 	
+	// Letar upp vilken värde det är
 	while(raw_value < pgm_read_byte_near(&table[i][1]))
 	{
-		// Kollar att man inte går utanför tabellen!!!
+		// Kollar att man inte går utanför tabellen
 		if (i > size)
 		{
 			return 0xFF; // För stort
@@ -134,10 +136,12 @@ uint8_t lookUp(uint8_t raw_value, uint8_t size, const uint8_t table[][2])
 	}
 	else if (pgm_read_byte_near(&table[i][1]) == raw_value)
 	{
+		// returnera den värde som är tabellen
 		return pgm_read_byte_near(&table[i][0]);
 	}
 	else
 	{
+		// räknar ut ett värde mellan två värden i tabellen
 		uint8_t previous_voltage = pgm_read_byte_near(&table[i - 1][1]);
 		uint8_t previous_distance = pgm_read_byte_near(&table[i - 1][0]);
 		

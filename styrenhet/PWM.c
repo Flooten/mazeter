@@ -4,7 +4,8 @@
  * PROGRAMMERARE: Herman Ekwall och Joel Davidsson
  * DATUM:         2013-04-04
  *
- * BESKRIVNING:
+ * BESKRIVNING: I denna fil finns alla funktioner som styr PWM. pwmInit sätter utgångar och sätter igång timer,
+ *              den ser också till att den inte åker någonstans och öppnar klon.
  *
  */
 
@@ -14,7 +15,7 @@
 void pwmInit()
 {
 	// Initierar utgångar
-	DDRA = (1 << DDA0) | (1 << DDA1); // DIR setup
+	DDRA = (1 << DDA0) | (1 << DDA1); // DIR setup, vilken riking hjulen går åt
 	DDRD = (1 << DDD4) | (1 << DDD5) | (1 << DDD6); // PWM till motorer och klo
 		
 	// Kontrollregister till hjulen
@@ -24,7 +25,7 @@ void pwmInit()
 	// Periodtiden 0x4E1F = 19999 klockpulser dvs. 20 ms
 	ICR1 = 0x4E1F; 
 	
-	// Står still
+	// Ser till att roboten står still det första den gör
 	OCR1A = MIN_PWM_WHEELS;
 	OCR2B = MIN_PWM_WHEELS;
 	
@@ -35,12 +36,13 @@ void pwmInit()
 	// Periodtiden 0x9B = 155 klockpulser dvs. 20 ms
 	OCR2A = 0x9B;  
 	
-	//Öppnar klon
+	// Öppnar klon det första den gör
 	OCR2B = MIN_PWM_CLAW + 5;
 }
 
 void pwmWheels(const ControlSignals ctrlsig)
 {
+	// Översätter Controlsignals till PWM signaler
 	OCR1A = MIN_PWM_WHEELS + ctrlsig.left_value * INCREASE_PWM_WHEELS;
 	OCR1B = MIN_PWM_WHEELS + ctrlsig.right_value * INCREASE_PWM_WHEELS;
 
@@ -49,17 +51,6 @@ void pwmWheels(const ControlSignals ctrlsig)
 
 void pwmClaw(const ControlSignals ctrlsig)
 {
+	// Översätter Controlssignals till PWM signaler
 	OCR2B = MIN_PWM_CLAW + ctrlsig.claw_value;
 }
-
-//void pwmWheels(uint8_t* ctrlsig)
-//{
-	//OCR1A = MIN_PWM_WHEELS + ctrlsig[LEFT_VALUE] * INCREASE_PWM_WHEELS;
-	//OCR1B = MIN_PWM_WHEELS + ctrlsig[RIGHT_VALUE] * INCREASE_PWM_WHEELS;
-	//PORTA = (ctrlsig[RIGHT_DIRECTION] << PORTA0) | (ctrlsig[LEFT_DIRECTION] << PORTA1);
-//}
-//
-//void pwmClaw(uint8_t* ctrlsig)
-//{
-	//OCR2B = MIN_PWM_CLAW + ctrlsig[CLAW_VALUE];
-//}

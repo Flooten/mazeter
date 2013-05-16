@@ -22,8 +22,10 @@
 #include "sensor_parameters.h"
 #include "control_parameters.h"
 
+// Definierar tiden ??? ANVÄNDS INTE
 #define DELTA_T 2 // i ms 
 
+// Variabler
 volatile uint8_t control_mode_flag;
 volatile uint8_t control_command;
 volatile uint8_t sensor_command;
@@ -31,17 +33,14 @@ volatile SensorData sensor_data;
 volatile ControlSignals control_signals;
 volatile SensorParameters sensor_parameters;
 volatile ControlParameters control_parameters;
-
 uint8_t new_control_parameters = 0;
-
 volatile uint8_t throttle;
 volatile uint8_t start;
 
 // Funktioner som initierar kommunikationsenheten
 void ioInit()
 {
-	// Sätter upp in och ut för BT, samt en bit som har med LCD:n att göra
-	//DDRD = 0x22;
+	// Sätter upp in och ut för BT
 	DDRD = (1 << DDD4);
 	
 	// Sätter vilket mode vi befinner oss i
@@ -50,6 +49,7 @@ void ioInit()
 	else
 		control_mode_flag = FLAG_MANUAL;
 		
+	// Ser till att roboten inte åker iväg vid uppstarten
 	start = 0;
 	
 	// Interupt init
@@ -67,6 +67,7 @@ ISR (USART0_RX_vect)
 
 ISR(INT0_vect)
 {
+	// Skjutomkopplaren som ställer in autonomt/manuellt läge
 	if (((1 << PIND2) & PIND) == 0x04)
 	{
 		control_mode_flag = FLAG_AUTO;
@@ -81,6 +82,7 @@ ISR(INT0_vect)
 
 ISR(INT1_vect)
 {
+	// Initierar start om roboten är i autonomt läge
 	if (control_mode_flag == FLAG_AUTO)
 	{
 		start = 1;
@@ -90,12 +92,14 @@ ISR(INT1_vect)
 
 ISR(TIMER1_COMPA_vect)
 {
-	timer_internal_ready = 1; // Sätter flaggan att det är dags att begära data
+	// Sätter flaggan att det är dags att begära data
+	timer_internal_ready = 1; 
 }
 
 ISR(TIMER3_COMPA_vect)
 {
-	timer_external_ready = 1; // Sätter flaggan att det är dags att skicka data till datorn
+	// Sätter flaggan att det är dags att skicka data till datorn
+	timer_external_ready = 1;
 }
 
 int main(void)
@@ -125,31 +129,37 @@ int main(void)
 	
     while(1)
     {
+		// Om den interna timern är klar påbörjas ny SPI-cykel
 		if (timer_internal_ready)
 		{
-			// Läs sensordata
+			// Läs sensordata från sensorenheten via bussen
 			if (spiReadData(SENSOR_DATA_ALL, SENSOR_ENHET, (uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
 			{
 				btSendString("Failed to fetch the sensor data from the sensor device.");
 			}
 			
+			// Skicka vilket mode roboten är i till styrenheten
 			spiSendData(control_mode_flag, STYR_ENHET, NULL, 0);
 			
 			if (control_mode_flag == FLAG_MANUAL)
 			{
+				// Skicka gaspådrag till styrenheten
 				spiSendData(CONTROL_THROTTLE, STYR_ENHET, (const uint8_t*)&throttle, 1);
 				
+				// Skicka styrkommandon från datorn till styrenheten
 				if (spiSendCommand(control_command, STYR_ENHET) == ERROR_UNKNOWN_SPI_COMMAND)
 				{
 					btSendString("Failed to send control commands to the control device.");
 				}
 				
+				// Kalibrera linjesensor om det ska göras
 				if(sensor_command != 0)
 				{
 					spiSendCommand(sensor_command, SENSOR_ENHET);
 					sensor_command = 0;
 				}
 				
+				// Skicka parametrar från datorn till styrenheten
 				if (new_control_parameters)
 				{
 					if (spiSendData(CONTROL_PARAMETERS_ALL, STYR_ENHET, (const uint8_t*)&control_parameters.dist_kp, sizeof(control_parameters)) != CONTROL_PARAMETERS_ALL)
@@ -161,11 +171,13 @@ int main(void)
 			}
 			else
 			{
+				// Skicka abort till styrenheten om det ska göras
 				if (control_command == ABORT)
 				{
 					spiSendCommand(control_command, STYR_ENHET);
 				}
 				
+				// Skicka sensordata till styrenheten om roboten kör i autonomt läge
 				if (start == 1)
 				{
 					if (spiSendData(SENSOR_DATA_ALL, STYR_ENHET, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data)) != SENSOR_DATA_ALL)
@@ -177,9 +189,11 @@ int main(void)
 				//spiReadData(TURN_DONE, STYR_ENHET, &turn_done_flag, 1);
 				//spiSendData(TURN_DONE, SENSOR_ENHET, &turn_done_flag, 1);
 				
+				// Sätter gyro till 120 grader om reset_gyro är 1
 				spiReadData(RESET_GYRO, STYR_ENHET, &reset_gyro, 1);
 				spiSendData(RESET_GYRO, SENSOR_ENHET, &reset_gyro, 1);
 				
+				// Skickar senaste svängen till datorn
 				spiReadData(CHECK_STACK, STYR_ENHET, &new_node, 1);
 				if (new_node == 1)
 				{
@@ -187,26 +201,36 @@ int main(void)
 					btSendData(TURN_STACK_TOP, &turn_stack_top, 1);
 				}
 				
+				// Frågar styrenheten vilken algoritm roboten är i
 				spiReadData(ALGO_STATE, STYR_ENHET, &algo_state, 1);
 			}
 			
+			// Läser kontrollsignaler från styrenheten
 			spiReadData(CONTROL_SIGNALS, STYR_ENHET, (uint8_t*)&control_signals.right_value, sizeof(control_signals));		
+			// Nollställer flaggan som den interna timern uppdaterar
 			timer_internal_ready = 0;
 		}		
 		
+		// Om den externa timern är klar påbörjas ny blåtands-cykel
 		if (timer_external_ready)
 		{			
+			// Skickar till datorn vilken algoritm roboten är i om den är i autonom körning 
 			if (control_mode_flag == FLAG_AUTO)
 			{
 				btSendData(ALGO_STATE, &algo_state, 1);
 			}
 			
+			// Sänder kontrollsignaler emottagna från styrenheten till datorn
 			btSendData(CONTROL_SIGNALS, (const uint8_t*)&control_signals.right_value, sizeof(control_signals));
+			// Sänder sensordata emottagna från sensorenheten till datorn
 			btSendData(SENSOR_DATA_ALL, (const uint8_t*)&sensor_data.distance1, sizeof(sensor_data));
+			// Sänder vilken mode roboten är i till datorn
 			btSendData(control_mode_flag, NULL, 0);
+			// Nollställer flaggan som den externa timern uppdaterar
 			timer_external_ready = 0;
 		}
 
+		// Här hanteras kön för blåtandskommunikation
 		ATOMIC_BLOCK(ATOMIC_FORCEON)
 		{
 			while (empty((const Queue*)&rx_queue) == 0)

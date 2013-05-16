@@ -3,9 +3,9 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Fredrik Stenmark och Herman Ekwall
  *                
- * DATUM:         2013-04-10
+ * DATUM:         2013-05-17
  *
- * BESKRIVNING:
+ * BESKRIVNING: Definition av de sensornamn som används.
  *
  */
 
