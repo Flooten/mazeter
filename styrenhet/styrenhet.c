@@ -4,9 +4,9 @@
  * PROGRAMMERARE: Fredrik Stenmark
  *                Herman Ekwall
  *                Mattias Fransson
- * DATUM:         2013-05-02
+ * DATUM:         2013-05-16
  *
- * BESKRIVNING: Styrenhetens huvudloop.
+ * BESKRIVNING:   Styrenhetens huvudloop.
  *
  */
 
@@ -53,10 +53,13 @@ void parseCommand(uint8_t cmd);
 
 ISR(SPI_STC_vect)
 {
+    // Läs in den mottagna datan.
     uint8_t received = SPDR;
     
     if (spi_status == SPI_RECEIVING_DATA)
     {
+        // Om vi försöker skriva data till en felaktigt satt buffer, skicka fel.
+        // Ska aldrig kunna ske.
         if (buffer == NULL || current_byte >= buffer_size)
         {
             SPDR = ERROR_SPI;
@@ -65,6 +68,7 @@ ISR(SPI_STC_vect)
         
         buffer[current_byte++] = received;
         
+        // När vi är klara, återställ SPI-funktionaliteten.
         if (current_byte == buffer_size)
         {
             spi_status = SPI_READY;
@@ -72,6 +76,7 @@ ISR(SPI_STC_vect)
             buffer_size = 0;
             current_byte = 0;
 			
+            // Specialflaggan för ljust sensordatan.
 			if(receiving_sensor_data_flag == 1)
 			{
 				new_sensor_data_flag = 1;
@@ -82,6 +87,7 @@ ISR(SPI_STC_vect)
     }
     else
     {
+        // Så länge 0 skickas från kommunikationsenheten antar vi att vi ska skicka data.
         if (received == 0)
         {
             if (buffer == NULL || current_byte == buffer_size)
@@ -92,6 +98,7 @@ ISR(SPI_STC_vect)
             
             SPDR = buffer[current_byte++];
 			
+            // Återställ SPI när vi är klara
 			if (current_byte == buffer_size)
 			{
 				spi_status = SPI_READY;
@@ -102,13 +109,19 @@ ISR(SPI_STC_vect)
         }
         else
         {
+            // Om den mottagna byten inte var 0, och vi håller inte på att ta emot data så måste
+            // det finnas en kommandokod i received.
             parseCommand(received);
         }
     }
 }
 
+// Funktion som hanterar SPI-kommandon.
 void parseCommand(uint8_t cmd)
 {
+    // Försätt SPI-variablerna i rätt läge beroende på vilket kommando
+    // som inkommer (skicka/ta emot). Om styrenheten behöver vidare information när
+    // ett kommando tas emot, försök hantera detta med flaggor.
     switch (cmd)
     {
         case SENSOR_DATA_ALL:
@@ -140,6 +153,7 @@ void parseCommand(uint8_t cmd)
 		case FLAG_AUTO:
 			if (control_mode_flag == FLAG_MANUAL)
 			{
+                // Halvreset, återställ labyrintlogiken.
 				clear(&turn_stack);
 				algo_mode_flag = ALGO_IN; // ALGO_START;
 				control_signals.left_direction = 1;
@@ -286,6 +300,7 @@ void parseCommand(uint8_t cmd)
     }
 }
 
+// Översätter ett styrkommando till styrsignaler (control_signals).
 void commandToControlSignal(uint8_t cmd)
 {
 	switch (cmd)
@@ -368,6 +383,7 @@ void resetData()
 	control_parameters.line_kp = 4;
 }
 
+// Ta bort denna när den inte används längre.
 uint8_t maxAwesome(uint8_t x, uint8_t y)
 {
 	return (x < y) ? y : x;
@@ -424,6 +440,9 @@ int main()
 			*/
 			else if (control_mode_flag == FLAG_AUTO)
 			{
+                // Labyrintalgoritmen
+
+                // "Nollställ" gyrot så länge vi befinner oss i en korridor.
 				reset_gyro = 1;
 				
 				if (new_sensor_data_flag == 1)
@@ -476,7 +495,7 @@ int main()
 					new_sensor_data_flag = 0;
 					
 				}
-			}				
+			}
 			
 			pwmWheels(control_signals);
 			pwmClaw(control_signals);

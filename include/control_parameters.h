@@ -5,6 +5,8 @@
  *				  Herman Ekwall
  * DATUM:         2013-04-18
  *
+ * BESKRIVNING:   Parametrar till PD-reglering
+ *
  */
 
 

@@ -5,10 +5,7 @@
  *				  Joel Davidsson
  *				  Marcus Eriksson
  * 				  Mattias Fransson
- * DATUM:         2013-04-08
- *
- * BESKRIVNING:   I denna fil finns funktionalitet för
- *				  blåtandskommunikation från kommunikationsenheten.
+ * DATUM:         2013-05-16
  *         
  */
 
@@ -24,10 +21,9 @@ volatile uint8_t current_command = 0;
 volatile uint8_t data_count = 0;
 volatile Node* buffer_node = NULL;
 
+// Sätter upp BT enligt designspecifikationen
 void btInit()
-{
-	// Sätter upp BT enligt designspecifikationen
-	
+{	
 	// Baud-rate 9600 @ 2x
 	UBRR0H = 0x00;
 	UBRR0L = 0x67;
@@ -38,8 +34,11 @@ void btInit()
 	UCSR0C = 0x06;
 }
 
+// Läser in allt som finns att läsa och packeterar detta i noder.
+// Noderna pushas sedan på meddelandekön.
 void btReadData()
 {
+    // Läs in nästa byte
 	uint8_t received = UDR0;
 	
 	if (bt_status == BT_READY)
@@ -49,6 +48,8 @@ void btReadData()
 	}
 	else if (bt_status == BT_COMMAND_RECEIVED)
 	{
+        // Om storleken är 0, skapa en nod som endast innehåller
+        // kommandot och återställ bluetooth.
 		if (received == 0)
 		{
 			buffer_node = (Node*)malloc(sizeof(Node));
@@ -62,6 +63,7 @@ void btReadData()
 			return;
 		}
 		
+        // Skapa en ny nod med specificerad storlek.
 		buffer_node = newNode(received);
 		buffer_node->command = current_command;
 		data_count = 0;
@@ -69,8 +71,10 @@ void btReadData()
 	}
 	else if (bt_status == BT_READING_MESSAGE)
 	{
+        // Läs in så många bytes som nodstorleken anger, lägg in noden i kön
+        // och återställ bluetooth.
 		buffer_node->data[data_count++] = received;
-		
+	
 		if (data_count == buffer_node->size)
 		{
 			insert((Queue*)&rx_queue, (Node*)buffer_node);
@@ -87,6 +91,9 @@ void btSendByte(const uint8_t data)
 	// Se till så att överföringsbuffern är tömd
 	while (!(UCSR0A & (1 << UDRE0)));
 	
+    // Om ingen handskakning har skett, skicka inget.
+    // Detta för att inte råka skicka bruten data när datorn väl
+    // ansluter.
 	if (!bt_connected)
 	{
 		return;
@@ -95,6 +102,7 @@ void btSendByte(const uint8_t data)
 	UDR0 = data;
 }
 
+// Skicka size bytes från buffer med kommandokoden command.
 void btSendData(uint8_t command, const uint8_t* buffer, uint8_t size)
 {
 	btSendByte(command);
@@ -107,6 +115,7 @@ void btSendData(uint8_t command, const uint8_t* buffer, uint8_t size)
 	}
 }
 
+// Skicka en hel nod.
 void btSendNode(const Node* node)
 {
 	btSendByte(node->command);
@@ -119,6 +128,7 @@ void btSendNode(const Node* node)
 	}
 }
 
+// Skicka en sträng med bytes.
 void btSendString(const char* str)
 {
 	btSendByte(0x30); // Skickar en sträng

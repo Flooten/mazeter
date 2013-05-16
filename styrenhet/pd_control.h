@@ -5,6 +5,8 @@
  *				  Herman Ekwall
  * DATUM:         2013-05-02
  *
+ * BESKRIVNING:   All PD-reglering samt svängutförande. 
+ *
  */
 
 #ifndef PD_CONTROL_H_

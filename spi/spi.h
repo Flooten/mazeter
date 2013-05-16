@@ -3,9 +3,11 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Martin Andersson
  *                Mattias Fransson
- * DATUM:         2013-04-04
+ * DATUM:         2013-05-16
  *
- * BESKRIVNING:
+ * BESKRIVNING:   All funktionalitet för att hantera SPI-kommunikation. Endast
+ *                mastern kan använda dessa funktioner (bortsett från spiSlaveInit).
+ *                Slavarna hanteras i respektive SPI-avbrottsvektor.
  *
  */
 

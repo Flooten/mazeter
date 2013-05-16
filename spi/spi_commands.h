@@ -3,9 +3,9 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Martin Andersson
  *                Mattias Fransson
- * DATUM:         2013-04-15
+ * DATUM:         2013-05-16
  *
- * BESKRIVNING:
+ * BESKRIVNING:   Innehåller alla kommandokoder som skickas över SPI och bluetooth.
  *
  */
 
@@ -22,11 +22,6 @@
 #define SENSOR_LINE_DEVIATION 0x08
 #define SENSOR_ANGLE 0x09
 #define SENSOR_LINE_TYPE 0x0A
-//#define SENSOR_LINE_LEFT 0x0A
-//#define SENSOR_LINE_RIGHT 0x0B
-//#define SENSOR_LINE_STRAIGHT 0x0C
-//#define SENSOR_LINE_GOAL 0x0D
-//#define SENSOR_LINE_STOP 0x0E
 #define SENSOR_DATA_ALL 0x0F
 
 #define CONTROL_SIGNALS 0x20

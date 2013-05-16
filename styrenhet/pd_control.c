@@ -3,7 +3,7 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Mattias Fransson
  *				  Herman Ekwall
- * DATUM:         2013-05-02
+ * DATUM:         2013-05-16
  *
  */
 
@@ -495,6 +495,9 @@ void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 	control_signals.right_direction = 1;
 }
 
+// Kör framåt (driveStraight) eller bakåt (driveStraightBack) utan reglering under angiven sträcka.
+// Värdet skiljer dock från verkligheten med ungefär 10 cm, men felet
+// är alltid det samma.
 void driveStraight(uint8_t cm)
 {
 	resetTimer();
@@ -528,9 +531,10 @@ void driveStraightBack(uint8_t cm)
 	startTimer();
 	
 	while((TIM16_ReadTCNT3() < timer_count) && !abort_flag)
-{}
+    {}
 }
 
+// Backar med reglering tills en sväng upptäcks och utför svängen.
 void jamesBondTurn(volatile TurnStack* turn_stack)
 {
 	// behöver pd regleras istället
