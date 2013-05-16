@@ -1,12 +1,12 @@
 ﻿/*
- * FILNAMN:       raw_data.h
+ * FILNAMN:       sensor_parameters.h
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Herman Ekwall
  *                Mattias Fransson
  *                
- * DATUM:         2013-04-15
+ * DATUM:         2013-05-17
  *
- * BESKRIVNING:
+ * BESKRIVNING: Parameterar för linjehantering
  *
  */
 
