@@ -46,39 +46,54 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 {
 	// PD-reglering med avståndssensorerna
 
-	uint8_t speed = 90; //throttle;
+	uint8_t speed = throttle;
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
 		int8_t regulator_value = 0;
 		
-		if (current->distance3 >= 80 && current->distance6 != 255)
-		{
-			int16_t delta = 30 - current->distance4;
-			int16_t delta_previous = 30 - previous->distance4;
+		// Vänster sida har släppt
+		if (current->distance3 >= 80)
+		{			
+			int16_t delta = 0;
+			int16_t delta_previous = 0;
 			
-			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
+			if (current->distance6 != 255)
+			{
+				// Reglera på höger kort
+				delta = 30 - current->distance6;
+				delta_previous = 30 - previous->distance6;
+			}
+			else
+			{
+				// Reglera på höger lång
+				delta = 30 - current->distance4;
+				delta_previous = 30 - previous->distance4;				
+			}
 			
-			// Reglera på högersidan
-			//int16_t delta_right = current->distance4 - current->distance6;
-			//int16_t delta_right_previous = previous->distance4 - previous->distance6;
-			//
-			//regulator_value = -((float)control_parameters.dist_kp / 10 * delta_right + (float)control_parameters.dist_kd / 10 * (delta_right - delta_right_previous));
+			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 		}
-		else if (current->distance4 >= 80 && current->distance5 != 255)
+		else if (current->distance4 >= 80)
 		{
-			int16_t delta = current->distance3 - 30;
-			int16_t delta_previous = previous->distance3 - 30;
+			int16_t delta = 0;
+			int16_t delta_previous = 0;
 			
-			regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
+			if (current->distance5 != 255)
+			{
+				// Reglera på vänster kort
+				delta = current->distance5 - 30;
+				delta_previous = previous->distance5 - 30;
+			}
+			else
+			{
+				// Reglera på vänster lång
+				delta = current->distance3 - 30;
+				delta_previous = previous->distance3 - 30;
+			}
 			
-			// Reglera på vänstersidan
-			//int16_t delta_left = current->distance3 - current->distance5;
-			//int16_t delta_left_previous = previous->distance3 - previous->distance5;
-			//
-			//regulator_value = (float)control_parameters.dist_kp / 10 * delta_left + (float)control_parameters.dist_kd / 10 * (delta_left - delta_left_previous);
+			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 		}
-		else if (current->distance4 >= 43 && current->distance6 == 255)
+		else if (current->distance4 >= 43)// && current->distance6 == 255)
 		{
 			// Kör höger mot mitten
 			//regulator_value = -20;
@@ -88,13 +103,13 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			//
 			//regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
 			
-			int16_t delta = current->distance5 - 30;
-			int16_t delta_previous = previous->distance5 - 30;
+			int16_t delta = 30 - current->distance4;
+			int16_t delta_previous = 30 - previous->distance4;
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 			
 		}
-		else if (current->distance3 >= 43 && current->distance5 == 255)
+		else if (current->distance3 >= 43) // && current->distance5 == 255)
 		{
 			// Kör vänster mot mitten
 			//regulator_value = 20;
@@ -104,8 +119,8 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			//
 			//regulator_value = (float)control_parameters.dist_kp / 5 * delta + (float)control_parameters.dist_kd / 5 * (delta - delta_previous);
 			
-			int16_t delta = 30 - current->distance6;
-			int16_t delta_previous = 30 - previous->distance6;
+			int16_t delta = current->distance3 - 30;
+			int16_t delta_previous = previous->distance3 - 30;
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta + (float)control_parameters.dist_kd / 10 * (delta - delta_previous);
 		}
@@ -181,9 +196,6 @@ void makeTurn(uint8_t turn)
 						angle_copy = current_sensor_data.angle;
 					}
 				} while ((angle_copy < angle_end || angle_copy >= angle_start - 500) && !abort_flag);
-				
-				//while ((current_sensor_data.angle < angle_end || current_sensor_data.angle >= angle_start) && !abort_flag)
-				//{}
 			}
 			else
 			{
@@ -195,8 +207,6 @@ void makeTurn(uint8_t turn)
 						angle_copy = current_sensor_data.angle;
 					}
 				} while (angle_copy < angle_end && !abort_flag);
-				//while (current_sensor_data.angle < angle_end && !abort_flag)
-				//{}
 			}
 			break;
 		
@@ -214,9 +224,7 @@ void makeTurn(uint8_t turn)
 					{
 						angle_copy = current_sensor_data.angle;
 					}
-				} while ((angle_copy > angle_end || angle_copy <= angle_start + 500) && !abort_flag);
-				//while ((current_sensor_data.angle > angle_end || current_sensor_data.angle <= angle_start) && !abort_flag)
-				//{}		
+				} while ((angle_copy > angle_end || angle_copy <= angle_start + 500) && !abort_flag);		
 			}
 			else
 			{
@@ -232,8 +240,6 @@ void makeTurn(uint8_t turn)
 						angle_copy = angle_start;
 					
 				} while ((angle_copy > angle_end) && !abort_flag);
-				//while (current_sensor_data.angle > angle_end && !abort_flag)
-				//{}
 			}
 			break;
 		
@@ -255,7 +261,7 @@ void makeTurn(uint8_t turn)
 	//while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
 	//{}
 	
-	driveStraight(50);
+	driveStraight(60);
 	
 	//memset((void*)&current_sensor_data.distance1, 0, sizeof(current_sensor_data));
 	//memset((void*)&previous_sensor_data.distance1, 0, sizeof(current_sensor_data));
@@ -472,7 +478,7 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 		}			
 		
 		// Kör fram till mitten av svängen.
-		driveStraightBack(10);
+		driveStraightBack(15);
 		makeTurn(tmp);
 		driveStraight(15);
 		

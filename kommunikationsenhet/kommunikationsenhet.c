@@ -113,7 +113,7 @@ int main(void)
 	// Sätt roboten i manuell körning.
 	control_mode_flag = FLAG_MANUAL;
 	control_command = STEER_STOP;
-	throttle = 62;
+	throttle = 80;
 	
 	uint8_t turn_stack_top = 0;
 	uint8_t algo_state = 0;

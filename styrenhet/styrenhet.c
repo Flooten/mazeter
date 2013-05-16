@@ -356,6 +356,11 @@ void resetData()
 	
 	current_command = STEER_STOP;
 	throttle = 0;
+	
+	control_parameters.dist_kd = 250;
+	control_parameters.dist_kp = 15;
+	control_parameters.line_kd = 40;
+	control_parameters.line_kp = 4;
 }
 
 uint8_t maxAwesome(uint8_t x, uint8_t y)
@@ -399,7 +404,20 @@ int main()
 			
 			if (control_mode_flag == FLAG_MANUAL)
 			{
-				commandToControlSignal(current_command);
+				if (current_command == STEER_ROTATE_LEFT)
+				{
+					makeTurn(LEFT_TURN);
+					current_command = STEER_STOP;
+				}
+				else if (current_command == STEER_ROTATE_RIGHT)
+				{
+					makeTurn(RIGHT_TURN);
+					current_command = STEER_STOP;
+				}
+				else
+				{
+					commandToControlSignal(current_command);
+				}
 			}
 			else if (control_mode_flag == FLAG_AUTO)
 			{
@@ -481,4 +499,3 @@ int main()
 		}	
     }
 }
-

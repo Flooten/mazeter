@@ -40,20 +40,10 @@ uint8_t max(uint8_t x, uint8_t y)
 		return y;
 	}
 }
-/* DETEECT TURN TEST */
+
+/* Upptäcker svängar på väg in i labyrinten */
 void detectTurnTest(TurnStack* turn_stack)
 {
-	//if ((current_sensor_data.distance1 < 50 || current_sensor_data.distance2 < 50) && 0)
-	//{
-		//if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
-		//{
-			//makeTurn(RIGHT_TURN);
-		//}
-		//else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance4 != 255 && current_sensor_data.distance5 == 255)
-		//{
-			//makeTurn(LEFT_TURN);
-		//}
-	//}
 	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 130)
 	{
 		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
@@ -173,11 +163,10 @@ void detectTurn(TurnStack* turn_stack)
 void detectTurnOut(volatile TurnStack* turn_stack)
 {
 	if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance5 == 255) ||
-	    (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255) ||
-		(max(current_sensor_data.distance1, current_sensor_data.distance2) <= 60))
+	    (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255))
 	{
 		// Kör fram till mitten av svängen.
-		driveStraight(10);
+		driveStraight(15);
 		makeTurn(popTurnStack(turn_stack));
 	}
 }

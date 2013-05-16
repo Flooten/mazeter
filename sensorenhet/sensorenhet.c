@@ -474,12 +474,11 @@ int main()
 	buffer_size = 0;
 	current_byte = 0;
 
-
 	// Tröskelvärden för linjesensorn. tape_threshold kan kalibreras via datorn
 	sensor_parameters.tape_threshold = 160;
-	sensor_parameters.horizontal_line_threshold = 4;
+	sensor_parameters.horizontal_line_threshold = 3;
 	sensor_parameters.no_line_detection_threshold = 25;
-	sensor_parameters.line_diff_threshold = 4;
+	sensor_parameters.line_diff_threshold = 6;
 	sensor_parameters.horizontal_to_vertical_threshold = 30;
 
 	ioInit();
