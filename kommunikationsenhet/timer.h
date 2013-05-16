@@ -4,7 +4,7 @@
  * PROGRAMMERARE: Fredrik Stenmark
  * DATUM:         2013-04-08
  *
- * BESKRIVNING:   
+ * BESKRIVNING:   I denna fil 
  *          
  */
 
@@ -13,9 +13,11 @@
 
 #include <stdint.h>
 
+// Variabler
 extern volatile uint8_t timer_internal_ready;
 extern volatile uint8_t timer_external_ready;
 
+// Funktion
 void timerInit();
 
 #endif /* TIMER_H_ */

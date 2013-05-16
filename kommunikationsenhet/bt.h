@@ -7,7 +7,8 @@
  * 				  Mattias Fransson
  * DATUM:         2013-04-08
  *
- * BESKRIVNING:   
+ * BESKRIVNING:   I denna fil finns funktionalitet för 
+ *				  blåtandskommunikation från kommunikationsenheten. 
  *          
  */
 
@@ -30,6 +31,7 @@ extern volatile uint8_t current_command;
 extern volatile uint8_t data_count;
 extern volatile Node* buffer_node;
 
+// Funktioner
 void btInit();
 void btReadData();
 void btSendByte(uint8_t data);

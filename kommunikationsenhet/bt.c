@@ -6,13 +6,17 @@
  *				  Marcus Eriksson
  * 				  Mattias Fransson
  * DATUM:         2013-04-08
- *          
+ *
+ * BESKRIVNING:   I denna fil finns funktionalitet för
+ *				  blåtandskommunikation från kommunikationsenheten.
+ *         
  */
 
 #include "bt.h"
 #include <avr/io.h>
 #include <string.h>
 
+// Variabler
 volatile Queue rx_queue;
 volatile uint8_t bt_connected = 0;
 volatile uint8_t bt_status = BT_READY;
