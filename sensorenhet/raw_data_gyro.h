@@ -3,9 +3,9 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Fredrik Stenmark och Herman Ekwall
  *                
- * DATUM:         2013-04-09
+ * DATUM:         2013-05-17
  *
- * BESKRIVNING:
+ * BESKRIVNING: Datastructen som används för gyro datan.
  *
  */
 
@@ -19,7 +19,7 @@ typedef struct
 	uint8_t sensor_type;
 	uint8_t value;
 	uint8_t is_converted;
-	uint16_t time; // Antal klockcykler från förra konverteringen
+	uint16_t time; // Antal millisekunder från förra konverteringen (prescaler 8)
 } RawDataGyro;
 
 

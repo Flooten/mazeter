@@ -5,9 +5,9 @@
  *                Herman Ekwall
  *                Mattias Fransson
  *
- * DATUM:         2013-04-17
+ * DATUM:         2013-05-17
  *
- * BESKRIVNING:
+ * BESKRIVNING: Hanterar konvertering av rådatan från samtliga sensorer till enheter som har en mer direkt tolkning.
  *
  */
 
@@ -105,13 +105,14 @@ void convertRawData(RawData* data)
 	}
 }
 
+/* Integrering av vinkelhastigheten för att få fram vinkeln */
 void convertRawDataGyro(volatile RawDataGyro* data)
 {	
-	//* --- FIR filter, uint16_t angle ---------- */
+	// Konvertera endast om nödvändigt
 	if (!data->is_converted)
-	{
+	{	
+		// Skifta alla värden i gyro_samples ett steg för att göra plats åt ett nytt värde
 		uint8_t i;
-	
 		for (i = 0; i < NR_OF_GYRO_SAMPLES-1; i++)
 		{
 			gyro_samples[i] = gyro_samples[i+1];
@@ -148,6 +149,7 @@ void convertRawDataGyro(volatile RawDataGyro* data)
 		
 		sensor_data.angle += gyro_filtered;
 		
+		// Korrigera för eventuella överslag
 		if (gyro_filtered >= 0)
 		{
 			if (sensor_data.angle >= 36000)

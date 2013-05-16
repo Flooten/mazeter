@@ -3,7 +3,7 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Mattias Fransson
  *				  Herman Ekwall
- * DATUM:         2013-04-18
+ * DATUM:         2013-05-17
  *
  * BESKRIVNING:   I denna headerfil finns tabellerna för sensorerna.
  *

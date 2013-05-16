@@ -5,9 +5,9 @@
  *                Herman Ekwall
  *                Mattias Fransson
  *
- * DATUM:         2013-04-17
+ * DATUM:         2013-05-17
  *
- * BESKRIVNING:
+ * BESKRIVNING: Hanterar konvertering av rådatan från samtliga sensorer till enheter som har en mer direkt tolkning.
  *
  */
 
