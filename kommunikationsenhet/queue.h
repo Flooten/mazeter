@@ -37,7 +37,6 @@ void freeNode(Node* node);
 /* Queue */
 Queue createQueue();
 void freeQueue(Queue* queue);
-//void insert(Queue* queue, uint8_t info);
 void insert(Queue* queue, Node* node);
 void pop(Queue* queue);
 Node* top(const Queue* queue);

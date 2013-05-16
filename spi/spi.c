@@ -3,7 +3,7 @@
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Martin Andersson
  *                Mattias Fransson
- * DATUM:         2013-04-04
+ * DATUM:         2013-05-16
  *
  */
 
@@ -31,16 +31,18 @@ void spiSlaveInit()
 	SPCR = (1 << SPE) | (1 << SPIE);
 }
 
+// Aktiverar chip-select (SS) för angiven slav. Endast SENSOR_ENHET,
+// STYR_ENHET och 0 är tillåtna värden.
 void spiSelectSlave(uint8_t slave)
 {
 	// Sätt båda SS höga.
 	PORTB |= 0x18;
-    //PORTB |= 0b00011000;
 
 	if (slave)
     	PORTB &= ~(1 << slave);
 }
 
+// Skickar en byte till den slav som senast aktiverades med spiSelectSlave.
 uint8_t spiSendByte(uint8_t data)
 {
     SPDR = data;
@@ -48,8 +50,10 @@ uint8_t spiSendByte(uint8_t data)
 	return SPDR;
 }
 
+// Skickar ett kommando och returnerar slavens svar.
 uint8_t spiSendCommand(uint8_t command, uint8_t to)
 {
+    // För att slaven ska kunna svara måste SS-pinnen hos slaven sättas hög.
 	spiSelectSlave(to);
 	spiSendByte(command);
 	spiSelectSlave(0);
@@ -62,8 +66,8 @@ uint8_t spiSendCommand(uint8_t command, uint8_t to)
 
 uint8_t spiSendData(uint8_t command, uint8_t to, const uint8_t* buffer, uint8_t size)
 {
-	//uint8_t response = spiSendCommand(command, to);
-	
+    // Pga. att slavens avbrottsrutin direkt börjar ta emot data kan första
+    // byten skickas med när svaret läses.
 	spiSelectSlave(to);
 	spiSendByte(command);
 	uint8_t response = spiSendByte(buffer[0]);
@@ -95,6 +99,7 @@ uint8_t spiReadData(uint8_t command, uint8_t from, uint8_t* buffer, uint8_t size
 	return response;
 }
 
+// Experimentell kod. Fungerar förmodligen inte, använd ej.
 char* spiReadString(uint8_t command, uint8_t from)
 {
 	char* buffer = NULL;

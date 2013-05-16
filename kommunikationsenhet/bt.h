@@ -31,7 +31,7 @@ extern volatile uint8_t current_command;
 extern volatile uint8_t data_count;
 extern volatile Node* buffer_node;
 
-// Funktioner
+// Bluetooth funktioner
 void btInit();
 void btReadData();
 void btSendByte(uint8_t data);
