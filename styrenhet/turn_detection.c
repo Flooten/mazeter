@@ -65,19 +65,19 @@ void detectTurnTest(TurnStack* turn_stack)
 			makeTurn(LEFT_TURN);
 		}
 	}		
-	else if (algo_mode_flag == ALGO_OUT)
-	{
-		uint8_t max_distance = max(current_sensor_data.distance1, current_sensor_data.distance2);
-		
-		if (((current_sensor_data.distance3 == 255 && previous_sensor_data.distance3 == 255) &&
-			 (current_sensor_data.distance4 == 255 && previous_sensor_data.distance4 == 255)) ||
-			((current_sensor_data.distance3 == 255 && previous_sensor_data.distance3 == 255) && max_distance == 255) ||
-			((current_sensor_data.distance4 == 255 && previous_sensor_data.distance4 == 255) && max_distance == 255))
-		{
-			driveStraight(10);
-			makeTurn(popTurnStack(turn_stack));
-		}
-	}
+	//else if (algo_mode_flag == ALGO_OUT)
+	//{
+		//uint8_t max_distance = max(current_sensor_data.distance1, current_sensor_data.distance2);
+		//
+		//if (((current_sensor_data.distance3 == 255 && previous_sensor_data.distance3 == 255) &&
+			 //(current_sensor_data.distance4 == 255 && previous_sensor_data.distance4 == 255)) ||
+			//((current_sensor_data.distance3 == 255 && previous_sensor_data.distance3 == 255) && max_distance == 255) ||
+			//((current_sensor_data.distance4 == 255 && previous_sensor_data.distance4 == 255) && max_distance == 255))
+		//{
+			//driveStraight(10);
+			//makeTurn(popTurnStack(turn_stack));
+		//}
+	//}
 }
 
 /* Upptäcker svängar på väg in i labyrinten */
@@ -165,6 +165,14 @@ void detectTurnOut(volatile TurnStack* turn_stack)
 	if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance5 == 255) ||
 	    (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255))
 	{
+		// Kör fram till mitten av svängen.
+		driveStraight(15);
+		makeTurn(popTurnStack(turn_stack));
+	}
+	else if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 40)
+	{
+		if ((current_sensor_data.distance3 >= 100 && current_sensor_data.distance5 == 255) ||
+			(current_sensor_data.distance4 >= 100 && current_sensor_data.distance6 == 255))
 		// Kör fram till mitten av svängen.
 		driveStraight(15);
 		makeTurn(popTurnStack(turn_stack));

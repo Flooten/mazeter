@@ -462,9 +462,9 @@ int main()
 
 	// Tröskelvärden för linjesensorn. tape_threshold kan kalibreras via datorn
 	sensor_parameters.tape_threshold = 160;
-	sensor_parameters.horizontal_line_threshold = 3;
+	sensor_parameters.horizontal_line_threshold = 4;
 	sensor_parameters.no_line_detection_threshold = 25;
-	sensor_parameters.line_diff_threshold = 6;
+	sensor_parameters.line_diff_threshold = 5;
 	sensor_parameters.horizontal_to_vertical_threshold = 30;
 
 	ioInit();
@@ -493,7 +493,7 @@ int main()
 		
 		if (reset_gyro == 1)
 		{
-			sensor_data.angle = 12000;
+			sensor_data.angle = 18000;
 		}
 		convertAllData();
 	}

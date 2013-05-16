@@ -141,9 +141,14 @@ void parseCommand(uint8_t cmd)
 			if (control_mode_flag == FLAG_MANUAL)
 			{
 				clear(&turn_stack);
-				algo_mode_flag = ALGO_START;
+				algo_mode_flag = ALGO_IN; // ALGO_START;
 				control_signals.left_direction = 1;
 				control_signals.right_direction = 1;
+				
+				//TEST FÖR ATT PRIMA STACKEN
+				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(STRAIGHT));
 			}
 			control_mode_flag = FLAG_AUTO;
 			break;
@@ -404,21 +409,19 @@ int main()
 			
 			if (control_mode_flag == FLAG_MANUAL)
 			{
-				if (current_command == STEER_ROTATE_LEFT)
-				{
-					makeTurn(LEFT_TURN);
-					current_command = STEER_STOP;
-				}
-				else if (current_command == STEER_ROTATE_RIGHT)
-				{
-					makeTurn(RIGHT_TURN);
-					current_command = STEER_STOP;
-				}
-				else
-				{
-					commandToControlSignal(current_command);
-				}
+				commandToControlSignal(current_command);
 			}
+			
+			/* TEST
+			else if (control_mode_flag == FLAG_AUTO)
+			{
+				if (new_sensor_data_flag == 1)
+				{
+					makeTurnTest(RIGHT_TURN);
+					driveStraight(60);
+				}				
+			}
+			*/
 			else if (control_mode_flag == FLAG_AUTO)
 			{
 				reset_gyro = 1;
@@ -438,8 +441,11 @@ int main()
 					}
 					else if (algo_mode_flag == ALGO_OUT)
 					{
-						handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						if (current_sensor_data.line_type == LINE_START_STOP)
+							handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						//else
 						detectTurnOut(&turn_stack);
+							
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 					}
 					else if (algo_mode_flag == ALGO_START)
@@ -469,28 +475,6 @@ int main()
 					
 					new_sensor_data_flag = 0;
 					
-					//handleTape(&turn_stack, current_sensor_data.line_type);
-					//if (algo_mode_flag == ALGO_IN)
-					//{
-						//detectTurn(&turn_stack);
-						//straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-					//}
-					//else if (algo_mode_flag == ALGO_GOAL)
-					//{
-						//commandToControlSignal(CLAW_OPEN);
-						//lineRegulator(current_sensor_data.line_deviation, previous_sensor_data.line_deviation);
-					//}
-					//else if (algo_mode_flag == ALGO_GOAL_REVERSE)
-					//{
-						//jamesBondTurn(&turn_stack);
-					//}
-					//else if (algo_mode_flag == ALGO_OUT)
-					//{
-						//detectTurnOut(&turn_stack);
-						//straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-					//}
-					//
-					//new_sensor_data_flag = 0;
 				}
 			}				
 			

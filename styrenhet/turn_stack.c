@@ -91,8 +91,9 @@ void pushTurnStack(TurnStack* stack, TurnNode* node)
 uint8_t popTurnStack(volatile TurnStack* stack)
 {
 	if (empty(stack) == 1)
+	{
 		return 0xEE;
-		
+	}		
 	uint8_t turn = stack->first->turn;
 	
 	if (stack->first->next == NULL)
