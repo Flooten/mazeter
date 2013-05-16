@@ -5,6 +5,8 @@
  *				  Herman Ekwall
  * DATUM:         2013-04-18
  *
+ * BESKRIVNING:   I denna headerfil finns tabellerna för sensorerna.
+ *
  */
 
 
@@ -22,7 +24,10 @@ extern const uint8_t distance5_table[27][2];
 extern const uint8_t distance6_table[27][2];
 extern const uint8_t distance7_table[37][2];
 
+// Omvandlar sensordatan för en sensor
 uint8_t lookUp(uint8_t raw_value, uint8_t size, const uint8_t table[][2]);
+
+// Tar reda på vilken sensor som ska omvandlas
 uint8_t lookUpDistance(uint8_t raw_value, uint8_t sensor);
 
 #endif /* LOOK_UP_TABLE_H_ */

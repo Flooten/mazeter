@@ -5,15 +5,13 @@
  *				  Joel Davidsson
  * DATUM:         2013-04-25
  *
- * BESKRIVNING: 
+ * BESKRIVNING:   
  *
  */
-
 
 #include "turn_stack.h"
 #include <stdio.h>
 #include <string.h>
-
 
 /*
  *	TurnNode
@@ -131,6 +129,9 @@ uint8_t empty(const volatile TurnStack* stack)
 	return (stack->first == NULL) ? 1 : 0;
 }
 
+/*
+ *	Tömmer stacken
+ */
 void clear(volatile TurnStack* stack)
 {
 	while(!empty(stack))

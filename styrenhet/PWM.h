@@ -4,7 +4,7 @@
  * PROGRAMMERARE: Herman Ekwall och Joel Davidsson
  * DATUM:         2013-04-04
  *
- * BESKRIVNING:
+ * BESKRIVNING:   Denna Headerfil så finns alla PWM funktioner och variabler. 
  *
  */
 
@@ -23,7 +23,4 @@
 void pwmInit();
 void pwmWheels(const ControlSignals ctrlsig);
 void pwmClaw(const ControlSignals ctrlsig);
-//void pwmWheels(uint8_t* ctrlsig);
-//void pwmClaw(uint8_t* ctrlsig);
-//
 #endif /* PWM_H_ */
