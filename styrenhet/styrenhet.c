@@ -160,9 +160,9 @@ void parseCommand(uint8_t cmd)
 				control_signals.right_direction = 1;
 				
 				//TEST FÖR ATT PRIMA STACKEN
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(STRAIGHT));
+				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(RIGHT_TURN));
+				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
 			}
 			control_mode_flag = FLAG_AUTO;
 			break;
@@ -493,7 +493,6 @@ int main()
 					}
 					
 					new_sensor_data_flag = 0;
-					
 				}
 			}
 			

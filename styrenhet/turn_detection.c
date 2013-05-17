@@ -41,6 +41,36 @@ uint8_t max(uint8_t x, uint8_t y)
 	}
 }
 
+// Högersväng upptäckt
+void right_detected(TurnStack* turn_stack)
+{
+	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
+	{
+		driveStraight(40);
+	}
+	//else
+	//{
+		//driveStraight(10); // för att undvika moment fr reglering precis innan sväng
+	//}
+	pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
+	makeTurn(RIGHT_TURN);	
+}
+
+// Vänstersväng upptäckt
+void left_detected(TurnStack* turn_stack)
+{
+	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
+	{
+		driveStraight(40);
+	}
+	//else
+	//{
+		//driveStraight(10); // för att undvika moment fr reglering precis innan sväng
+	//}
+	pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
+	makeTurn(LEFT_TURN);
+}
+
 /* Upptäcker svängar på väg in i labyrinten */
 void detectTurnTest(TurnStack* turn_stack)
 {
@@ -48,21 +78,11 @@ void detectTurnTest(TurnStack* turn_stack)
 	{
 		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
 		{ 
-			if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
-			{
-				driveStraight(10);
-			}
-			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
-			makeTurn(RIGHT_TURN);
+			right_detected(turn_stack);
 		}
 		else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance4 != 255 && current_sensor_data.distance5 == 255)
 		{
-			if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
-			{
-				driveStraight(10);
-			}
-			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
-			makeTurn(LEFT_TURN);
+			left_detected(turn_stack);
 		}
 	}		
 	//else if (algo_mode_flag == ALGO_OUT)
@@ -162,8 +182,10 @@ void detectTurn(TurnStack* turn_stack)
 /* Upptäcker svängar (även rakt fram) på väg ut ur labyrinten */
 void detectTurnOut(volatile TurnStack* turn_stack)
 {
-	if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance5 == 255) ||
-	    (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255))
+	if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance5 == 255 &&
+	       previous_sensor_data.distance3 == 255 && previous_sensor_data.distance5 == 255) ||
+	    (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255 && 
+		   previous_sensor_data.distance4 == 255 && previous_sensor_data.distance6 == 255))
 	{
 		// Kör fram till mitten av svängen.
 		driveStraight(15);
@@ -171,8 +193,10 @@ void detectTurnOut(volatile TurnStack* turn_stack)
 	}
 	else if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 40)
 	{
-		if ((current_sensor_data.distance3 >= 100 && current_sensor_data.distance5 == 255) ||
-			(current_sensor_data.distance4 >= 100 && current_sensor_data.distance6 == 255))
+		if ((current_sensor_data.distance3 >= 100 && current_sensor_data.distance5 == 255 &&
+		      previous_sensor_data.distance3 >= 100 && previous_sensor_data.distance5 == 255) ||
+			(current_sensor_data.distance4 >= 100 && current_sensor_data.distance6 == 255 &&
+			  previous_sensor_data.distance4 >= 100 && previous_sensor_data.distance6 == 255))
 		// Kör fram till mitten av svängen.
 		driveStraight(15);
 		makeTurn(popTurnStack(turn_stack));

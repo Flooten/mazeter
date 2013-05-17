@@ -38,6 +38,8 @@ uint8_t min(uint8_t x, uint8_t y);
 
 /* TEST*/
 void detectTurnTest(TurnStack* turn_stack);
+void left_detected(TurnStack* turn_stack);
+void right_detected(TurnStack* turn_stack);
 
 /* Upptäcker svängar på väg in i labyrinten */
 void detectTurn(TurnStack* turn_stack);

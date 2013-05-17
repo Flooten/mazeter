@@ -66,7 +66,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			}
 			else
 			{
-				// Reglera på höger lång
+				 //Reglera på höger lång
 				delta = 30 - current->distance4;
 				delta_previous = 30 - previous->distance4;				
 			}
@@ -86,7 +86,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 			}
 			else
 			{
-				// Reglera på vänster lång
+				 //Reglera på vänster lång
 				delta = current->distance3 - 30;
 				delta_previous = previous->distance3 - 30;
 			}
@@ -126,11 +126,11 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 		}
 		else if (current->distance3 <= 42 && current->distance4 <= 42)
 		{	
-			//int16_t delta_front = current->distance3 - current->distance4;
-			//int16_t delta_front_previous = previous->distance3 - previous->distance4;
+			int16_t delta_front = current->distance3 - current->distance4;
+			int16_t delta_front_previous = previous->distance3 - previous->distance4;
 			
-			int16_t delta_front = 28 - current->distance4;
-			int16_t delta_front_previous = 28 - previous->distance4;
+			//int16_t delta_front = 28 - current->distance4;
+			//int16_t delta_front_previous = 28 - previous->distance4;
 			
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
 		}
@@ -278,8 +278,46 @@ void makeTurn(uint8_t turn)
 	reset_gyro = 1;
 }
 
+void getOutAfterTurn()
+{
+	uint8_t throttle_copy = throttle;
+	
+	if (current_sensor_data.distance3 < 80 || current_sensor_data.distance4 < 80)
+	{
+		commandToControlSignal(STEER_STRAIGHT);
+		
+		while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
+		{
+			straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+		}
+		driveStraight(7);
+		return;
+	} 
+	else
+	{
+		driveStraight(70);
+	}	
+	
+	throttle = throttle_copy;
+}
+
+void stopBeforeTurn()
+{
+	uint16_t timer_count = 800;
+	resetTimer();
+	startTimer();
+	
+	while ((TIM16_ReadTCNT3() < timer_count) && !abort_flag)
+	{}
+	
+	stopTimer();
+}
+
 void makeTurnTest(uint8_t turn)
 {	
+	commandToControlSignal(STEER_STOP);
+	pwmWheels(control_signals);
+	stopBeforeTurn();
 	reset_gyro = 0;
 	//
 	//uint16_t angle_end;
@@ -313,7 +351,7 @@ void makeTurnTest(uint8_t turn)
 				//}
 			//} while (angle_copy < angle_end && !abort_flag);
 		
-			driveStraight(70);
+			//driveStraight(70);
 			break;
 		
 		case RIGHT_TURN:
@@ -337,7 +375,7 @@ void makeTurnTest(uint8_t turn)
 			
 			stopTimer();
 		
-			driveStraight(70);
+			//driveStraight(70);
 			break;
 		
 		case STRAIGHT:
@@ -373,9 +411,9 @@ void makeTurnTest(uint8_t turn)
 
 //memset((void*)&current_sensor_data.distance1, 0, sizeof(current_sensor_data));
 //memset((void*)&previous_sensor_data.distance1, 0, sizeof(current_sensor_data));
-
-turn_done_flag = 1;
-reset_gyro = 1;
+	getOutAfterTurn();
+	turn_done_flag = 1;
+	reset_gyro = 1;
 }
 
 void makeTurn180()
