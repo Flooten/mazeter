@@ -50,7 +50,7 @@ void detectTurnTest(TurnStack* turn_stack)
 		{ 
 			if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
 			{
-				driveStraight(10);
+				driveStraight(35);
 			}
 			pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 			makeTurn(RIGHT_TURN);
@@ -59,7 +59,7 @@ void detectTurnTest(TurnStack* turn_stack)
 		{
 			if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
 			{
-				driveStraight(10);
+				driveStraight(35);
 			}
 			pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 			makeTurn(LEFT_TURN);

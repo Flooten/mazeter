@@ -294,6 +294,7 @@ void makeTurnTest(uint8_t turn)
 	switch(turn)
 	{
 		case LEFT_TURN:
+			waitBeforeTurn();
 			commandToControlSignal(STEER_ROTATE_LEFT);
 			pwmWheels(control_signals);
 			//angle_end += DEGREES_90;
@@ -317,6 +318,7 @@ void makeTurnTest(uint8_t turn)
 			break;
 		
 		case RIGHT_TURN:
+			waitBeforeTurn();
 			commandToControlSignal(STEER_ROTATE_RIGHT);
 			pwmWheels(control_signals);
 			//angle_end -= DEGREES_90;
@@ -376,6 +378,21 @@ void makeTurnTest(uint8_t turn)
 
 turn_done_flag = 1;
 reset_gyro = 1;
+}
+
+void waitBeforeTurn()
+{
+	uint16_t timer_count = 2000;
+	commandToControlSignal(STEER_STOP);
+	pwmWheels(control_signals);
+	resetTimer();
+	startTimer();
+	
+	while ((TIM16_ReadTCNT3() < timer_count) && !abort_flag)
+	{}
+	
+	stopTimer();
+	commandToControlSignal(STEER_STRAIGHT);
 }
 
 void makeTurn180()

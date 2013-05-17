@@ -25,6 +25,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous);
 void makeTurn(uint8_t turn);
 void makeTurnTest(uint8_t turn);
 void makeTurn180();
+void waitBeforeTurn();
 void handleTape(TurnStack* turn_stack, uint8_t tape);
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation);
 void driveStraight(uint8_t cm);
