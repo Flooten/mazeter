@@ -186,11 +186,7 @@ void detectTurnOut(volatile TurnStack* turn_stack)
 	{
 		if (current_sensor_data.distance3 == 255 || current_sensor_data.distance4 == 255)
 		{
-			if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
-			{
-				driveStraight(15);
-			}
-			
+			driveStraight(15);
 			makeTurn(popTurnStack(turn_stack));
 		}
 	}

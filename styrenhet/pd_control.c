@@ -505,7 +505,7 @@ void handleTape(TurnStack* turn_stack, uint8_t tape)
 
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 {
-	const int8_t speed = 40;
+	const int8_t speed = 50;
 	int8_t regulator_value = (float)control_parameters.line_kp / 10 * current_deviation + (float)control_parameters.line_kd / 10 * (current_deviation - previous_deviation);
 	
 	if (regulator_value > speed)
