@@ -142,7 +142,6 @@ ISR(ADC_vect)
 	// Se teknisk dokumentation för ordningen.
 	// Avståndssenorena omvandlas number_of_adc gånger, och sedan beräknas medelvärdet av dessa och läggs i distanceX.value
 
-
 	switch (current_sensor)
 	{
 		// --------------- Avståndssensorer ---------------

@@ -27,7 +27,7 @@ void pwmInit()
 	
 	// Ser till att roboten står still det första den gör
 	OCR1A = MIN_PWM_WHEELS;
-	OCR2B = MIN_PWM_WHEELS;
+	OCR1B = MIN_PWM_WHEELS;
 	
 	// Kontrollregister till Klon
 	TCCR2A = (1 << COM2B1) | (1 << WGM20) | (1 << WGM21); // Mode 7 i tabel 15-8

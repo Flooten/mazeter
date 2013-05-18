@@ -37,6 +37,7 @@ volatile uint8_t abort_flag = 0;
 volatile uint8_t algo_mode_flag = ALGO_IN;
 volatile uint8_t turn_stack_top;
 volatile uint8_t turn_stack_sent_flag = 0;
+volatile uint8_t look_turn_flag = 0;
 
 volatile ControlSignals control_signals;
 volatile SensorData current_sensor_data;
@@ -160,9 +161,9 @@ void parseCommand(uint8_t cmd)
 				control_signals.right_direction = 1;
 				
 				//TEST FÖR ATT PRIMA STACKEN
-				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(RIGHT_TURN));
-				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
-				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(RIGHT_TURN));
+				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
 			}
 			control_mode_flag = FLAG_AUTO;
 			break;
@@ -452,9 +453,13 @@ int main()
 						//detectTurnTest((TurnStack*)&turn_stack); // TEST
 						
 						if (current_sensor_data.line_type == LINE_NONE)
+						{
 							detectTurnTest((TurnStack*)&turn_stack);
+						}							
 						else
+						{
 							handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
+						}
 						
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 					}
@@ -462,8 +467,8 @@ int main()
 					{
 						if (current_sensor_data.line_type == LINE_START_STOP)
 							handleTape((TurnStack*)&turn_stack, current_sensor_data.line_type);
-						//else
-						detectTurnOut(&turn_stack);
+						else
+							detectTurnOut(&turn_stack);
 							
 						straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
 					}

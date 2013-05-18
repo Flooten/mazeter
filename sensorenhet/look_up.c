@@ -1,4 +1,4 @@
-﻿/*
+﻿ /*
  * FILNAMN:       look_up.c
  * PROJEKT:       Mazeter
  * PROGRAMMERARE: Mattias Fransson
@@ -12,7 +12,7 @@
 
 #include "look_up.h"
 #include "sensor_names.h"
-#include <avr/pgmspace.h> 
+#include <avr/pgmspace.h>
 
 // Funktion som räknar ut antal rader.
 #define ELEM_CNT(x)  (sizeof(x) / sizeof(x[0]))
