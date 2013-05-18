@@ -74,6 +74,9 @@ void left_detected(TurnStack* turn_stack)
 /* Upptäcker svängar på väg in i labyrinten */
 void detectTurnTest(TurnStack* turn_stack)
 {
+	if (lockDetectTurn == 1)
+		return;
+	
 	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 130)
 	{
 		if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
@@ -89,7 +92,7 @@ void detectTurnTest(TurnStack* turn_stack)
 
 /* Upptäcker svängar på väg in i labyrinten */
 void detectTurn(TurnStack* turn_stack)
-{
+{	
 	if (current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE)
 	{
 		// Vänster ej kontakt
@@ -169,6 +172,9 @@ void detectTurn(TurnStack* turn_stack)
 /* Upptäcker svängar (även rakt fram) på väg ut ur labyrinten */
 void detectTurnOut(volatile TurnStack* turn_stack)
 {
+	if (lockDetectTurn == 1)
+		return;
+	
 	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 70)
 	{
 		if (current_sensor_data.distance3 >= 100 || current_sensor_data.distance4 >= 100)

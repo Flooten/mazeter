@@ -47,6 +47,8 @@ volatile ControlParameters control_parameters;
 volatile uint8_t turn_done_flag = 0;
 volatile uint8_t turn_done_flag_copy;
 volatile uint8_t reset_gyro = 1;
+uint8_t numberOfSensorTransfers = 0;
+uint8_t lockDetectTurn = 0;
 
 volatile TurnStack turn_stack;
 
@@ -83,7 +85,6 @@ ISR(SPI_STC_vect)
 				new_sensor_data_flag = 1;
 				receiving_sensor_data_flag = 0;
 			}
-			
         }
     }
     else
@@ -161,9 +162,10 @@ void parseCommand(uint8_t cmd)
 				control_signals.right_direction = 1;
 				
 				//TEST FÖR ATT PRIMA STACKEN
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(RIGHT_TURN));
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(RIGHT_TURN));
+				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(RIGHT_TURN));
+				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
 			}
 			control_mode_flag = FLAG_AUTO;
 			break;
@@ -497,6 +499,10 @@ int main()
 						commandToControlSignal(STEER_STOP);
 					}
 					
+					if (++numberOfSensorTransfers >= 50)
+					{
+						lockDetectTurn = 0;
+					}
 					new_sensor_data_flag = 0;
 				}
 			}

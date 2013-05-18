@@ -407,12 +407,18 @@ void makeTurnTest(uint8_t turn)
 	
 	//// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att upptäcka svängar på.
 	//while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-//{}
+	//{}
 
 
-//memset((void*)&current_sensor_data.distance1, 0, sizeof(current_sensor_data));
-//memset((void*)&previous_sensor_data.distance1, 0, sizeof(current_sensor_data));
-	getOutAfterTurn();
+	//memset((void*)&current_sensor_data.distance1, 0, sizeof(current_sensor_data));
+	//memset((void*)&previous_sensor_data.distance1, 0, sizeof(current_sensor_data));
+	//getOutAfterTurn();
+	
+	lockDetectTurn = 1;
+	numberOfSensorTransfers = 0;
+	
+	//getOutAfterTurn();
+	driveStraight(50);
 	turn_done_flag = 1;
 	reset_gyro = 1;
 }

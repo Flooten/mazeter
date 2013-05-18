@@ -464,7 +464,7 @@ int main()
 	sensor_parameters.horizontal_line_threshold = 4;
 	sensor_parameters.no_line_detection_threshold = 25;
 	sensor_parameters.line_diff_threshold = 5;
-	sensor_parameters.horizontal_to_vertical_threshold = 30;
+	sensor_parameters.horizontal_to_vertical_threshold = 20; // "fungerar" med 30
 
 	ioInit();
 	initADC();

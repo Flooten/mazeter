@@ -33,6 +33,8 @@ extern volatile ControlParameters control_parameters;
 
 extern volatile uint8_t turn_done_flag;
 extern volatile uint8_t reset_gyro;
+extern uint8_t numberOfSensorTransfers;
+extern uint8_t lockDetectTurn;
 
 // Olika lägen för labyrintalgoritmen.
 #define ALGO_IN 1
