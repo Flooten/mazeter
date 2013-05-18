@@ -304,7 +304,11 @@ void getOutAfterTurn()
 
 void stopBeforeTurn()
 {
-	uint16_t timer_count = 800;
+	uint16_t timer_count = 3000;
+	
+	commandToControlSignal(STEER_STOP);
+	pwmWheels(control_signals);
+	
 	resetTimer();
 	startTimer();
 	
@@ -315,10 +319,7 @@ void stopBeforeTurn()
 }
 
 void makeTurnTest(uint8_t turn)
-{	
-	commandToControlSignal(STEER_STOP);
-	pwmWheels(control_signals);
-	stopBeforeTurn();
+{
 	reset_gyro = 0;
 	//
 	//uint16_t angle_end;
@@ -333,6 +334,7 @@ void makeTurnTest(uint8_t turn)
 	switch(turn)
 	{
 		case LEFT_TURN:
+			stopBeforeTurn();
 			commandToControlSignal(STEER_ROTATE_LEFT);
 			pwmWheels(control_signals);
 			//angle_end += DEGREES_90;
@@ -356,6 +358,7 @@ void makeTurnTest(uint8_t turn)
 			break;
 		
 		case RIGHT_TURN:
+			stopBeforeTurn();
 			commandToControlSignal(STEER_ROTATE_RIGHT);
 			pwmWheels(control_signals);
 			//angle_end -= DEGREES_90;
@@ -381,10 +384,14 @@ void makeTurnTest(uint8_t turn)
 		
 		case STRAIGHT:
 			// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att upptäcka svängar på.
-			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-			{
-				straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-			}
+			//while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
+			//{
+				//straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
+			//}
+			driveStraight(15);			
+			lockDetectTurn = 1;
+			numberOfSensorTransfers = 0;
+			return;
 			break;
 		
 		case 0xEE:

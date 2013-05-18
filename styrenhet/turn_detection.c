@@ -44,14 +44,14 @@ uint8_t max(uint8_t x, uint8_t y)
 // Högersväng upptäckt
 void right_detected(TurnStack* turn_stack)
 {
-	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
+	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 90)
 	{
-		driveStraight(15);
+		driveStraight(10);
 	}
-	//else
-	//{
-		//driveStraight(10); // för att undvika moment fr reglering precis innan sväng
-	//}
+	else
+	{
+		driveStraight(10); // för att undvika moment fr reglering precis innan sväng
+	}
 	pushTurnStack(turn_stack, newTurnNode(LEFT_TURN));
 	makeTurn(RIGHT_TURN);	
 }
@@ -59,14 +59,14 @@ void right_detected(TurnStack* turn_stack)
 // Vänstersväng upptäckt
 void left_detected(TurnStack* turn_stack)
 {
-	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 80)
+	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 90)
 	{
-		driveStraight(15);
+		driveStraight(10);
 	}
-	//else
-	//{
-		//driveStraight(10); // för att undvika moment fr reglering precis innan sväng
-	//}
+	else
+	{
+		driveStraight(10); // för att undvika moment fr reglering precis innan sväng
+	}
 	pushTurnStack(turn_stack, newTurnNode(RIGHT_TURN));
 	makeTurn(LEFT_TURN);
 }
@@ -175,7 +175,7 @@ void detectTurnOut(volatile TurnStack* turn_stack)
 	if (lockDetectTurn == 1)
 		return;
 	
-	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 70)
+	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 45)
 	{
 		if (current_sensor_data.distance3 >= 100 || current_sensor_data.distance4 >= 100)
 		{
