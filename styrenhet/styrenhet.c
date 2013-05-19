@@ -162,9 +162,9 @@ void parseCommand(uint8_t cmd)
 				control_signals.right_direction = 1;
 				
 				//TEST FÖR ATT PRIMA STACKEN
-				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
-				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
-				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(STRAIGHT));
+				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(STRAIGHT));
 			}
 			control_mode_flag = FLAG_AUTO;
 			break;

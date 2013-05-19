@@ -433,7 +433,7 @@ void makeTurnTest(uint8_t turn)
 
 void makeTurn180()
 {
-	uint16_t timer_count = 6800; // 7000 för batteri 18
+	uint16_t timer_count = 6800; // 7000 för batteri 18, 6800 för batteri 16
 	commandToControlSignal(STEER_ROTATE_LEFT);
 	pwmWheels(control_signals);
 	resetTimer();
