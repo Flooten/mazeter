@@ -329,7 +329,7 @@ void makeTurnTest(uint8_t turn)
 	//}
 	//uint16_t angle_copy;
 	
-	uint16_t timer_count = 3500;
+	uint16_t timer_count = 3600; // 3500 för batteri 16, 3600 för batteri 18
 	
 	switch(turn)
 	{
@@ -362,6 +362,7 @@ void makeTurnTest(uint8_t turn)
 			commandToControlSignal(STEER_ROTATE_RIGHT);
 			pwmWheels(control_signals);
 			//angle_end -= DEGREES_90;
+			timer_count -= 200;
 			resetTimer();	
 			startTimer();
 
@@ -512,7 +513,7 @@ void handleTape(TurnStack* turn_stack, uint8_t tape)
 
 void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 {
-	const int8_t speed = 50;
+	const int8_t speed = 40;
 	int8_t regulator_value = (float)control_parameters.line_kp / 10 * current_deviation + (float)control_parameters.line_kd / 10 * (current_deviation - previous_deviation);
 	
 	if (regulator_value > speed)
@@ -660,7 +661,7 @@ void jamesBondTurn(volatile TurnStack* turn_stack)
 		}
 		
 		// Kör fram till mitten av svängen.
-		driveStraightBack(15);
+		driveStraightBack(10);
 		makeTurn(tmp);
 		driveStraight(15);
 		

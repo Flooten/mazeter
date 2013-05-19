@@ -46,7 +46,7 @@ void right_detected(TurnStack* turn_stack)
 {
 	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 90)
 	{
-		driveStraight(10);
+		driveStraight(15);
 	}
 	else
 	{
@@ -61,7 +61,7 @@ void left_detected(TurnStack* turn_stack)
 {
 	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 90)
 	{
-		driveStraight(10);
+		driveStraight(15);
 	}
 	else
 	{
@@ -175,7 +175,7 @@ void detectTurnOut(volatile TurnStack* turn_stack)
 	if (lockDetectTurn == 1)
 		return;
 	
-	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 45)
+	if (max(current_sensor_data.distance1, current_sensor_data.distance2) <= 35)
 	{
 		if (current_sensor_data.distance3 >= 100 || current_sensor_data.distance4 >= 100)
 		{

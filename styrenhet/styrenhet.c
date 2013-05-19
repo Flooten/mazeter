@@ -162,10 +162,9 @@ void parseCommand(uint8_t cmd)
 				control_signals.right_direction = 1;
 				
 				//TEST FÖR ATT PRIMA STACKEN
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(RIGHT_TURN));
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(RIGHT_TURN));
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
+				pushTurnStack((TurnStack*)&turn_stack, newTurnNode(STRAIGHT));
 			}
 			control_mode_flag = FLAG_AUTO;
 			break;
@@ -380,10 +379,10 @@ void resetData()
 	current_command = STEER_STOP;
 	throttle = 0;
 	
-	control_parameters.dist_kd = 250;
-	control_parameters.dist_kp = 15;
-	control_parameters.line_kd = 40;
-	control_parameters.line_kp = 4;
+	//control_parameters.dist_kd = 250;
+	//control_parameters.dist_kp = 15;
+	//control_parameters.line_kd = 40;
+	//control_parameters.line_kp = 4;
 }
 
 // Ta bort denna när den inte används längre.
@@ -403,6 +402,11 @@ int main()
     pwmInit();
     spiSlaveInit();
     sei();
+	
+	control_parameters.dist_kd = 250;
+	control_parameters.dist_kp = 13;
+	control_parameters.line_kd = 60;
+	control_parameters.line_kp = 40;
 	
 	commandToControlSignal(current_command);
 	commandToControlSignal(CLAW_OPEN);

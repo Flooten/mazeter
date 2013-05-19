@@ -14,8 +14,8 @@
 
 #define DEGREES_90 5800 // 5000 i 90% hastiget, 5800 @ 80
 #define DEGREES_180 14000
-#define DISTANCE_TAPE_TURN 35
-#define DISTANCE_DETECT_TURN 40 
+#define DISTANCE_TAPE_TURN 45
+#define DISTANCE_DETECT_TURN 45 
 
 #include "pd_control.h"
 #include "control_parameters.h"

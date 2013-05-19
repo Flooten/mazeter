@@ -463,7 +463,7 @@ int main()
 	sensor_parameters.tape_threshold = 160;
 	sensor_parameters.horizontal_line_threshold = 4;
 	sensor_parameters.no_line_detection_threshold = 25;
-	sensor_parameters.line_diff_threshold = 7;
+	sensor_parameters.line_diff_threshold = 6;
 	sensor_parameters.horizontal_to_vertical_threshold = 20; // "fungerar" med 30
 
 	ioInit();
