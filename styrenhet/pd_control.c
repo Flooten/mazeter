@@ -329,7 +329,7 @@ void makeTurnTest(uint8_t turn)
 	//}
 	//uint16_t angle_copy;
 	
-	uint16_t timer_count = 3600; // 3500 för batteri 16, 3600 för batteri 18
+	uint16_t timer_count = 3500; // 3500 för batteri 16, 3600 för batteri 18
 	
 	switch(turn)
 	{
@@ -433,7 +433,7 @@ void makeTurnTest(uint8_t turn)
 
 void makeTurn180()
 {
-	uint16_t timer_count = 7000;
+	uint16_t timer_count = 6800; // 7000 för batteri 18
 	commandToControlSignal(STEER_ROTATE_LEFT);
 	pwmWheels(control_signals);
 	resetTimer();
@@ -443,6 +443,8 @@ void makeTurn180()
 	{}
 	
 	stopTimer();
+	numberOfSensorTransfers = 0;
+	lockDetectTurn = 1;
 }
 
 void handleTape(TurnStack* turn_stack, uint8_t tape)

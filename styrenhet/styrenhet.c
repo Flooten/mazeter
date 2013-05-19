@@ -157,7 +157,7 @@ void parseCommand(uint8_t cmd)
 			{
                 // Halvreset, återställ labyrintlogiken.
 				clear(&turn_stack);
-				algo_mode_flag = ALGO_IN;
+				algo_mode_flag = ALGO_START;
 				control_signals.left_direction = 1;
 				control_signals.right_direction = 1;
 				
