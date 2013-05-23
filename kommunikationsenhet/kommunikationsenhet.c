@@ -186,9 +186,6 @@ int main(void)
 					}
 				}
 				
-				//spiReadData(TURN_DONE, STYR_ENHET, &turn_done_flag, 1);
-				//spiSendData(TURN_DONE, SENSOR_ENHET, &turn_done_flag, 1);
-				
 				// Sätter gyro till 120 grader om reset_gyro är 1
 				spiReadData(RESET_GYRO, STYR_ENHET, &reset_gyro, 1);
 				spiSendData(RESET_GYRO, SENSOR_ENHET, &reset_gyro, 1);
