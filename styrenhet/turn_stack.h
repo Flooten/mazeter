@@ -5,7 +5,7 @@
  *				  Joel Davidsson
  * DATUM:         2013-04-25
  *
- * BESKRIVNING:   Vi puskar alla svängar som tas när man kör in,
+ * BESKRIVNING:   Svängstacken. Vi pushar alla svängar som tas när man kör in,
  *                och popar på vägen ut.
  *
  */

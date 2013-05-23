@@ -7,7 +7,7 @@
  *
  * DATUM:         2013-05-17
  *
- * BESKRIVNING: Hanterar konvertering av rådatan från samtliga sensorer till enheter som har en mer direkt tolkning.
+ * BESKRIVNING: Hanterar konvertering av rådatan från samtliga sensorer till relevanta enheter (cm etc.)
  *
  */
 

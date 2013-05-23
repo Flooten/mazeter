@@ -5,7 +5,7 @@
  *                Mattias Fransson
  * DATUM:         2013-04-10
  *
- * BESKRIVNING:
+ * BESKRIVNING: Styrsignaler till PWM-styrning
  *
  */
 

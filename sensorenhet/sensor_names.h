@@ -1,7 +1,8 @@
 ﻿/*
  * FILNAMN:       sensor_name.h
  * PROJEKT:       Mazeter
- * PROGRAMMERARE: Fredrik Stenmark och Herman Ekwall
+ * PROGRAMMERARE: Fredrik Stenmark
+ *                Herman Ekwall
  *                
  * DATUM:         2013-05-17
  *

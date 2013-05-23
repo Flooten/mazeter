@@ -5,7 +5,7 @@
  *				  Joel Davidsson
  * DATUM:         2013-04-25
  *
- * BESKRIVNING: 
+ * BESKRIVNING: Funktionaltitet för att upptäcka svängar
  *
  */
 

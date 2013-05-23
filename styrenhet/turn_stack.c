@@ -5,8 +5,6 @@
  *				  Joel Davidsson
  * DATUM:         2013-04-25
  *
- * BESKRIVNING:   
- *
  */
 
 #include "turn_stack.h"

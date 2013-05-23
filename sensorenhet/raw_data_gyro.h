@@ -1,11 +1,12 @@
 ﻿/*
  * FILNAMN:       raw_data.h
  * PROJEKT:       Mazeter
- * PROGRAMMERARE: Fredrik Stenmark och Herman Ekwall
+ * PROGRAMMERARE: Fredrik Stenmark 
+ *                Herman Ekwall
  *                
  * DATUM:         2013-05-17
  *
- * BESKRIVNING: Datastructen som används för gyro datan.
+ * BESKRIVNING: Datastructen som används för gyrodatan.
  *
  */
 

@@ -4,7 +4,7 @@
  * PROGRAMMERARE: Herman Ekwall och Joel Davidsson
  * DATUM:         2013-04-04
  *
- * BESKRIVNING:   Denna Headerfil så finns alla PWM funktioner och variabler. 
+ * BESKRIVNING:   PWM-funktioner och variabler. 
  *
  */
 

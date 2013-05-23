@@ -5,7 +5,7 @@
  *                Mattias Fransson
  * DATUM:         2013-04-02
  *
- * BESKRIVNING:
+ * BESKRIVNING: Omvandlad sensordata
  *
  */
 

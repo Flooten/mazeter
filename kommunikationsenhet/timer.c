@@ -4,7 +4,6 @@
  * PROGRAMMERARE: Fredrik Stenmark
  * DATUM:         2013-04-08
  *
- * BESKRIVNING: I denna fil initieras kommunikationsenhetens två timrar  
  *          
  */
 

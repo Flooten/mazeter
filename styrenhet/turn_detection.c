@@ -6,8 +6,6 @@
  *				  Fredrik Stenmark
  * DATUM:         2013-04-25
  *
- * BESKRIVNING: 
- *
  */
 
 #include "sensor_data.h"

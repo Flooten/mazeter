@@ -5,8 +5,6 @@
  *				  Marcus Eriksson
  * 				  Mattias Fransson
  * DATUM:         2013-04-05
- *
- * BESKRIVNING:
  *          
  */ 
 

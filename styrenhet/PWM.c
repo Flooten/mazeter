@@ -4,14 +4,13 @@
  * PROGRAMMERARE: Herman Ekwall och Joel Davidsson
  * DATUM:         2013-04-04
  *
- * BESKRIVNING: I denna fil finns alla funktioner som styr PWM. pwmInit sätter utgångar och sätter igång timer,
- *              den ser också till att den inte åker någonstans och öppnar klon.
- *
  */
 
 #include <avr/io.h>
 #include "PWM.h"
 
+
+// Sätter utgångar och sätter startar timer, den ser också till att roboten inte åker någonstans och öppnar klon.
 void pwmInit()
 {
 	// Initierar utgångar
