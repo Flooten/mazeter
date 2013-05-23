@@ -160,11 +160,6 @@ void parseCommand(uint8_t cmd)
 				algo_mode_flag = ALGO_START;
 				control_signals.left_direction = 1;
 				control_signals.right_direction = 1;
-				
-				//TEST FÖR ATT PRIMA STACKEN
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(LEFT_TURN));
-				//pushTurnStack((TurnStack*)&turn_stack, newTurnNode(STRAIGHT));
 			}
 			control_mode_flag = FLAG_AUTO;
 			break;
@@ -378,17 +373,6 @@ void resetData()
 	
 	current_command = STEER_STOP;
 	throttle = 0;
-	
-	//control_parameters.dist_kd = 250;
-	//control_parameters.dist_kp = 15;
-	//control_parameters.line_kd = 40;
-	//control_parameters.line_kp = 4;
-}
-
-// Ta bort denna när den inte används längre.
-uint8_t maxAwesome(uint8_t x, uint8_t y)
-{
-	return (x < y) ? y : x;
 }
 
 int main()
@@ -434,17 +418,6 @@ int main()
 			{
 				commandToControlSignal(current_command);
 			}
-			
-			/* TEST
-			else if (control_mode_flag == FLAG_AUTO)
-			{
-				if (new_sensor_data_flag == 1)
-				{
-					makeTurnTest(RIGHT_TURN);
-					driveStraight(60);
-				}				
-			}
-			*/
 			else if (control_mode_flag == FLAG_AUTO)
 			{
                 // Labyrintalgoritmen
@@ -454,13 +427,11 @@ int main()
 				
 				if (new_sensor_data_flag == 1)
 				{
-					if (algo_mode_flag == ALGO_IN)// || algo_mode_flag == ALGO_OUT)
-					{
-						//detectTurnTest((TurnStack*)&turn_stack); // TEST
-						
+					if (algo_mode_flag == ALGO_IN)
+					{	
 						if (current_sensor_data.line_type == LINE_NONE)
 						{
-							detectTurnTest((TurnStack*)&turn_stack);
+							detectTurn((TurnStack*)&turn_stack);
 						}							
 						else
 						{

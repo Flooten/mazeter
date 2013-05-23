@@ -96,13 +96,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 		else if (current->distance4 >= 43)// && current->distance6 == 255)
 		{
 			// Kör höger mot mitten
-			//regulator_value = -20;
-			
-			//int16_t delta = current->distance5 - current->distance4;
-			//int16_t delta_previous = previous->distance5 - previous->distance4;
-			//
-			//regulator_value = (float)control_parameters.dist_kp / 20 * delta + (float)control_parameters.dist_kd / 20 * (delta - delta_previous);
-			
+
 			int16_t delta = 32 - current->distance4;
 			int16_t delta_previous = 32 - previous->distance4;
 			
@@ -112,13 +106,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 		else if (current->distance3 >= 43) // && current->distance5 == 255)
 		{
 			// Kör vänster mot mitten
-			//regulator_value = 20;
-			
-			//int16_t delta = current->distance3 - current->distance6;
-			//int16_t delta_previous = previous->distance3 - previous->distance6;
-			//
-			//regulator_value = (float)control_parameters.dist_kp / 5 * delta + (float)control_parameters.dist_kd / 5 * (delta - delta_previous);
-			
+	
 			int16_t delta = current->distance3 - 32;
 			int16_t delta_previous = previous->distance3 - 32;
 			
@@ -128,10 +116,7 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 		{	
 			int16_t delta_front = current->distance3 - current->distance4;
 			int16_t delta_front_previous = previous->distance3 - previous->distance4;
-			
-			//int16_t delta_front = 32 - current->distance4;
-			//int16_t delta_front_previous = 32 - previous->distance4;
-			
+
 			regulator_value = (float)control_parameters.dist_kp / 10 * delta_front + (float)control_parameters.dist_kd / 10 * (delta_front - delta_front_previous);
 		}
 		else
@@ -166,142 +151,6 @@ void straightRegulator(const SensorData* current, const SensorData* previous)
 	}
 }
 
-void makeTurn(uint8_t turn)
-{
-	// test
-	makeTurnTest(turn);
-	return;
-	
-	reset_gyro = 0;
-	
-	uint16_t angle_end;
-	ATOMIC_BLOCK(ATOMIC_FORCEON)
-	{
-		angle_end = current_sensor_data.angle;	
-	}
-	//uint16_t angle_start = angle_end;
-	uint16_t angle_copy;
-	
-	switch(turn)
-	{
-		case LEFT_TURN:
-			angle_end += DEGREES_90;
-			commandToControlSignal(STEER_ROTATE_LEFT);
-			pwmWheels(control_signals);
-			
-			//if (angle_end >= 36000)
-			//{
-				//angle_end -= 36000;
-				//
-				//uint16_t angle_copy;
-				//do 
-				//{
-					//ATOMIC_BLOCK(ATOMIC_FORCEON)
-					//{
-						//angle_copy = current_sensor_data.angle;
-					//}
-				//} while ((angle_copy < angle_end || angle_copy >= angle_start - 700) && !abort_flag);
-			//}
-			//else
-			//{
-				//uint16_t angle_copy;
-				do
-				{
-					ATOMIC_BLOCK(ATOMIC_FORCEON)
-					{
-						angle_copy = current_sensor_data.angle;
-					}
-				} while (angle_copy < angle_end && !abort_flag);
-			//}
-			driveStraight(60);
-			break;
-		
-		case RIGHT_TURN:
-			angle_end -= DEGREES_90;
-			commandToControlSignal(STEER_ROTATE_RIGHT);
-			pwmWheels(control_signals);
-			//if (angle_end >= 36000)
-			//{
-				//angle_end = 36000 - (DEGREES_90 - angle_start);
-				//uint16_t angle_copy;
-				//do
-				//{
-					//ATOMIC_BLOCK(ATOMIC_FORCEON)
-					//{
-						//angle_copy = current_sensor_data.angle;
-					//}
-				//} while ((angle_copy > angle_end || angle_copy <= angle_start + 700) && !abort_flag);		
-			//}
-			//else
-			//{
-				//uint16_t angle_copy;
-				do
-				{
-					ATOMIC_BLOCK(ATOMIC_FORCEON)
-					{
-						angle_copy = current_sensor_data.angle;
-					}
-					
-					//if (angle_start > 300 && (angle_copy >= 0 && angle_copy <= 45))
-						//angle_copy = angle_start;
-					
-				} while ((angle_copy > angle_end) && !abort_flag);
-			//}
-			driveStraight(60);
-			break;
-		
-		case STRAIGHT:
-			// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att upptäcka svängar på.
-			while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-			{
-				straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-			}
-			break;
-			
-		default:
-			return;
-			break;
-	}
-	
-	//commandToControlSignal(STEER_STRAIGHT);
-	//pwmWheels(control_signals);
-	
-	//// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att upptäcka svängar på.
-	//while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-	//{}
-	
-	
-	//memset((void*)&current_sensor_data.distance1, 0, sizeof(current_sensor_data));
-	//memset((void*)&previous_sensor_data.distance1, 0, sizeof(current_sensor_data));
-
-	turn_done_flag = 1;
-	reset_gyro = 1;
-}
-
-void getOutAfterTurn()
-{
-	uint8_t throttle_copy = throttle;
-	
-	if ((current_sensor_data.distance3 < 80 || current_sensor_data.distance4 < 80) &&
-	    (current_sensor_data.distance5 != 255 || current_sensor_data.distance6 != 255))
-	{
-		commandToControlSignal(STEER_STRAIGHT);
-		
-		while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-		{
-			straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-		}
-		driveStraight(7);
-		return;
-	} 
-	else
-	{
-		driveStraight(70);
-	}	
-	
-	throttle = throttle_copy;
-}
-
 void stopBeforeTurn()
 {
 	uint16_t timer_count = 3000;
@@ -318,16 +167,9 @@ void stopBeforeTurn()
 	stopTimer();
 }
 
-void makeTurnTest(uint8_t turn)
+void makeTurn(uint8_t turn)
 {
 	reset_gyro = 0;
-	//
-	//uint16_t angle_end;
-	//ATOMIC_BLOCK(ATOMIC_FORCEON)
-	//{
-		//angle_end = current_sensor_data.angle;
-	//}
-	//uint16_t angle_copy;
 	
 	uint16_t timer_count = 3500; // 3500 för batteri 16, 3600 för batteri 18
 	
@@ -345,16 +187,6 @@ void makeTurnTest(uint8_t turn)
 			{}
 			
 			stopTimer();
-			
-			//do
-			//{
-				//ATOMIC_BLOCK(ATOMIC_FORCEON)
-				//{
-					//angle_copy = current_sensor_data.angle;
-				//}
-			//} while (angle_copy < angle_end && !abort_flag);
-		
-			//driveStraight(70);
 			break;
 		
 		case RIGHT_TURN:
@@ -368,27 +200,11 @@ void makeTurnTest(uint8_t turn)
 
 			while ((TIM16_ReadTCNT3() < timer_count) && !abort_flag)
 			{}
-				
-			//do
-			//{
-				//ATOMIC_BLOCK(ATOMIC_FORCEON)
-				//{
-					//angle_copy = current_sensor_data.angle;
-				//}
-				//
-			//} while ((angle_copy > angle_end) && !abort_flag);
-			
+
 			stopTimer();
-		
-			//driveStraight(70);
 			break;
 		
 		case STRAIGHT:
-			// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att upptäcka svängar på.
-			//while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-			//{
-				//straightRegulator((const SensorData*)&current_sensor_data, (const SensorData*)&previous_sensor_data);
-			//}
 			driveStraight(15);			
 			lockDetectTurn = 1;
 			numberOfSensorTransfers = 0;
@@ -410,22 +226,9 @@ void makeTurnTest(uint8_t turn)
 			break;
 	}
 	
-	//commandToControlSignal(STEER_STRAIGHT);
-	//pwmWheels(control_signals);
-	
-	//// Ser till att vi inte lämnar svängen för PD-reglering förrän vi har något vettigt att upptäcka svängar på.
-	//while ((current_sensor_data.distance3 > THRESHOLD_CONTACT_SIDE || current_sensor_data.distance4 > THRESHOLD_CONTACT_SIDE) && !abort_flag)
-	//{}
-
-
-	//memset((void*)&current_sensor_data.distance1, 0, sizeof(current_sensor_data));
-	//memset((void*)&previous_sensor_data.distance1, 0, sizeof(current_sensor_data));
-	//getOutAfterTurn();
-	
 	lockDetectTurn = 1;
 	numberOfSensorTransfers = 0;
 	
-	//getOutAfterTurn();
 	driveStraight(50);
 	turn_done_flag = 1;
 	reset_gyro = 1;
@@ -488,10 +291,10 @@ void handleTape(TurnStack* turn_stack, uint8_t tape)
 		case LINE_STRAIGHT:
 			if (algo_mode_flag != ALGO_IN)
 				break;
-			//driveStraight(DISTANCE_TAPE_TURN);
+
 			driveStraight(20);
 			makeTurn(STRAIGHT);
-			//driveStraight(90);
+
 			current_sensor_data.line_type = LINE_NONE;
 			pushTurnStack(turn_stack, newTurnNode(STRAIGHT));
 			break;
@@ -527,14 +330,6 @@ void lineRegulator(int8_t current_deviation, int8_t previous_deviation)
 		regulator_value = -speed;
 	}
 	
-	//if (current_deviation >= 40)
-	//{
-		//regulator_value = 20;
-	//}
-	//else if (current_deviation <= -40)
-	//{
-		//regulator_value = -20;
-	//}
 	
 	control_signals.right_value = speed + regulator_value;
 	control_signals.left_value = speed - regulator_value;
@@ -592,53 +387,9 @@ void driveStraightBack(uint8_t cm)
 // Backar med reglering tills en sväng upptäcks och utför svängen.
 void jamesBondTurn(volatile TurnStack* turn_stack)
 {
-	// behöver pd regleras istället
+
 	commandToControlSignal(STEER_BACK);
 	pwmWheels(control_signals);
-	
-	//if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance4 == 255) ||
-	    //(current_sensor_data.distance3 == 255 && current_sensor_data.distance7 == 255) ||
-		//(current_sensor_data.distance4 == 255 && current_sensor_data.distance7 == 255))
-	//{
-		////driveStraight(40);
-		//
-		//uint8_t tmp = popTurnStack(turn_stack);
-		//
-		////if (tmp == LEFT_TURN)
-			////makeTurn(RIGHT_TURN);
-		////else if (tmp == RIGHT_TURN)
-			////makeTurn(LEFT_TURN);
-		////else if (tmp == STRAIGHT)
-			////return;
-			//
-		//makeTurn(tmp);
-		//
-		//commandToControlSignal(STEER_STOP);
-		//pwmWheels(control_signals);
-		//while (!abort_flag)
-		//{
-			//
-		//}
-		//
-		//algo_mode_flag = ALGO_OUT;
-	//}
-	//else if (current_sensor_data.distance7 <= 130)
-	//{
-		//if (current_sensor_data.distance4 == 255 && current_sensor_data.distance3 != 255 && current_sensor_data.distance6 == 255)
-		//{
-			//driveStraightBack(10);
-			//makeTurn(RIGHT_TURN);
-			//driveStraight(20);
-			//algo_mode_flag = ALGO_OUT;
-		//}
-		//else if (current_sensor_data.distance3 == 255 && current_sensor_data.distance4 != 255 && current_sensor_data.distance5 == 255)
-		//{
-			//driveStraightBack(10);
-			//makeTurn(LEFT_TURN);
-			//driveStraight(20);
-			//algo_mode_flag = ALGO_OUT;
-		//}
-	//}
 	
 	if ((current_sensor_data.distance3 == 255 && current_sensor_data.distance5 == 255) ||
 	    (current_sensor_data.distance4 == 255 && current_sensor_data.distance6 == 255))

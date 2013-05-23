@@ -94,7 +94,6 @@ void startADC()
 
 void pauseADC()
 {
-	//ADCSRA &= ~(1 << ADIE);
 	ADCSRA &= 0x7F;
 }
 
